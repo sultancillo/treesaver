@@ -6,9 +6,9 @@ require('./document');
 require('./article');
 require('./index');
 require('../layout/page');
-
-  var ArticleManager = {},
-      capabilities = require('../lib/capabilities'),
+require('./articleposition');
+var ArticleManager = {};
+      var capabilities = require('../lib/capabilities'),
       debug = require('../lib/debug'),
       dimensions = require('../lib/dimensions'),
       dom = require('../lib/dom'),
@@ -314,7 +314,7 @@ require('../layout/page');
         ArticleManager.setCurrentDocument(
           doc,
           ArticlePosition.BEGINNING,
-          position ? new treesaver.layout.ContentPosition(position.block, position.figure, position.overhang) : null,
+          position ? new ContentPosition(position.block, position.figure, position.overhang) : null,
           index,
           true
         );
@@ -429,7 +429,7 @@ require('../layout/page');
         articlePosition = ArticlePosition.END;
       }
 
-      return fetch ? doc : ArticleManager.setCurrentDocument(doc, articlePosition, end ? treesaver.layout.ContentPosition.END : null, index);
+      return fetch ? doc : ArticleManager.setCurrentDocument(doc, articlePosition, end ? ContentPosition.END : null, index);
     }
     else {
       return null;
@@ -451,7 +451,7 @@ require('../layout/page');
           index = ArticleManager.currentDocumentIndex,
           doc = /** @type {!treesaver.ui.Document} */ (ArticleManager.currentDocument);
 
-      return fetch ? doc : ArticleManager.setCurrentDocument(doc, articlePosition, end ? treesaver.layout.ContentPosition.END : null, index);
+      return fetch ? doc : ArticleManager.setCurrentDocument(doc, articlePosition, end ? ContentPosition.END : null, index);
     }
     else {
       return ArticleManager.previousDocument(end, fetch);
@@ -528,7 +528,7 @@ require('../layout/page');
     }
     else {
       // Perhaps we're on the last page of the article?
-      if (ArticleManager.currentPosition === treesaver.layout.ContentPosition.END) {
+      if (ArticleManager.currentPosition === ContentPosition.END) {
         return ArticleManager.canGoToNextArticle();
       }
       else {
@@ -629,7 +629,7 @@ require('../layout/page');
     }
 
     if (ArticleManager.currentPageIndex === -1) {
-      if (ArticleManager.currentPosition === treesaver.layout.ContentPosition.END) {
+      if (ArticleManager.currentPosition === ContentPosition.END) {
         return ArticleManager.nextArticle();
       }
 
@@ -815,6 +815,7 @@ require('../layout/page');
     // Use pages.length, not page count to avoid placing a loading page when
     // there isn't a next article
     for (i = buffer, len = pages.length; i < len; i += 1) {
+
       if (!pages[i]) {
         if (!ArticleManager.currentDocument.error) {
           pages[i] = ArticleManager._createLoadingPage();
@@ -827,7 +828,7 @@ require('../layout/page');
 
     // Set our position if we don't have one
     if (!ArticleManager.currentPosition ||
-        ArticleManager.currentPosition === treesaver.layout.ContentPosition.END) {
+        ArticleManager.currentPosition === ContentPosition.END) {
       // Loading/error pages don't have markers
       if (pages[buffer] && pages[buffer].begin) {
         ArticleManager.currentPosition = pages[buffer].begin;
@@ -1088,8 +1089,8 @@ require('../layout/page');
     // Constuct a mock loading page
     // TODO: Make this size reasonably
     return /** @type {treesaver.layout.Page} */ ({
-      activate: treesaver.layout.Page.prototype.activate,
-      deactivate: treesaver.layout.Page.prototype.deactivate,
+      activate: Page.prototype.activate,
+      deactivate: Page.prototype.deactivate,
       html: ArticleManager.loadingPageHTML,
       size: ArticleManager.loadingPageSize
     });
@@ -1104,8 +1105,8 @@ require('../layout/page');
     // Constuct a mock loading page
     // TODO: Make this size reasonably
     return /** @type {treesaver.layout.Page} */ ({
-      activate: treesaver.layout.Page.prototype.activate,
-      deactivate: treesaver.layout.Page.prototype.deactivate,
+      activate: Page.prototype.activate,
+      deactivate: Page.prototype.deactivate,
       html: ArticleManager.errorPageHTML,
       size: ArticleManager.errorPageSize
     });

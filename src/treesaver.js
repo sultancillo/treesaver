@@ -11,19 +11,14 @@
  */
 
 
-
+require('./lib/styles');
   var debug = require('./lib/debug'),
       dom = require('./lib/dom'),
       events = require('./lib/events'),
       fonts = require('./lib/fonts'),
-      capabilities = require('./lib/capabilities');
-      ArticleManager = require('./ui/articlemanager'),
-      
-
+      capabilities = require('./lib/capabilities'),
       StateManager = require('./ui/statemanager'),
-      treesaver.ui = {};
-      treesaver.ui.ArticleManager = ArticleManager;
-      treesaver.ui.StateManager = StateManager;
+      ArticleManager = require('./ui/articlemanager');
       treesaver.network = require('./lib/network');
       treesaver.resources = require('./lib/resources');
       treesaver.scheduler = require('./lib/scheduler');
@@ -31,7 +26,7 @@
       treesaver.history = require('./lib/history');
       treesaver.dimensions = require('./lib/dimensions');
       
-      
+      treesaver.ui = {};
       treesaver.uri = require('./lib/uri');
       treesaver.LOAD_TIMEOUT = 5000 // 5 seconds
   /**
@@ -231,7 +226,7 @@
     // Root element for listening to UI events
     treesaver.ui.eventRoot = treesaver.inContainedMode ?
       treesaver.tsContainer : window;
-
+      treesaver.ui.ArticleManager = ArticleManager;
     // Kick off boot process, but back up if any single item fails
     if (StateManager.load() &&
         // Grids

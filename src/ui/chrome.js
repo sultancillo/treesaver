@@ -2,13 +2,14 @@
  * @fileoverview The chrome class.
  */
 
+require('./index');
+require('./document');
 
   var debug = require('../lib/debug'),
       dimensions = require('../lib/dimensions'),
       dom = require('../lib/dom'),
       Scrollable = require('./scrollable');
-  var 
-      Document = require('./document'),
+  var ArticleManager = require('./articlemanager');
       array = require('../lib/array'),
       capabilities = require('../lib/capabilities'),
       debug = require('../lib/debug'),
@@ -17,7 +18,6 @@
       events = require('../lib/events'),
       network = require('../lib/network'),
       scheduler = require('../lib/scheduler'),
-      Index = require('./index'),
       Scrollable = require('./scrollable');
 
   /**
@@ -1618,7 +1618,7 @@
     var old_pages = this.pages;
 
     // TODO: Master page width?
-    this.pages = ArticleManager.getPages(/** @type {!treesaver.dimensions.Size} */ (this.pageArea), 1);
+    this.pages = treesaver.ui.ArticleManager.getPages(/** @type {!treesaver.dimensions.Size} */ (this.pageArea), 1);
 
     old_pages.forEach(function(page) {
       // Only deactivate pages we're not about to use again

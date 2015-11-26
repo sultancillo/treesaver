@@ -18,7 +18,7 @@ require('../layout/breakrecord');
 require('../layout/page');
 require('../layout/grid');
 require('../layout/contentposition');
-  var Article = function(grids, node, doc) {
+Article = function(grids, node, doc) {
     this.pages = [];
     this.eligible_grids = [];
     this.grids = grids;

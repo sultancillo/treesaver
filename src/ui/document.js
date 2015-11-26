@@ -6,6 +6,7 @@
  * @param {!string} url The url of this document.
  * @param {?Object=} meta Meta-data for this document such as title, author, etc.
  */
+require('./article');
 Document = function(url, meta) {
   if (!url) {
     treesaver.debug.error('Document must have an URL');
@@ -29,7 +30,6 @@ require('./treenode')
       dom = require('../lib/dom'),
       events = require('../lib/events'),
       storage = require('../lib/storage'),
-      Article = require('./article'),
       uri = require('../lib/uri');
 
   /**
@@ -158,6 +158,7 @@ require('./treenode')
       // generate an identifier based on the article's position in the document:
       // `_<position>`, but not for the first article (which can always be
       // referenced by the requestUrl.)
+     
       var identifier = articleNode.getAttribute('id') || (index === 0 ? null : ('_' + index)),
           // FIXME: get rid of the global reference to ArticleManager
           article = new Article(treesaver.ui.ArticleManager.grids_, articleNode, this);

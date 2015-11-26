@@ -68,7 +68,7 @@
       if (mapping) {
         figureIndex = mapping.figureIndex;
         figure = /** @type {!treesaver.layout.Figure} */ (content.figures[figureIndex]);
-        success = treesaver.layout.Page.fillContainer(containerNode, figure, mapping,
+        success = Page.fillContainer(containerNode, figure, mapping,
           content.lineHeight);
 
         // Account for the figure we used
@@ -124,7 +124,7 @@
     // Columns
     dom.querySelectorAll('.column', this.node).forEach(function(colNode, i) {
       var col = best.grid.cols[i];
-      treesaver.layout.Page.fillColumn(content, br, colNode,
+        Page.fillColumn(content, br, colNode,
         best.grid.maxColHeight, col.minH);
     });
 
