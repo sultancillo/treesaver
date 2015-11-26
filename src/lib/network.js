@@ -2,19 +2,12 @@
  * @fileoverview Retrieve files via XMLHttpRequest.
  */
 
-goog.provide('treesaver.network');
 
-goog.require('treesaver.capabilities');
-goog.require('treesaver.debug');
-goog.require('treesaver.events');
-goog.require('treesaver.scheduler');
-
-goog.scope(function() {
-  var network = treesaver.network,
-      capabilities = treesaver.capabilities,
-      debug = treesaver.debug,
-      events = treesaver.events,
-      scheduler = treesaver.scheduler;
+  var network = {},
+      capabilities = require('./capabilities'),
+      debug =require('./debug'),
+      events = require('./events'),
+      scheduler = require('./scheduler');
 
   /**
    * @private
@@ -327,6 +320,6 @@ goog.scope(function() {
   };
 
   if (WITHIN_IOS_WRAPPER) {
-    goog.exportSymbol('treesaver.setOnlineStatus', network.setOnlineStatus);
+    //goog.exportSymbol('treesaver.setOnlineStatus', network.setOnlineStatus);
   }
-});
+module.exports = network;

@@ -1,7 +1,4 @@
-goog.provide('treesaver.template');
-goog.require('treesaver.dom');
 
-goog.scope(function() {
   var dom = treesaver.dom;
 
   /**
@@ -21,4 +18,4 @@ goog.scope(function() {
       e.setAttribute('href', e.getAttribute('data-href'));
     });
   };
-});
+

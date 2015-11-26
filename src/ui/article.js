@@ -2,21 +2,7 @@
  * @fileoverview Article class.
  */
 
-goog.provide('treesaver.ui.Article');
 
-goog.require('treesaver.array');
-goog.require('treesaver.debug');
-goog.require('treesaver.dimensions');
-goog.require('treesaver.dom');
-goog.require('treesaver.events');
-goog.require('treesaver.layout.BreakRecord');
-goog.require('treesaver.layout.Content');
-goog.require('treesaver.layout.ContentPosition');
-goog.require('treesaver.layout.Grid');
-goog.require('treesaver.layout.Page');
-goog.require('treesaver.scheduler');
-
-goog.scope(function() {
   /**
    * A chunk of content
    *
@@ -24,7 +10,15 @@ goog.scope(function() {
    * @param {!Array.<treesaver.layout.Grid>} grids
    * @param {?Element} node
    */
-  treesaver.ui.Article = function(grids, node, doc) {
+ 
+
+
+require('../layout/content');
+require('../layout/breakrecord');
+require('../layout/page');
+require('../layout/grid');
+require('../layout/contentposition');
+  var Article = function(grids, node, doc) {
     this.pages = [];
     this.eligible_grids = [];
     this.grids = grids;
@@ -34,22 +28,13 @@ goog.scope(function() {
     if (node) {
       this.processHTML(node);
     }
-  };
-});
-
-goog.scope(function() {
-  var Article = treesaver.ui.Article,
-      array = treesaver.array,
-      debug = treesaver.debug,
-      dimensions = treesaver.dimensions,
-      dom = treesaver.dom,
-      events = treesaver.events,
-      scheduler = treesaver.scheduler,
-      BreakRecord = treesaver.layout.BreakRecord,
-      Content = treesaver.layout.Content,
-      ContentPosition = treesaver.layout.ContentPosition,
-      Grid = treesaver.layout.Grid,
-      Page = treesaver.layout.Page;
+  },
+      array = require('../lib/array'),
+      debug = require('../lib/debug'),
+      dimensions = require('../lib/dimensions'),
+      dom = require('../lib/dom'),
+      events = require('../lib/events'),
+      scheduler = require('../lib/scheduler');
 
   /**
    * @type {?string}
@@ -584,4 +569,4 @@ goog.scope(function() {
       return '[treesaver.ui.Article]';
     };
   }
-});
+

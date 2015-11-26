@@ -2,17 +2,13 @@
  * @fileoverview Helpers for measuring elements.
  */
 
-goog.provide('treesaver.dimensions');
 
-goog.require('treesaver.capabilities');
-goog.require('treesaver.css');
-goog.require('treesaver.debug');
 
-goog.scope(function() {
-  var dimensions = treesaver.dimensions,
-      capabilities = treesaver.capabilities,
-      css = treesaver.css,
-      debug = treesaver.debug;
+
+  var dimensions = {},
+      capabilities = require('./capabilities'),
+      css = require('./css'),
+      debug = require('./debug');
 
   /**
    * Alias for Size type
@@ -343,4 +339,5 @@ goog.scope(function() {
       return '[Metrics: ' + this.w + 'x' + this.h + ']';
     };
   }
-});
+
+module.exports = dimensions;

@@ -1,18 +1,10 @@
-goog.provide('treesaver.layout.Figure');
 
-goog.require('treesaver.array');
-goog.require('treesaver.capabilities');
-goog.require('treesaver.dom');
-// Block requires Figure, so avoid a circular dependency
-//goog.require('treesaver.layout.Block');
-goog.require('treesaver.layout.FigureSize');
-goog.require('treesaver.string'); // String.trim
 
-goog.scope(function() {
-  var array = treesaver.array,
-      capabilities = treesaver.capabilities,
-      dom = treesaver.dom,
-      FigureSize = treesaver.layout.FigureSize;
+
+  var array = require('../lib/array'),
+      capabilities = require('../lib/capabilities'),
+      dom = require('../lib/dom'),
+      FigureSize = require('./FigureSize');
 
   /**
    * A figure element
@@ -22,7 +14,7 @@ goog.scope(function() {
    * @param {?Object} indices Current block and figure index.
    * @constructor
    */
-  treesaver.layout.Figure = function(el, baseLineHeight, indices) {
+Figure = function(el, baseLineHeight, indices) {
     this.anchorIndex = indices.index;
     this.figureIndex = indices.figureIndex;
     indices.figureIndex += 1;
@@ -57,14 +49,8 @@ goog.scope(function() {
       delete this.sizes['fallback'];
     }
   };
-});
 
-goog.scope(function() {
-  var Figure = treesaver.layout.Figure,
-      array = treesaver.array,
-      capabilities = treesaver.capabilities,
-      dom = treesaver.dom,
-      FigureSize = treesaver.layout.FigureSize;
+
 
   /**
    * @type {number}
@@ -329,4 +315,4 @@ goog.scope(function() {
       return '[Figure: ' + this.index + '/' + this.figureIndex + ']';
     };
   }
-});
+module.exports = Figure;

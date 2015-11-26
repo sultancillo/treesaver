@@ -2,16 +2,13 @@
  * @fileoverview BreakRecord class.
  */
 
-goog.provide('treesaver.layout.BreakRecord');
-
-goog.require('treesaver.array');
-goog.require('treesaver.layout.ContentPosition');
 
 /**
  * BreakRecord class
  * @constructor
  */
-treesaver.layout.BreakRecord = function() {
+require('./contentposition');
+BreakRecord = function() {
   this.index = 0;
   this.figureIndex = 0;
   this.overhang = 0;
@@ -20,10 +17,10 @@ treesaver.layout.BreakRecord = function() {
   this.pageNumber = 0;
 };
 
-goog.scope(function() {
-  var BreakRecord = treesaver.layout.BreakRecord,
-      ContentPosition = treesaver.layout.ContentPosition,
-      array = treesaver.array;
+
+  var
+      
+      array = require('../lib/array');
 
   /**
    * @type {number}
@@ -282,4 +279,4 @@ goog.scope(function() {
       return '[BreakRecord ' + this.index + '/' + this.figureIndex + ']';
     };
   }
-});
+

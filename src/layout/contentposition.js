@@ -1,4 +1,4 @@
-goog.provide('treesaver.layout.ContentPosition');
+
 
 /**
  * Helper class for indicating a relative position within a
@@ -9,14 +9,14 @@ goog.provide('treesaver.layout.ContentPosition');
  * @param {number} figure Index of the current figure.
  * @param {number} overhang Overhang.
  */
-treesaver.layout.ContentPosition = function(block, figure, overhang) {
+ContentPosition = function(block, figure, overhang) {
   this.block = block;
   this.figure = figure;
   this.overhang = overhang;
 };
 
-goog.scope(function() {
-  var ContentPosition = treesaver.layout.ContentPosition;
+
+ 
 
   /**
    * @type {number}
@@ -95,4 +95,3 @@ goog.scope(function() {
   ContentPosition.prototype.clone = function() {
     return new this.constructor(this.block, this.figure, this.overhang);
   };
-});

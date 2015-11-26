@@ -2,15 +2,12 @@
  * @fileoverview Helper functions for scrolling elements.
  */
 
-goog.provide('treesaver.ui.Scrollable');
 
-goog.require('treesaver.capabilities');
-goog.require('treesaver.dom');
 
-goog.scope(function() {
-  var Scrollable = treesaver.ui.Scrollable,
-      capabilities = treesaver.capabilities,
-      dom = treesaver.dom;
+
+  var Scrollable = {},
+      capabilities = require('../lib/capabilities'),
+      dom = require('../lib/dom');
 
   /**
    * Can this scroller scroll horizontally?
@@ -71,4 +68,5 @@ goog.scope(function() {
     // Initialize all
     els.forEach(Scrollable.initDom);
   };
-});
+
+module.exports = Scrollable;

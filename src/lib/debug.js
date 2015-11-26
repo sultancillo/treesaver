@@ -2,12 +2,10 @@
  * @fileoverview Logging functions for use while debugging.
  */
 
-goog.provide('treesaver.debug');
 
-goog.require('treesaver.capabilities');
 
-goog.scope(function() {
-  var debug = treesaver.debug;
+
+  var debug = {};
 
   /**
    * Original load time of debug code
@@ -109,6 +107,6 @@ goog.scope(function() {
       }
     }
   };
-
+  module.exports = debug;
   debug.info('Running in DEBUG mode');
-});
+

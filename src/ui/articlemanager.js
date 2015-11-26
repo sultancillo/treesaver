@@ -1,35 +1,23 @@
 /**
  * @fileoverview Article manager class.
  */
+require('../layout/grid');
+require('./document');
+require('./article');
+require('./index');
+require('../layout/page');
 
-goog.provide('treesaver.ui.ArticleManager');
-
-goog.require('treesaver.capabilities');
-goog.require('treesaver.debug');
-goog.require('treesaver.dimensions');
-goog.require('treesaver.dom');
-goog.require('treesaver.events');
-goog.require('treesaver.network');
-goog.require('treesaver.resources');
-goog.require('treesaver.ui.Article');
-goog.require('treesaver.ui.ArticlePosition');
-goog.require('treesaver.ui.Document');
-goog.require('treesaver.ui.Index');
-goog.require('treesaver.uri');
-
-goog.scope(function() {
-  var ArticleManager = treesaver.ui.ArticleManager,
-      capabilities = treesaver.capabilities,
-      debug = treesaver.debug,
-      dimensions = treesaver.dimensions,
-      dom = treesaver.dom,
-      events = treesaver.events,
-      network = treesaver.network,
-      resources = treesaver.resources,
-      Article = treesaver.ui.Article,
-      ArticlePosition = treesaver.ui.ArticlePosition,
-      Document = treesaver.ui.Document,
-      Index = treesaver.ui.Index;
+  var ArticleManager = {},
+      capabilities = require('../lib/capabilities'),
+      debug = require('../lib/debug'),
+      dimensions = require('../lib/dimensions'),
+      dom = require('../lib/dom'),
+      events = require('../lib/events'),
+      network = require('../lib/network'),
+      resources = require('../lib/resources');
+      
+      
+      
 
   /**
    * Initialize all content
@@ -37,6 +25,7 @@ goog.scope(function() {
    */
   ArticleManager.load = function(initialHTML) {
     // Initialize state
+    
     ArticleManager.currentPageIndex = -1;
     ArticleManager.currentDocumentIndex = -1;
     ArticleManager.currentArticlePosition = ArticlePosition.BEGINNING;
@@ -62,6 +51,7 @@ goog.scope(function() {
     }
 
     // TODO: Store hash, so we can use it to jump directly to an article
+    
     ArticleManager.initialDocument = new Document(treesaver.uri.stripHash(document.location.href), {});
 
     if (initialHTML) {
@@ -180,7 +170,7 @@ goog.scope(function() {
       // Make sure the grid meets our requirements
       if (!requires || capabilities.check(requires.split(' '))) {
         // Initialize each grid and store
-        grid = new treesaver.layout.Grid(node);
+        grid = new Grid(node);
         if (!grid.error) {
           grids.push(grid);
         }
@@ -719,6 +709,7 @@ goog.scope(function() {
    * @return {Array.<?treesaver.layout.Page>} Array of pages, some may be null.
    */
   ArticleManager.getPages = function(maxSize, buffer) {
+
     if (ArticleManager.currentArticlePosition.atEnding() && ArticleManager.currentDocument.loaded) {
       ArticleManager.currentArticlePosition = new ArticlePosition(ArticleManager.currentDocument.articles.length - 1);
     }
@@ -1119,7 +1110,7 @@ goog.scope(function() {
       size: ArticleManager.errorPageSize
     });
   };
-
+module.exports = ArticleManager;
   // Expose functions
   goog.exportSymbol('treesaver.canGoToNextPage', ArticleManager.canGoToNextPage);
   goog.exportSymbol('treesaver.canGoToPreviousPage', ArticleManager.canGoToPreviousPage);
@@ -1132,4 +1123,4 @@ goog.scope(function() {
   goog.exportSymbol('treesaver.getCurrentDocument', ArticleManager.getCurrentDocument);
   goog.exportSymbol('treesaver.getDocumentCount', ArticleManager.getDocumentCount);
   goog.exportSymbol('treesaver.goToDocumentByURL', ArticleManager.goToDocumentByURL);
-});
+

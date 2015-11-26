@@ -1,18 +1,3 @@
-goog.provide('treesaver.ui.Document');
-
-goog.require('treesaver.capabilities');
-goog.require('treesaver.debug');
-goog.require('treesaver.dom');
-goog.require('treesaver.events');
-goog.require('treesaver.dom');
-goog.require('treesaver.storage');
-goog.require('treesaver.ui.Article');
-// Avoid circular ref
-// goog.require('treesaver.ui.ArticleManager');
-goog.require('treesaver.ui.TreeNode');
-goog.require('treesaver.object');
-goog.require('treesaver.uri');
-
 /**
  * Class representing "documents" which are usually HTML pages that contain one or
  * more (top level) articles.
@@ -21,7 +6,7 @@ goog.require('treesaver.uri');
  * @param {!string} url The url of this document.
  * @param {?Object=} meta Meta-data for this document such as title, author, etc.
  */
-treesaver.ui.Document = function(url, meta) {
+Document = function(url, meta) {
   if (!url) {
     treesaver.debug.error('Document must have an URL');
     return;
@@ -37,16 +22,15 @@ treesaver.ui.Document = function(url, meta) {
   this.contents = [];
 };
 
-goog.scope(function() {
-  var Document = treesaver.ui.Document,
-      capabilities = treesaver.capabilities,
-      debug = treesaver.debug,
-      dom = treesaver.dom,
-      events = treesaver.events,
-      storage = treesaver.storage,
-      Article = treesaver.ui.Article,
-      TreeNode = treesaver.ui.TreeNode,
-      uri = treesaver.uri;
+require('./treenode')
+  var 
+      capabilities = require('../lib/capabilities'),
+      debug = require('../lib/debug'),
+      dom = require('../lib/dom'),
+      events = require('../lib/events'),
+      storage = require('../lib/storage'),
+      Article = require('./article'),
+      uri = require('../lib/uri');
 
   /**
    * @type {!string}
@@ -395,4 +379,4 @@ goog.scope(function() {
   goog.exportSymbol('treesaver.Document.prototype.getUrl', Document.prototype.getUrl);
   goog.exportSymbol('treesaver.Document.prototype.setUrl', Document.prototype.setUrl);
   goog.exportSymbol('treesaver.Document.prototype.getMeta', Document.prototype.getMeta);
-});
+

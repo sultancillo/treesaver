@@ -2,11 +2,10 @@
  * @fileoverview Helper functions for manipulating arrays.
  */
 
-goog.provide('treesaver.array');
 
-goog.scope(function() {
-  var array = treesaver.array;
 
+  var array = {};
+  
   if (!'isArray' in Array) {
     /**
      * Test Array-ness.
@@ -45,4 +44,4 @@ goog.scope(function() {
     arr.length = from < 0 ? arr.length + from : from;
     return arr.push.apply(arr, rest);
   };
-});
+module.exports = array;

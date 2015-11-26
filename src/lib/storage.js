@@ -2,13 +2,8 @@
  * @fileoverview Simple wrapper for localStorage.
  */
 
-goog.provide('treesaver.storage');
-
-goog.require('treesaver.debug');
-
-goog.scope(function() {
-  var storage = treesaver.storage,
-      debug = treesaver.debug,
+  var storage = {},
+      debug = require('./debug'),
       localStore = window.localStorage,
       sessionStore = window.sessionStorage;
 
@@ -108,4 +103,5 @@ goog.scope(function() {
       });
     }
   };
-});
+
+module.exports = storage;

@@ -3,20 +3,11 @@
  * do not support it.
  */
 
-goog.provide('treesaver.history');
-
-goog.require('treesaver.capabilities');
-goog.require('treesaver.debug');
-goog.require('treesaver.events');
-goog.require('treesaver.scheduler');
-goog.require('treesaver.storage');
-
-goog.scope(function() {
-  var history = treesaver.history,
-      debug = treesaver.debug,
-      events = treesaver.events,
-      scheduler = treesaver.scheduler,
-      storage = treesaver.storage;
+  var history = {},
+      debug = require('./debug'),
+      events = require('./events'),
+      scheduler = require('./scheduler'),
+      storage = require('./storage');
 
   /**
    * @type {Object.<string, string>}
@@ -237,4 +228,5 @@ goog.scope(function() {
       window['onhashchange'] = history.hashChange_;
     }
   }
-});
+
+module.exports = history;

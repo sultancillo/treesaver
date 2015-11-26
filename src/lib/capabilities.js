@@ -3,16 +3,10 @@
  *
  */
 
-goog.provide('treesaver.capabilities');
 
-goog.require('treesaver.array'); // array.some
-goog.require('treesaver.constants');
-// Avoid circular dependency
-// goog.require('treesaver.network');
 
-goog.scope(function() {
-  var capabilities = treesaver.capabilities,
-      constants = treesaver.constants;
+  var capabilities = {},
+      constants = require('./constants');
 
   /**
    * Cached value of browser user agent
@@ -669,4 +663,5 @@ goog.scope(function() {
       }
     });
   };
-});
+
+module.exports = capabilities;

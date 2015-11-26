@@ -2,14 +2,10 @@
  * @fileoverview Container data structure.
  */
 
-goog.provide('treesaver.layout.Container');
 
-goog.require('treesaver.dimensions');
-goog.require('treesaver.dom');
 
-goog.scope(function() {
-  var dimensions = treesaver.dimensions,
-      dom = treesaver.dom;
+  var dimensions = require('../lib/dimensions'),
+      dom = require('../lib/dom');
 
   /**
    * A column within a grid
@@ -18,7 +14,7 @@ goog.scope(function() {
    * @param {!Element} el         HTML element.
    * @param {number}   gridHeight The height of the grid that contains this container.
    */
-  treesaver.layout.Container = function(el, gridHeight) {
+   Container = function(el, gridHeight) {
     var d = new treesaver.dimensions.Metrics(el);
 
     this.flexible = !treesaver.dom.hasClass(el, 'fixed');
@@ -42,12 +38,8 @@ goog.scope(function() {
      */
     this.sizes = sizesProperty ? sizesProperty.split(' ') : [];
   };
-});
 
-goog.scope(function() {
-  var Container = treesaver.layout.Container,
-      dimensions = treesaver.dimensions,
-      dom = treesaver.dom;
+
 
   /**
    * @type {boolean}
@@ -93,4 +85,3 @@ goog.scope(function() {
       return '[Container ' + this.h + '/' + this.delta + ']';
     };
   }
-});

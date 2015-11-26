@@ -1,17 +1,17 @@
-goog.provide('treesaver.ui.TreeNode');
+
 
 /**
  * TreeNode to represent a node in the (hierarchical) index. Every document inherits
  * from TreeNode, as well as the index itself.
  * @constructor
  */
-treesaver.ui.TreeNode = function() {
+TreeNode = function() {
   this.contents = [];
   this.parent = null;
 };
 
-goog.scope(function() {
-  var TreeNode = treesaver.ui.TreeNode;
+
+
 
   /**
    * Appends a child to this node.
@@ -88,4 +88,4 @@ goog.scope(function() {
     }
     return node;
   };
-});
+

@@ -1,15 +1,4 @@
-goog.provide('treesaver.ui.Index');
 
-goog.require('treesaver.capabilities');
-goog.require('treesaver.debug');
-goog.require('treesaver.events');
-goog.require('treesaver.json');
-goog.require('treesaver.network');
-goog.require('treesaver.object');
-goog.require('treesaver.storage');
-goog.require('treesaver.ui.Document');
-goog.require('treesaver.ui.TreeNode');
-goog.require('treesaver.uri');
 
 /**
  * Class representing the index file (i.e. the table of contents for documents.)
@@ -17,23 +6,23 @@ goog.require('treesaver.uri');
  * @extends {treesaver.ui.TreeNode}
  * @param {?string} url The url the index was loaded from.
  */
-treesaver.ui.Index = function(url) {
+require('./treenode');
+Index = function(url) {
   this.url = url;
   this.settings = {};
   this.meta = {};
 };
 
-goog.scope(function() {
-  var Index = treesaver.ui.Index,
-      Document = treesaver.ui.Document,
-      TreeNode = treesaver.ui.TreeNode,
-      capabilities = treesaver.capabilities,
-      debug = treesaver.debug,
-      uri = treesaver.uri,
-      events = treesaver.events,
-      network = treesaver.network,
-      storage = treesaver.storage,
-      json = treesaver.json;
+
+  var 
+      Document = require('./document'),
+      capabilities = require('../lib/capabilities'),
+      debug = require('../lib/debug'),
+      uri = require('../lib/uri'),
+      events = require('../lib/events'),
+      network = require('../lib/network'),
+      storage = require('../lib/storage'),
+      json = require('../lib/json');
 
   Index.prototype = new TreeNode();
 
@@ -466,4 +455,4 @@ goog.scope(function() {
   goog.exportSymbol('treesaver.Index.prototype.getDocuments', Index.prototype.getDocuments);
   goog.exportSymbol('treesaver.Index.prototype.getNumberOfDocuments', Index.prototype.getNumberOfDocuments);
   goog.exportSymbol('treesaver.Index.prototype.getMeta', Index.prototype.getMeta);
-});
+

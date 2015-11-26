@@ -3,15 +3,10 @@
  *
  */
 
-goog.provide('treesaver.scheduler');
 
-goog.require('treesaver.array');
-goog.require('treesaver.debug');
-
-goog.scope(function() {
-  var scheduler = treesaver.scheduler,
-      debug = treesaver.debug,
-      array = treesaver.array;
+  var scheduler = {},
+      debug = require('./debug'),
+      array = require('./array');
 
   /**
    * Milliseconds between checks for task execution
@@ -383,4 +378,5 @@ goog.scope(function() {
     scheduler.tasks_ = [];
     scheduler.namedTasks_ = {};
   };
-});
+  
+module.exports = scheduler;

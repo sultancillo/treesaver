@@ -2,9 +2,7 @@
  * @fileoverview HTML and other information about a figure's content payload.
  */
 
-goog.provide('treesaver.layout.FigureSize');
 
-goog.require('treesaver.dom');
 
 /**
  * HTML and other information about a figure content payload
@@ -14,7 +12,7 @@ goog.require('treesaver.dom');
  * @param {?Array.<string>} requirements
  * @constructor
  */
-treesaver.layout.FigureSize = function(html, minW, minH, requirements) {
+FigureSize = function(html, minW, minH, requirements) {
   this.html = html;
 
   // TODO: Use outerHTML from the node eventually in order to sanitize bad
@@ -29,9 +27,9 @@ treesaver.layout.FigureSize = function(html, minW, minH, requirements) {
   this.requirements = requirements;
 };
 
-goog.scope(function() {
-  var FigureSize = treesaver.layout.FigureSize,
-      dom = treesaver.dom;
+
+
+      dom = require('../lib/dom');
 
   /**
    * The full HTML content for this payload.
@@ -103,4 +101,6 @@ goog.scope(function() {
       return '[FigureSize: ' + this.index + '/' + this.html + ']';
     };
   }
-});
+
+
+

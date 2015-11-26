@@ -2,15 +2,10 @@
  * @fileoverview DOM helper functions.
  */
 
-goog.provide('treesaver.dom');
 
-goog.require('treesaver.array');
-goog.require('treesaver.scheduler');
-
-goog.scope(function() {
-  var dom = treesaver.dom,
-      array = treesaver.array,
-      scheduler = treesaver.scheduler;
+  var dom = {},
+      array = require('./array');
+      scheduler = require('./scheduler');
 
   // Mozilla doesn't support element.contains()
   if ('Node' in window && Node.prototype && !('contains' in Node.prototype)) {
@@ -319,4 +314,4 @@ goog.scope(function() {
   dom.dummyDiv_ = document.createElement('div');
   // Prevent all layout on the element
   dom.dummyDiv_.style.display = 'none';
-});
+module.exports = dom;

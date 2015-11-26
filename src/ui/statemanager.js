@@ -2,30 +2,18 @@
  * @fileoverview Responsible for managing the application state. Should really be called ChromeManager.
  */
 
-goog.provide('treesaver.ui.StateManager');
 
-goog.require('treesaver.capabilities');
-goog.require('treesaver.constants');
-goog.require('treesaver.debug');
-goog.require('treesaver.dimensions');
-goog.require('treesaver.dom');
-goog.require('treesaver.events');
-goog.require('treesaver.resources');
-goog.require('treesaver.scheduler');
-goog.require('treesaver.ui.Chrome');
-goog.require('treesaver.ui.LightBox');
-
-goog.scope(function() {
-  var StateManager = treesaver.ui.StateManager,
-      capabilities = treesaver.capabilities,
-      debug = treesaver.debug,
-      dimensions = treesaver.dimensions,
-      dom = treesaver.dom,
-      events = treesaver.events,
-      resources = treesaver.resources,
-      scheduler = treesaver.scheduler,
-      Chrome = treesaver.ui.Chrome,
-      LightBox = treesaver.ui.LightBox;
+  var StateManager = {},
+      capabilities = require('../lib/capabilities'),
+      debug = require('../lib/debug'),
+      dimensions = require('../lib/dimensions'),
+      dom = require('../lib/dom'),
+      events = require('../lib/events'),
+      resources = require('../lib/resources'),
+      scheduler = require('../lib/scheduler'),
+      
+      LightBox = require('./lightbox');
+      require('./chrome');
 
   /**
    * Current state
@@ -352,4 +340,4 @@ goog.scope(function() {
     goog.exportSymbol('treesaver.previousArticle',
       treesaver.activeFunctionWrapper(treesaver.ui.ArticleManager.previousArticle));
   }
-});
+module.exports = StateManager;

@@ -2,20 +2,13 @@
  * @fileoverview A block element.
  */
 
-goog.provide('treesaver.layout.Block');
 
-goog.require('treesaver.array');
-goog.require('treesaver.debug');
-goog.require('treesaver.dimensions');
-goog.require('treesaver.dom');
-goog.require('treesaver.layout.Figure');
 
-goog.scope(function() {
-  var array = treesaver.array,
-      debug = treesaver.debug,
-      dimensions = treesaver.dimensions,
-      dom = treesaver.dom,
-      Figure = treesaver.layout.Figure;
+  var array = require('../lib/array'),
+      debug = require('../lib/debug'),
+      dimensions = require('../lib/dimensions'),
+      dom = require('../lib/dom'),
+      Figure = require('./figure');
 
   /**
    * A block element. Includes paragraphs, images, lists, etc.
@@ -26,8 +19,8 @@ goog.scope(function() {
    * @param {?boolean} isFallback Whether child figures should be ignored.
    * @constructor
    */
-  treesaver.layout.Block = function(node, baseLineHeight, indices, isFallback) {
-    var isReplacedElement = treesaver.layout.Block.isReplacedElement(node),
+  Block = function(node, baseLineHeight, indices, isFallback) {
+    var isReplacedElement = Block.isReplacedElement(node),
         hasFigures,
         figureSizes,
         html_zero = '',
@@ -72,7 +65,7 @@ goog.scope(function() {
     indices.index += 1;
 
     this.hasBlockChildren = !isReplacedElement &&
-      treesaver.layout.Block.hasBlockChildren(node);
+      Block.hasBlockChildren(node);
 
     ///////////////
     // Hierarchy
@@ -85,7 +78,7 @@ goog.scope(function() {
     hasFigures = false;
     if (this.hasBlockChildren && !dom.hasClass(node, 'keeptogether')) {
       // Extract child blocks and figures
-      treesaver.layout.Block.
+      Block.
         processChildren(this, node, baseLineHeight, indices, isFallback);
 
       // TODO: Collapse if there is only one child element
@@ -197,16 +190,11 @@ goog.scope(function() {
     this.openTag_zero = this.hasBlockChildren ?
       html_zero.substr(0, html_zero.indexOf('>') + 1) : null;
   };
-});
+
 
 // Use another scope block in order to have a reference to the new Block class
-goog.scope(function() {
-  var array = treesaver.array,
-      Block = treesaver.layout.Block,
-      debug = treesaver.debug,
-      dimensions = treesaver.dimensions,
-      dom = treesaver.dom,
-      Figure = treesaver.layout.Figure;
+
+
 
   /**
    * Index of this block within the article
@@ -719,4 +707,4 @@ goog.scope(function() {
         this.metrics.lineHeight + ']';
     };
   }
-});
+module.exports = Block;

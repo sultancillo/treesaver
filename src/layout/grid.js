@@ -2,28 +2,18 @@
  * @fileoverview A skeleton of page, later filled with content.
  */
 
-goog.provide('treesaver.layout.Grid');
-
-goog.require('treesaver.capabilities');
-goog.require('treesaver.debug');
-goog.require('treesaver.dom');
-goog.require('treesaver.dimensions');
-goog.require('treesaver.layout.Column');
-goog.require('treesaver.layout.Container');
-
-goog.scope(function() {
-  var debug = treesaver.debug,
-      dom = treesaver.dom,
-      dimensions = treesaver.dimensions,
-      Column = treesaver.layout.Column,
-      Container = treesaver.layout.Container;
+require('./column');
+  var debug = require('../lib/debug'),
+      dom = require('../lib/dom'),
+      dimensions = require('../lib/dimensions'),
+      Container = require('./container');
 
   /**
    * Grid class
    * @constructor
-   * @param {!Element} node HTML root for grid.
+   * @param {!Element} node HTML root for Grid.
    */
-  treesaver.layout.Grid = function(node) {
+  Grid = function(node) {
     if (goog.DEBUG) {
       if (!node || !dom.hasClass(node, 'grid')) {
         debug.error('Non grid passed to initGrid');
@@ -102,13 +92,8 @@ goog.scope(function() {
     // Remove the child
     document.body.removeChild(node);
   };
-});
 
-goog.scope(function() {
-  var Grid = treesaver.layout.Grid,
-      capabilities = treesaver.capabilities,
-      debug = treesaver.debug,
-      dimensions = treesaver.dimensions;
+  var capabilities = require('../lib/capabilities');
 
   /**
    * List of required capabilities for this Grid
@@ -245,7 +230,7 @@ goog.scope(function() {
   /**
    * Stretch the height of a grid
    * @param {number} totalHeight The maximum possible height (including margin,
-   *                             border, and padding) of the grid.
+   *                             border, and padding) of the Grid.
    */
   Grid.prototype.stretch = function(totalHeight) {
     if (!this.flexible) {
@@ -294,8 +279,8 @@ goog.scope(function() {
 
   /**
    * Comparison function for sorting grids
-   * @param {!treesaver.layout.Grid} a
-   * @param {!treesaver.layout.Grid} b
+   * @param {!Grid} a
+   * @param {!Grid} b
    */
   Grid.sort = function(a, b) {
     // Sort by column and container count, descending
@@ -523,20 +508,20 @@ goog.scope(function() {
   /**
     * Find the best grid for given content
     * @param {!treesaver.layout.Content} content
-    * @param {!Array.<treesaver.layout.Grid>} grids
+    * @param {!Array.<Grid>} grids
     * @param {!treesaver.layout.BreakRecord} breakRecord
-    * @return {?{grid: !treesaver.layout.Grid, containers: !Array.<treesaver.layout.Grid.ContainerMap>}}
+    * @return {?{grid: !Grid, containers: !Array.<treesaver.layout.Grid.ContainerMap>}}
     */
   Grid.best = function(content, grids, breakRecord) {
     if (goog.DEBUG) {
       if (!content) {
-        debug.error('No content passed to grid.best');
+        debug.error('No content passed to Grid.best');
       }
       else if (!grids.length) {
-        debug.error('No grids passed to grid.best');
+        debug.error('No grids passed to Grid.best');
       }
       else if (!breakRecord) {
-        debug.error('No breakRecord passed to grid.best');
+        debug.error('No breakRecord passed to Grid.best');
       }
     }
 
@@ -697,4 +682,3 @@ goog.scope(function() {
       return "[Grid " + this.classes + "]";
     };
   }
-});

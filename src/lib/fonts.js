@@ -2,19 +2,11 @@
  * @fileoverview Extract fonts defined in an external HTML file.
  */
 
-goog.provide('treesaver.fonts');
-
-goog.require('treesaver.fonts.googleadapter');
-goog.require('treesaver.debug');
-goog.require('treesaver.dom');
-goog.require('treesaver.events');
-
-goog.scope(function() {
-  var fonts = treesaver.fonts,
-      debug = treesaver.debug,
-      dom = treesaver.dom,
-      events = treesaver.events,
-      googleadapter = treesaver.fonts.googleadapter;
+  var fonts = {},
+      debug = require('./debug'),
+      dom = require('./dom'),
+      events = require('./events'),
+      googleadapter = require('./fonts/googleadapter');
 
   /**
    * Loads custom fonts for the current document
@@ -116,4 +108,5 @@ goog.scope(function() {
    * @type {Array.<function()>}
    */
   fonts.callbacks_;
-});
+
+module.exports = fonts;

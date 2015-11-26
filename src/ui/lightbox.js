@@ -2,18 +2,12 @@
  * @fileoverview The lightbox class.
  */
 
-goog.provide('treesaver.ui.LightBox');
 
-goog.require('treesaver.capabilities');
-goog.require('treesaver.debug');
-goog.require('treesaver.dimensions');
-goog.require('treesaver.dom');
-goog.require('treesaver.ui.Scrollable');
 
-goog.scope(function() {
-  var debug = treesaver.debug,
-      dimensions = treesaver.dimensions,
-      dom = treesaver.dom;
+
+  var debug = require('../lib/debug'),
+      dimensions = require('../lib/dimensions'),
+      dom = require('../lib/dom');
 
   /**
    * LightBox
@@ -21,7 +15,7 @@ goog.scope(function() {
    * @param {!Element} node HTML node.
    * @constructor
    */
-  treesaver.ui.LightBox = function(node) {
+  LightBox = function(node) {
     var containerNode = dom.querySelectorAll('.container', node)[0];
 
     // DEBUG-only validation
@@ -43,15 +37,12 @@ goog.scope(function() {
     delete this.size.w;
     delete this.size.h;
   };
-});
 
-goog.scope(function() {
-  var LightBox = treesaver.ui.LightBox,
-      capabilities = treesaver.capabilities,
-      debug = treesaver.debug,
-      dimensions = treesaver.dimensions,
-      dom = treesaver.dom,
-      Scrollable = treesaver.ui.Scrollable;
+
+
+  var 
+      capabilities = require('../lib/capabilities'),
+      Scrollable = require('./scrollable');
 
   /**
    * List of required capabilities for this LightBox
@@ -230,4 +221,5 @@ goog.scope(function() {
 
     return lightbox;
   };
-});
+
+

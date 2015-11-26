@@ -2,34 +2,30 @@
  * @fileoverview The chrome class.
  */
 
-goog.provide('treesaver.ui.Chrome');
 
-goog.require('treesaver.array');
-goog.require('treesaver.capabilities');
-goog.require('treesaver.debug');
-goog.require('treesaver.dimensions');
-goog.require('treesaver.dom');
-goog.require('treesaver.events');
-goog.require('treesaver.network');
-goog.require('treesaver.scheduler');
-goog.require('treesaver.template');
-goog.require('treesaver.ui.ArticleManager');
-goog.require('treesaver.ui.Document');
-goog.require('treesaver.ui.Index');
-goog.require('treesaver.ui.Scrollable');
-
-goog.scope(function() {
-  var debug = treesaver.debug,
-      dimensions = treesaver.dimensions,
-      dom = treesaver.dom,
-      Scrollable = treesaver.ui.Scrollable;
+  var debug = require('../lib/debug'),
+      dimensions = require('../lib/dimensions'),
+      dom = require('../lib/dom'),
+      Scrollable = require('./scrollable');
+  var 
+      Document = require('./document'),
+      array = require('../lib/array'),
+      capabilities = require('../lib/capabilities'),
+      debug = require('../lib/debug'),
+      dimensions = require('../lib/dimensions'),
+      dom = require('../lib/dom'),
+      events = require('../lib/events'),
+      network = require('../lib/network'),
+      scheduler = require('../lib/scheduler'),
+      Index = require('./index'),
+      Scrollable = require('./scrollable');
 
   /**
    * Chrome
    * @param {!Element} node HTML node.
    * @constructor
    */
-  treesaver.ui.Chrome = function(node) {
+  Chrome = function(node) {
     // DEBUG-only validation checks
     if (goog.DEBUG) {
       if (!dom.querySelectorAll('.viewer', node).length) {
@@ -58,22 +54,10 @@ goog.scope(function() {
     delete this.size.w;
     delete this.size.h;
   };
-});
 
-goog.scope(function() {
-  var Chrome = treesaver.ui.Chrome,
-      Document = treesaver.ui.Document,
-      array = treesaver.array,
-      capabilities = treesaver.capabilities,
-      debug = treesaver.debug,
-      dimensions = treesaver.dimensions,
-      dom = treesaver.dom,
-      events = treesaver.events,
-      network = treesaver.network,
-      scheduler = treesaver.scheduler,
-      ArticleManager = treesaver.ui.ArticleManager,
-      Index = treesaver.ui.Index,
-      Scrollable = treesaver.ui.Scrollable;
+
+
+
 
   /**
    * List of required capabilities for this Chrome
@@ -389,6 +373,7 @@ goog.scope(function() {
   /**
    * @type {Array.<string>}
    */
+
   Chrome.watchedEvents = [
     Index.events.UPDATED,
     ArticleManager.events.PAGESCHANGED,
@@ -1842,5 +1827,3 @@ goog.scope(function() {
       return '[Chrome: ]';
     };
   }
-});
-

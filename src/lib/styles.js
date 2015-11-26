@@ -2,15 +2,10 @@
  * @fileoverview Create a stylesheet with the built-in styles required by Treesaver.
  */
 
-goog.provide('treesaver.styles');
 
-goog.require('treesaver.debug');
-goog.require('treesaver.dom');
-
-goog.scope(function() {
-  var styles = treesaver.styles,
-      debug = treesaver.debug,
-      dom = treesaver.dom;
+  var styles = {},
+      debug = require('./debug'),
+      dom = require('./dom');
 
   /**
    * @param {!string} selector
@@ -36,4 +31,4 @@ goog.scope(function() {
   else {
     debug.error('No head to put default stylesheet into');
   }
-});
+module.exports = styles;

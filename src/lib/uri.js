@@ -1,7 +1,4 @@
-goog.provide('treesaver.uri');
-
-goog.scope(function() {
-  var uri = treesaver.uri;
+  var uri = {};
 
   // URI parser, based on parseUri by Steven Levithan <stevenlevithan.com> (MIT License)
   uri._parserRegex = /^(?:([^:\/?#]+):)?(?:\/\/((?:(([^:@]*)(?::([^:@]*))?)?@)?([^:\/?#]*)(?::(\d*))?))?((((?:[^?#\/]*\/)*)([^?#]*))(?:\?([^#]*))?(?:#(.*))?)/;
@@ -84,4 +81,5 @@ goog.scope(function() {
     tmp.file = null;
     return uri.stringify(tmp);
   };
-});
+
+module.exports = uri;

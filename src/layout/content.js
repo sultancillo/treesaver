@@ -2,20 +2,12 @@
  * @fileoverview The Content class.
  */
 
-goog.provide('treesaver.layout.Content');
 
-goog.require('treesaver.css');
-goog.require('treesaver.debug');
-goog.require('treesaver.dimensions');
-goog.require('treesaver.dom');
-goog.require('treesaver.layout.Block');
-
-goog.scope(function() {
-  var css = treesaver.css,
-      debug = treesaver.debug,
-      dimensions = treesaver.dimensions,
-      dom = treesaver.dom,
-      Block = treesaver.layout.Block;
+  var css = require('../lib/css'),
+      debug = require('../lib/debug'),
+      dimensions = require('../lib/dimensions'),
+      dom = require('../lib/dom'),
+      Block = require('./block');
 
   /**
    * A chunk of content
@@ -24,7 +16,7 @@ goog.scope(function() {
    * @param {!Element} el HTML node which contains all content.
    * @param {!treesaver.ui.Document} doc The parent document that owns this content chunk.
    */
-  treesaver.layout.Content = function(el, doc) {
+Content = function(el, doc) {
     var indices = {
       index: 0,
       figureIndex: 0
@@ -67,33 +59,33 @@ goog.scope(function() {
    *
    * @type {number}
    */
-  treesaver.layout.Content.prototype.lineHeight;
+  Content.prototype.lineHeight;
 
   /**
    * The column width at which this content was measured
    *
    * @type {number}
    */
-  treesaver.layout.Content.prototype.colWidth;
+  Content.prototype.colWidth;
 
   /**
    * @type {Array.<treesaver.layout.Figure>}
    */
-  treesaver.layout.Content.prototype.figures;
+  Content.prototype.figures;
 
   /**
    * @type {Array.<treesaver.layout.Block>}
    */
-  treesaver.layout.Content.prototype.blocks;
+  Content.prototype.blocks;
 
   /**
    * @type {!treesaver.ui.Document}
    */
-  treesaver.layout.Content.prototype.doc;
+  Content.prototype.doc;
 
   if (goog.DEBUG) {
-    treesaver.layout.Content.prototype.toString = function() {
+    Content.prototype.toString = function() {
       return '[Content]';
     };
   }
-});
+

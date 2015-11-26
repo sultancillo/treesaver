@@ -10,33 +10,30 @@
  * Licensed under MIT and GPLv2.
  */
 
-goog.provide('treesaver');
-
-goog.require('treesaver.capabilities');
-goog.require('treesaver.constants');
-goog.require('treesaver.debug');
-goog.require('treesaver.dom');
-goog.require('treesaver.events');
-goog.require('treesaver.fonts');
-goog.require('treesaver.history');
-goog.require('treesaver.resources');
-goog.require('treesaver.scheduler');
-goog.require('treesaver.styles');
-goog.require('treesaver.ui.Article');
-goog.require('treesaver.ui.ArticleManager');
-goog.require('treesaver.ui.Chrome');
-goog.require('treesaver.ui.StateManager');
-
-goog.scope(function() {
-  var debug = treesaver.debug,
-      dom = treesaver.dom,
-      events = treesaver.events,
-      fonts = treesaver.fonts,
-      capabilities = treesaver.capabilities,
-      ArticleManager = treesaver.ui.ArticleManager,
-      StateManager = treesaver.ui.StateManager;
 
 
+  var debug = require('./lib/debug'),
+      dom = require('./lib/dom'),
+      events = require('./lib/events'),
+      fonts = require('./lib/fonts'),
+      capabilities = require('./lib/capabilities');
+      ArticleManager = require('./ui/articlemanager'),
+      
+
+      StateManager = require('./ui/statemanager'),
+      treesaver.ui = {};
+      treesaver.ui.ArticleManager = ArticleManager;
+      treesaver.ui.StateManager = StateManager;
+      treesaver.network = require('./lib/network');
+      treesaver.resources = require('./lib/resources');
+      treesaver.scheduler = require('./lib/scheduler');
+      treesaver.fonts = fonts;
+      treesaver.history = require('./lib/history');
+      treesaver.dimensions = require('./lib/dimensions');
+      
+      
+      treesaver.uri = require('./lib/uri');
+      treesaver.LOAD_TIMEOUT = 5000 // 5 seconds
   /**
    * Treesaver events fired
    * @const
@@ -268,4 +265,3 @@ goog.scope(function() {
   else {
     debug.warn('Treesaver not supported');
   }
-});

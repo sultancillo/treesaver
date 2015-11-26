@@ -1,19 +1,9 @@
-goog.provide('treesaver.layout.Page');
 
-goog.require('treesaver.capabilities');
-goog.require('treesaver.debug');
-goog.require('treesaver.dimensions');
-goog.require('treesaver.dom');
-goog.require('treesaver.template');
-goog.require('treesaver.layout.Grid');
-goog.require('treesaver.ui.Scrollable');
-
-goog.scope(function() {
-  var capabilities = treesaver.capabilities,
-      debug = treesaver.debug,
-      dimensions = treesaver.dimensions,
-      dom = treesaver.dom,
-      Grid = treesaver.layout.Grid;
+  require('./grid');
+  var capabilities = require('../lib/capabilities'),
+      debug = require('../lib/debug'),
+      dimensions = require('../lib/dimensions'),
+      dom = require('../lib/dom');
 
   /**
    * Page class
@@ -23,7 +13,7 @@ goog.scope(function() {
    * @param {!treesaver.layout.BreakRecord} br The current breakRecord.
    *  @param {!Array.<string>} extra_classes Extra classes to apply.
    */
-  treesaver.layout.Page = function(content, grids, br, extra_classes) {
+  Page = function(content, grids, br, extra_classes) {
     var best = Grid.best(content, grids, br),
         host = document.createElement('div'),
         originalBr = br.clone(),
@@ -172,14 +162,14 @@ goog.scope(function() {
     this.deactivate();
     document.body.removeChild(host);
   };
-});
 
-goog.scope(function() {
-  var Page = treesaver.layout.Page,
-      debug = treesaver.debug,
-      dimensions = treesaver.dimensions,
-      dom = treesaver.dom,
-      Scrollable = treesaver.ui.Scrollable;
+
+
+  var 
+      debug =  require('../lib/debug'),
+      dimensions =  require('../lib/dimensions'),
+      dom =  require('../lib/dom'),
+      Scrollable = require('../ui/scrollable');
 
   /**
    * @type {boolean}
@@ -1026,4 +1016,5 @@ goog.scope(function() {
       return "[Page]";
     };
   }
-});
+
+

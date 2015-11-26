@@ -2,14 +2,11 @@
  * @fileoverview Event helper functions.
  */
 
-goog.provide('treesaver.events');
 
-goog.require('treesaver.debug');
-
-goog.scope(function() {
-  var events = treesaver.events,
-      debug = treesaver.debug;
-
+  var events = {},
+      debug = require('./debug'),
+      treesaver = {};
+    treesaver.events = {};
   /**
    * Create an event and fire it
    *
@@ -80,7 +77,8 @@ goog.scope(function() {
       obj.removeEventListener(type, fn, false);
     }
   };
-});
+
+module.exports = events;
 
 // Expose event helper functions via externs
 goog.exportSymbol('treesaver.addListener', treesaver.events.addListener);

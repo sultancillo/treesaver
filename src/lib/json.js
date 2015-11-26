@@ -2,13 +2,11 @@
  * @fileoverview JSON wrapper methods for older browsers.
  */
 
-goog.provide('treesaver.json');
 
-goog.require('treesaver.debug');
 
-goog.scope(function() {
-  var json = treesaver.json,
-      debug = treesaver.debug,
+
+  var json = {},
+      debug = require('./debug'),
       nativeJSON = window.JSON;
 
   /**
@@ -30,4 +28,4 @@ goog.scope(function() {
   json.stringify = function(val) {
     return nativeJSON.stringify(val);
   };
-});
+  module.exports = json;

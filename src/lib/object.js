@@ -1,4 +1,4 @@
-goog.provide('treesaver.object');
+var object = {};
 
 if (!Object.keys) {
   /**
@@ -26,7 +26,7 @@ if (!Object.keys) {
  * @param {!Object} value The object to test.
  * @return {boolean} True if the value is an object, false otherwise.
  */
-treesaver.object.isObject = function(value) {
+object.isObject = function(value) {
   return Object.prototype.toString.apply(value) === '[object Object]';
 };
 
@@ -43,3 +43,5 @@ Object.clone = function(o) {
   Clone.prototype = o;
   return new Clone();
 };
+
+module.exports = object;

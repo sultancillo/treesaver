@@ -2,20 +2,11 @@
  * @fileoverview Extract resources defined in an external HTML file.
  */
 
-goog.provide('treesaver.resources');
-
-goog.require('treesaver.array');
-goog.require('treesaver.constants');
-goog.require('treesaver.debug');
-goog.require('treesaver.dom');
-goog.require('treesaver.network');
-
-goog.scope(function() {
-  var resources = treesaver.resources,
-      array = treesaver.array,
-      debug = treesaver.debug,
-      dom = treesaver.dom,
-      network = treesaver.network;
+  var resources = {},
+      array = require('./array'),
+      debug = require('./debug'),
+      dom = require('./dom'),
+      network = require('./network');
   /**
    * Loads resource file for the current document, as specified through
    * <link rel="resources" /> in the <head>
@@ -203,4 +194,5 @@ goog.scope(function() {
    * @type {Element}
    */
   resources.container_;
-});
+
+module.exports = resources;

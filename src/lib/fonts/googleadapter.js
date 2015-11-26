@@ -2,13 +2,9 @@
  * @fileoverview Google WebFont Loader adapter/implementation for treesaver.fonts.
  */
 
-goog.provide('treesaver.fonts.googleadapter');
 
-goog.require('treesaver.debug');
-
-goog.scope(function() {
-  var googleadapter = treesaver.fonts.googleadapter,
-      debug = treesaver.debug;
+  var googleadapter = {},
+      debug = require('../debug');
 
   /**
    * @private
@@ -96,4 +92,4 @@ goog.scope(function() {
       debug.info('WebFont.loading');
     }
   };
-});
+module.exports = googleadapter;
