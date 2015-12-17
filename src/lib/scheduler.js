@@ -3,15 +3,15 @@
  *
  */
 
-goog.provide('treesaver.scheduler');
+treesaver = treesaver || {};
+treesaver.scheduler = treesaver.scheduler || {};
 
-goog.require('treesaver.array');
-goog.require('treesaver.debug');
 
-goog.scope(function() {
-  var scheduler = treesaver.scheduler,
-      debug = treesaver.debug,
-      array = treesaver.array;
+require('./array');
+require('./debug');
+
+
+
 
   /**
    * Milliseconds between checks for task execution
@@ -19,7 +19,7 @@ goog.scope(function() {
    * @const
    * @type {number}
    */
-  scheduler.TASK_INTERVAL = 17; // ~60 fps
+  treesaver.scheduler.TASK_INTERVAL = 17; // ~60 fps
 
   /**
    * Array of all tasks
@@ -27,7 +27,7 @@ goog.scope(function() {
    * @private
    * @type {!Array}
    */
-  scheduler.tasks_ = [];
+  treesaver.scheduler.tasks_ = [];
 
   /**
    * Map of named tasks
@@ -35,7 +35,7 @@ goog.scope(function() {
    * @private
    * @type {Object}
    */
-  scheduler.namedTasks_ = {};
+  treesaver.scheduler.namedTasks_ = {};
 
   /**
    * If set, suspends all tasks except the ones named in this array
@@ -43,49 +43,49 @@ goog.scope(function() {
    * @private
    * @type {Array.<string>}
    */
-  scheduler.taskWhitelist_ = null;
+  treesaver.scheduler.taskWhitelist_ = null;
 
   /**
    * ID of the scheduler tick task
    *
    * @private
    */
-  scheduler.tickID_ = -1;
+  treesaver.scheduler.tickID_ = -1;
 
   /**
    * ID of the pausing task
    *
    * @private
    */
-  scheduler.pauseTimeoutId_ = -1;
+  treesaver.scheduler.pauseTimeoutId_ = -1;
 
   /**
    * Based on Paul Irish's requestAnimationFrame
    *
    * @private
    */
-  scheduler.requestAnimationFrameFunction_ = function() {
+  treesaver.scheduler.requestAnimationFrameFunction_ = function() {
     return window.requestAnimationFrame ||
       window.webkitRequestAnimationFrame ||
       window.mozRequestAnimationFrame ||
       window.oRequestAnimationFrame ||
       window.msRequestAnimationFrame ||
       function(callback, element) {
-        return window.setTimeout(callback, scheduler.TASK_INTERVAL);
+        return window.setTimeout(callback, treesaver.scheduler.TASK_INTERVAL);
       }
   }();
 
   /**
    * @private
    */
-  scheduler.requestAnimationFrame_ = function(f, el) {
-    return scheduler.requestAnimationFrameFunction_.call(window, f, el);
+  treesaver.scheduler.requestAnimationFrame_ = function(f, el) {
+    return treesaver.scheduler.requestAnimationFrameFunction_.call(window, f, el);
   };
 
   /**
    * @private
    */
-  scheduler.cancelAnimationFrameFunction_ = function() {
+  treesaver.scheduler.cancelAnimationFrameFunction_ = function() {
     return window.cancelAnimationFrame ||
       window.webkitCancelRequestAnimationFrame ||
       window.mozCancelRequestAnimationFrame ||
@@ -97,21 +97,21 @@ goog.scope(function() {
   /**
    * @private
    */
-  scheduler.cancelAnimationFrame_ = function(id) {
-    return scheduler.cancelAnimationFrameFunction_.call(window, id);
+  treesaver.scheduler.cancelAnimationFrame_ = function(id) {
+    return treesaver.scheduler.cancelAnimationFrameFunction_.call(window, id);
   };
 
   /**
    * Master callback for task execution
    * @private
    */
-  scheduler.tick_ = function() {
+  treesaver.scheduler.tick_ = function() {
     var now = goog.now();
 
-    scheduler.tasks_.forEach(function(task, i) {
+    treesaver.scheduler.tasks_.forEach(function(task, i) {
       // If the tick function is no longer on interval, prevent all task
       // execution
-      if (scheduler.tickID_ === -1) {
+      if (treesaver.scheduler.tickID_ === -1) {
         return;
       }
 
@@ -121,9 +121,9 @@ goog.scope(function() {
       }
 
       // Is the whitelist active?
-      if (scheduler.taskWhitelist_) {
+      if (treesaver.scheduler.taskWhitelist_) {
         if (!task.name ||
-          scheduler.taskWhitelist_.indexOf(task.name) === -1) {
+          treesaver.scheduler.taskWhitelist_.indexOf(task.name) === -1) {
           // Task is not on whitelist, go to next
           return;
         }
@@ -142,8 +142,8 @@ goog.scope(function() {
         // they only get removed when their times count is -1
         if (!task.immediate || task.times < 0) {
           // Remove from registries
-          array.remove(treesaver.scheduler.tasks_, i);
-          delete scheduler.namedTasks_[task.name];
+          treesaver.array.remove(treesaver.treesaver.scheduler.tasks_, i);
+          delete treesaver.scheduler.namedTasks_[task.name];
 
           // Exit early in order to make sure we don't execute an extra time
           if (task.immediate) {
@@ -157,7 +157,7 @@ goog.scope(function() {
           task.fun.apply(task.obj, task.args);
         }
         catch (ex) {
-          debug.error('Task ' + (task.name || 'untitled') + ' threw: ' + ex);
+          treesaver.debug.error('Task ' + (task.name || 'untitled') + ' threw: ' + ex);
         }
       }
       else {
@@ -166,11 +166,11 @@ goog.scope(function() {
     });
 
     // Clear out previous id
-    scheduler.tickID_ = -1;
+    treesaver.scheduler.tickID_ = -1;
 
     // Don't do anything if no tasks waiting
-    if (scheduler.tasks_.length) {
-      scheduler.start_();
+    if (treesaver.scheduler.tasks_.length) {
+      treesaver.scheduler.start_();
     }
   };
 
@@ -186,20 +186,20 @@ goog.scope(function() {
    * @param {string=}     name
    * @param {Object=}     obj
    */
-  scheduler.addTask_ = function(fun, interval, times, args, immediate, name, obj) {
+  treesaver.scheduler.addTask_ = function(fun, interval, times, args, immediate, name, obj) {
     if (goog.DEBUG) {
       if (!'apply' in fun) {
-        debug.error('Function without apply() not added to the scheduler');
+        treesaver.debug.error('Function without apply() not added to the scheduler');
         return;
       }
     }
 
     var now = goog.now(),
-        task = name ? scheduler.namedTasks_[name] : null;
+        task = name ? treesaver.scheduler.namedTasks_[name] : null;
 
     // Re-use previous task if it exists
-    if (name && name in scheduler.namedTasks_) {
-      task = scheduler.namedTasks_[name];
+    if (name && name in treesaver.scheduler.namedTasks_) {
+      task = treesaver.scheduler.namedTasks_[name];
     }
     else {
       // Create a new task object
@@ -211,9 +211,9 @@ goog.scope(function() {
       };
 
       // Store
-      scheduler.tasks_.push(task);
+      treesaver.scheduler.tasks_.push(task);
       if (name) {
-        scheduler.namedTasks_[name] = task;
+        treesaver.scheduler.namedTasks_[name] = task;
       }
     }
 
@@ -224,7 +224,7 @@ goog.scope(function() {
     task.removed = false;
 
     // Restart the tick callback if it's not active
-    scheduler.start_();
+    treesaver.scheduler.start_();
   };
 
   /**
@@ -236,8 +236,8 @@ goog.scope(function() {
    * @param {string=}     name
    * @param {Object=}     obj
    */
-  scheduler.delay = function(fun, delay, args, name, obj) {
-    scheduler.addTask_(fun, delay, 1, args, false, name, obj);
+  treesaver.scheduler.delay = function(fun, delay, args, name, obj) {
+    treesaver.scheduler.addTask_(fun, delay, 1, args, false, name, obj);
   };
 
   /**
@@ -249,8 +249,8 @@ goog.scope(function() {
    * @param {string=}     name
    * @param {Object=}     obj
    */
-  scheduler.repeat = function(fun, interval, times, args, name, obj) {
-    scheduler.addTask_(fun, interval, times, args, false, name, obj);
+  treesaver.scheduler.repeat = function(fun, interval, times, args, name, obj) {
+    treesaver.scheduler.addTask_(fun, interval, times, args, false, name, obj);
   };
 
   /**
@@ -260,8 +260,8 @@ goog.scope(function() {
    * @param {string=}     name
    * @param {Object=}     obj
    */
-  scheduler.queue = function(fun, args, name, obj) {
-    scheduler.addTask_(fun, 0, 1, args, false, name, obj);
+  treesaver.scheduler.queue = function(fun, args, name, obj) {
+    treesaver.scheduler.addTask_(fun, 0, 1, args, false, name, obj);
   };
 
   /**
@@ -274,17 +274,17 @@ goog.scope(function() {
    * @param {string=}     name
    * @param {Object=}     obj
    */
-  scheduler.debounce =
+  treesaver.scheduler.debounce =
     function(fun, interval, args, immediate, name, obj) {
     // Check if the task already exists
-    var task = scheduler.namedTasks_[name];
+    var task = treesaver.scheduler.namedTasks_[name];
 
     if (task) {
       // Update timestamp to further delay execution
       task.last = goog.now();
     }
     else {
-      scheduler.addTask_(fun, interval, 1, args, immediate, name, obj);
+      treesaver.scheduler.addTask_(fun, interval, 1, args, immediate, name, obj);
     }
   };
 
@@ -297,13 +297,13 @@ goog.scope(function() {
    * @param {string=}     name
    * @param {Object=}     obj
    */
-  scheduler.limit = function(fun, interval, args, name, obj) {
+  treesaver.scheduler.limit = function(fun, interval, args, name, obj) {
     // Check if the task already exists
-    var task = scheduler.namedTasks_[name];
+    var task = treesaver.scheduler.namedTasks_[name];
 
     // Ignore if already in the queue
     if (!task) {
-      scheduler.addTask_(fun, interval, 1, args, true, name, obj);
+      treesaver.scheduler.addTask_(fun, interval, 1, args, true, name, obj);
     }
   };
 
@@ -313,27 +313,27 @@ goog.scope(function() {
    * @param {Array.<string>} whitelist Names of tasks that can still execute.
    * @param {number=} timeout Timeout before auto-resume.
    */
-  scheduler.pause = function(whitelist, timeout) {
-    scheduler.taskWhitelist_ = whitelist;
+  treesaver.scheduler.pause = function(whitelist, timeout) {
+    treesaver.scheduler.taskWhitelist_ = whitelist;
 
     // Clear previous if there
-    if (scheduler.pauseTimeoutId_ !== -1) {
-      window.clearTimeout(scheduler.pauseTimeoutId_);
+    if (treesaver.scheduler.pauseTimeoutId_ !== -1) {
+      window.clearTimeout(treesaver.scheduler.pauseTimeoutId_);
     }
 
     if (timeout) {
-      scheduler.pauseTimeoutId_ = setTimeout(scheduler.resume, timeout);
+      treesaver.scheduler.pauseTimeoutId_ = setTimeout(treesaver.scheduler.resume, timeout);
     }
   };
 
   /**
    * Resume task execution
    */
-  scheduler.resume = function() {
-    scheduler.taskWhitelist_ = null;
-    if (scheduler.pauseTimeoutId_ !== -1) {
-      window.clearTimeout(scheduler.pauseTimeoutId_);
-      scheduler.pauseTimeoutId_ = -1;
+  treesaver.scheduler.resume = function() {
+    treesaver.scheduler.taskWhitelist_ = null;
+    if (treesaver.scheduler.pauseTimeoutId_ !== -1) {
+      window.clearTimeout(treesaver.scheduler.pauseTimeoutId_);
+      treesaver.scheduler.pauseTimeoutId_ = -1;
     }
   };
 
@@ -341,12 +341,12 @@ goog.scope(function() {
    * Remove a task from the execution queue
    * @param {!string} name Task name.
    */
-  scheduler.clear = function(name) {
-    delete scheduler.namedTasks_[name];
+  treesaver.scheduler.clear = function(name) {
+    delete treesaver.scheduler.namedTasks_[name];
 
-    scheduler.tasks_.forEach(function(task, i) {
+    treesaver.scheduler.tasks_.forEach(function(task, i) {
       if (task.name === name) {
-        array.remove(treesaver.scheduler.tasks_, i);
+        treesaver.array.remove(treesaver.treesaver.scheduler.tasks_, i);
         // Mark task as inactive, in case there are any references left
         task.removed = true;
       }
@@ -357,10 +357,10 @@ goog.scope(function() {
    * Start function processing again
    * @private
    */
-  scheduler.start_ = function() {
-    if (scheduler.tickID_ === -1) {
-      scheduler.tickID_ = treesaver.scheduler.requestAnimationFrame_(
-        scheduler.tick_,
+  treesaver.scheduler.start_ = function() {
+    if (treesaver.scheduler.tickID_ === -1) {
+      treesaver.scheduler.tickID_ = treesaver.treesaver.scheduler.requestAnimationFrame_(
+        treesaver.scheduler.tick_,
         document.body
       );
     }
@@ -369,18 +369,17 @@ goog.scope(function() {
   /**
    * Stop all functions from being executed, and clear out the queue
    */
-  scheduler.stopAll = function() {
+  treesaver.scheduler.stopAll = function() {
     // Stop task
-    if (scheduler.tickID_) {
-      scheduler.cancelAnimationFrame_(treesaver.scheduler.tickID_);
+    if (treesaver.scheduler.tickID_) {
+      treesaver.scheduler.cancelAnimationFrame_(treesaver.treesaver.scheduler.tickID_);
     }
 
     // Clear out any timeout
-    scheduler.resume();
+    treesaver.scheduler.resume();
 
     // Clear data stores
-    scheduler.tickID_ = -1;
-    scheduler.tasks_ = [];
-    scheduler.namedTasks_ = {};
+    treesaver.scheduler.tickID_ = -1;
+    treesaver.scheduler.tasks_ = [];
+    treesaver.scheduler.namedTasks_ = {};
   };
-});

@@ -2,14 +2,16 @@
  * @fileoverview Container data structure.
  */
 
-goog.provide('treesaver.layout.Container');
+treesaver = treesaver || {};
+treesaver.layout = treesaver.layout || {};
+treesaver.layout.Container = treesaver.layout.Container || {};
 
-goog.require('treesaver.dimensions');
-goog.require('treesaver.dom');
 
-goog.scope(function() {
-  var dimensions = treesaver.dimensions,
-      dom = treesaver.dom;
+require('./lib/dimensions');
+require('./lib/dom');
+
+
+
 
   /**
    * A column within a grid
@@ -42,43 +44,39 @@ goog.scope(function() {
      */
     this.sizes = sizesProperty ? sizesProperty.split(' ') : [];
   };
-});
 
-goog.scope(function() {
-  var Container = treesaver.layout.Container,
-      dimensions = treesaver.dimensions,
-      dom = treesaver.dom;
+
 
   /**
    * @type {boolean}
    */
-  Container.prototype.flexible;
+  treesaver.layout.Container.prototype.flexible;
 
   /**
    * @type {number}
    */
-  Container.prototype.minH;
+  treesaver.layout.Container.prototype.minH;
 
   /**
    * @type {number}
    */
-  Container.prototype.h;
+  treesaver.layout.Container.prototype.h;
 
   /**
    * @type {number}
    */
-  Container.prototype.delta;
+  treesaver.layout.Container.prototype.delta;
 
   /**
    * @type {!Array.<string>}
    */
-  Container.prototype.sizes;
+  treesaver.layout.Container.prototype.sizes;
 
   /**
    * @param {number} gridHeight
    * @return {!treesaver.layout.Container} Returns self for chaining support.
    */
-  Container.prototype.stretch = function(gridHeight) {
+  treesaver.layout.Container.prototype.stretch = function(gridHeight) {
     if (!this.flexible) {
       return this;
     }
@@ -89,8 +87,8 @@ goog.scope(function() {
   };
 
   if (goog.DEBUG) {
-    Container.prototype.toString = function() {
+    treesaver.layout.Container.prototype.toString = function() {
       return '[Container ' + this.h + '/' + this.delta + ']';
     };
   }
-});
+

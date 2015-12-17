@@ -2,20 +2,19 @@
  * @fileoverview The Content class.
  */
 
-goog.provide('treesaver.layout.Content');
+treesaver = treesaver || {};
+treesaver.layout = treesaver.layout || {};
+treesaver.layout.Content = treesaver.layout.Content || {};
 
-goog.require('treesaver.css');
-goog.require('treesaver.debug');
-goog.require('treesaver.dimensions');
-goog.require('treesaver.dom');
-goog.require('treesaver.layout.Block');
 
-goog.scope(function() {
-  var css = treesaver.css,
-      debug = treesaver.debug,
-      dimensions = treesaver.dimensions,
-      dom = treesaver.dom,
-      Block = treesaver.layout.Block;
+require('./lib/css');
+require('./lib/debug');
+require('./lib/dimensions');
+require('./lib/dom');
+require('./block');
+
+
+
 
   /**
    * A chunk of content
@@ -32,7 +31,7 @@ goog.scope(function() {
 
     // TODO: More intelligent back-up value
     this.lineHeight =
-      Math.ceil(dimensions.toPixels(el, css.getStyleObject(el).lineHeight) || 1);
+      Math.ceil(dimensions.toPixels(el, treesaver.css.getStyleObject(el).lineHeight) || 1);
 
     this.colWidth = dimensions.getOffsetWidth(el);
 
@@ -42,7 +41,7 @@ goog.scope(function() {
     // stripped out of the content
     // TODO: Even without doing harm, this is a silly hack and it'd be
     // better to find a good way to deal with this situation.
-    dom.querySelectorAll('figure', el).forEach(function(figure) {
+    treesaver.dom.querySelectorAll('figure', el).forEach(function(figure) {
       figure.style.display = 'none';
     });
 
@@ -50,7 +49,7 @@ goog.scope(function() {
     // pays off to sanitize all the content, correcting for invalid
     // line height, margins, etc, etc
     // Note that this modifies the tree in place
-    Block.sanitizeNode(el, this.lineHeight);
+    treesaver.layout.Block.sanitizeNode(el, this.lineHeight);
 
     this.figures = [];
     this.blocks = [];
@@ -59,7 +58,7 @@ goog.scope(function() {
 
     // Now we're ready to create our objects, re-use the processChildren
     // function because it does exactly what we need
-    Block.processChildren(this, el, this.lineHeight, indices);
+    treesaver.layout.Block.processChildren(this, el, this.lineHeight, indices);
   };
 
   /**
@@ -96,4 +95,4 @@ goog.scope(function() {
       return '[Content]';
     };
   }
-});
+

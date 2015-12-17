@@ -1,4 +1,8 @@
-goog.provide('treesaver.object');
+
+treesaver = treesaver || {};
+treesaver.object = treesaver.object || {};
+
+
 
 if (!Object.keys) {
   /**

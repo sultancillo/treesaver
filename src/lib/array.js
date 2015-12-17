@@ -2,9 +2,11 @@
  * @fileoverview Helper functions for manipulating arrays.
  */
 
-goog.provide('treesaver.array');
+treesaver = treesaver || {};
+treesaver.array = treesaver.array || {};
 
-goog.scope(function() {
+
+
   var array = treesaver.array;
 
   if (!'isArray' in Array) {
@@ -28,7 +30,7 @@ goog.scope(function() {
    * @param {*} obj
    * @return {!Array}
    */
-  array.toArray = function(obj) {
+  treesaver.array.toArray = function(obj) {
     return Array.prototype.slice.call(/** @type {Object} */(obj), 0);
   };
 
@@ -40,9 +42,8 @@ goog.scope(function() {
    * @param {!number} from
    * @param {number=} to
    */
-  array.remove = function(arr, from, to) {
+  treesaver.array.remove = function(arr, from, to) {
     var rest = arr.slice((to || from) + 1 || arr.length);
     arr.length = from < 0 ? arr.length + from : from;
     return arr.push.apply(arr, rest);
   };
-});

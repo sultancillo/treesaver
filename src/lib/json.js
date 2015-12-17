@@ -1,14 +1,13 @@
 /**
  * @fileoverview JSON wrapper methods for older browsers.
  */
+treesaver = treesaver || {};
+treesaver.json = treesaver.json || {};
 
-goog.provide('treesaver.json');
 
-goog.require('treesaver.debug');
+require('./debug');
 
-goog.scope(function() {
-  var json = treesaver.json,
-      debug = treesaver.debug,
+
       nativeJSON = window.JSON;
 
   /**
@@ -30,4 +29,4 @@ goog.scope(function() {
   json.stringify = function(val) {
     return nativeJSON.stringify(val);
   };
-});
+

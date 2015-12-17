@@ -1,13 +1,14 @@
 /**
  * @fileoverview Logging functions for use while debugging.
  */
+treesaver = treesaver || {};
+treesaver.debug = treesaver.debug || {};
 
-goog.provide('treesaver.debug');
 
-goog.require('treesaver.capabilities');
+require('./capabilities');
 
-goog.scope(function() {
-  var debug = treesaver.debug;
+
+
 
   /**
    * Original load time of debug code
@@ -15,24 +16,24 @@ goog.scope(function() {
    * @const
    * @type {number}
    */
-  debug.startupTime_ = goog.now();
+  treesaver.debug.startupTime_ = goog.now();
 
   /**
    * Creates a timestamp for a log entry
    *
    * @return {!string}
    */
-  debug.timestamp_ = function() {
-    return '[' + (goog.now() - debug.startupTime_).toFixed(3) / 1000 + 's] ';
+  treesaver.debug.timestamp_ = function() {
+    return '[' + (goog.now() - treesaver.debug.startupTime_).toFixed(3) / 1000 + 's] ';
   };
 
   /**
    * Log a message
    * @param {!string} msg
    */
-  debug.info = function(msg) {
+  treesaver.debug.info = function(msg) {
     if (goog.DEBUG && window.console) {
-      msg = debug.timestamp_() + msg;
+      msg = treesaver.debug.timestamp_() + msg;
 
       if ('info' in window.console) {
         window.console['info'](msg);
@@ -47,9 +48,9 @@ goog.scope(function() {
    * Log a message
    * @param {!string} msg
    */
-  debug.log = function(msg) {
+  treesaver.debug.log = function(msg) {
     if (goog.DEBUG && window.console) {
-      msg = debug.timestamp_() + msg;
+      msg = treesaver.debug.timestamp_() + msg;
 
       if ('debug' in window.console) {
         window.console['debug'](msg);
@@ -64,9 +65,9 @@ goog.scope(function() {
    * Log a message
    * @param {!string} msg
    */
-  debug.warn = function(msg) {
+  treesaver.debug.warn = function(msg) {
     if (goog.DEBUG && window.console) {
-      msg = debug.timestamp_() + msg;
+      msg = treesaver.debug.timestamp_() + msg;
 
       if ('warn' in window.console) {
         window.console['warn'](msg);
@@ -81,9 +82,9 @@ goog.scope(function() {
    * Log a message
    * @param {!string} msg
    */
-  debug.error = function(msg) {
+  treesaver.debug.error = function(msg) {
     if (goog.DEBUG && window.console) {
-      msg = debug.timestamp_() + msg;
+      msg = treesaver.debug.timestamp_() + msg;
 
       if ('error' in window.console) {
         window.console['error'](msg);
@@ -99,16 +100,16 @@ goog.scope(function() {
    * @param {boolean} assertion
    * @param {?string} msg
    */
-  debug.assert = function(assertion, msg) {
+  treesaver.debug.assert = function(assertion, msg) {
     if (goog.DEBUG && window.console) {
       if ('assert' in window.console) {
         window.console['assert'](assertion, msg);
       }
       else if (!assertion) {
-        debug.error('Assertion failed: ' + msg);
+        treesaver.debug.error('Assertion failed: ' + msg);
       }
     }
   };
 
-  debug.info('Running in DEBUG mode');
-});
+  treesaver.debug.info('Running in DEBUG mode');
+

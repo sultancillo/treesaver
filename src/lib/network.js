@@ -1,34 +1,24 @@
 /**
  * @fileoverview Retrieve files via XMLHttpRequest.
  */
+treesaver = treesaver || {};
+treesaver.network = treesaver.network || {};
 
-goog.provide('treesaver.network');
 
-goog.require('treesaver.capabilities');
-goog.require('treesaver.debug');
-goog.require('treesaver.events');
-goog.require('treesaver.scheduler');
-
-goog.scope(function() {
-  var network = treesaver.network,
-      capabilities = treesaver.capabilities,
-      debug = treesaver.debug,
-      events = treesaver.events,
-      scheduler = treesaver.scheduler;
 
   /**
    * @private
    * @const
    * @type {number}
    */
-  network.DEFAULT_TIMEOUT = 10000; // 10 seconds
+  treesaver.network.DEFAULT_TIMEOUT = 10000; // 10 seconds
 
   /**
    * Network events fired
    * @const
    * @type {Object.<string, string>}
    */
-  network.events = {
+  treesaver.network.events = {
     ONLINE: 'treesaver.online',
     OFFLINE: 'treesaver.offline'
   };
@@ -39,7 +29,7 @@ goog.scope(function() {
    * @const
    * @type {Array.<string>}
    */
-  network.watchedEvents_ = [
+  treesaver.network.watchedEvents_ = [
     'offline',
     'online'
   ];
@@ -50,7 +40,7 @@ goog.scope(function() {
    * @const
    * @type {Array.<string>}
    */
-  network.watchedCacheEvents_ = [
+  treesaver.network.watchedCacheEvents_ = [
     'uncached',
     'idle',
     'checking',
@@ -64,26 +54,26 @@ goog.scope(function() {
    * @private
    * @type {boolean}
    */
-  network.isLoaded_ = false;
+  treesaver.network.isLoaded_ = false;
 
   /**
    * Initialize the network module, hook up event handlers, etc
    */
-  network.load = function() {
-    if (!network.isLoaded_) {
-      network.isLoaded_ = true;
+  treesaver.network.load = function() {
+    if (!treesaver.network.isLoaded_) {
+      treesaver.network.isLoaded_ = true;
 
       // Hook up event handlers
-      network.watchedEvents_.forEach(function(evt) {
-        events.addListener(document, evt, network);
+      treesaver.network.watchedEvents_.forEach(function(evt) {
+        treesaver.events.addListener(document, evt, network);
       });
 
-      if (capabilities.SUPPORTS_APPLICATIONCACHE &&
+      if (treesaver.capabilities.SUPPORTS_APPLICATIONCACHE &&
           // FF3.5 gets nasty if you try to add event handlers to an uncached page
           // (specifically, it won't let you add event handlers to the cache obj)
-          network.loadedFromCache_) {
-        network.watchedCacheEvents_.forEach(function(evt) {
-          events.addListener(window.applicationCache, evt, network);
+          treesaver.network.loadedFromCache_) {
+        treesaver.network.watchedCacheEvents_.forEach(function(evt) {
+          treesaver.events.addListener(window.applicationCache, evt, network);
         });
       }
     }
@@ -92,19 +82,19 @@ goog.scope(function() {
   /**
    * Unload handlers and cleanup
    */
-  network.unload = function() {
-    if (network.isLoaded_) {
-      network.isLoaded_ = false;
+  treesaver.network.unload = function() {
+    if (treesaver.network.isLoaded_) {
+      treesaver.network.isLoaded_ = false;
 
       // Unhook event handlers
-      network.watchedEvents_.forEach(function(evt) {
-        events.removeListener(window, evt, network);
+      treesaver.network.watchedEvents_.forEach(function(evt) {
+        treesaver.events.removeListener(window, evt, network);
       });
       // Unhook cache handlers only if they were set (avoid FF3.5 bug from above)
-      if (capabilities.SUPPORTS_APPLICATIONCACHE &&
-          network.loadedFromCache_) {
-        network.watchedCacheEvents_.forEach(function(evt) {
-          events.removeListener(window.applicationCache, evt, network);
+      if (treesaver.capabilities.SUPPORTS_APPLICATIONCACHE &&
+          treesaver.network.loadedFromCache_) {
+        treesaver.network.watchedCacheEvents_.forEach(function(evt) {
+          treesaver.events.removeListener(window.applicationCache, evt, network);
         });
       }
 
@@ -118,7 +108,7 @@ goog.scope(function() {
    * @private
    * @type {boolean}
    */
-  network.onlineStatus_ = 'onLine' in window.navigator ?
+  treesaver.network.onlineStatus_ = 'onLine' in window.navigator ?
     // TODO: What's a good fallback option here? IE8, and recent FF/WebKit support
     // navigator.onLine, so perhaps we just don't worry about this too much
     window.navigator.onLine : true;
@@ -126,8 +116,8 @@ goog.scope(function() {
   /**
    * @return {boolean} True if browser has an internet connection.
    */
-  network.isOnline = function() {
-    return network.onlineStatus_;
+  treesaver.network.isOnline = function() {
+    return treesaver.network.onlineStatus_;
   };
 
   /**
@@ -135,32 +125,32 @@ goog.scope(function() {
    *
    * @param {boolean} onLine True if should behave as if online.
    */
-  network.setOnlineStatus = function(onLine) {
-    network.onlineStatus_ = onLine;
+  treesaver.network.setOnlineStatus = function(onLine) {
+    treesaver.network.onlineStatus_ = onLine;
 
     // TODO: Refactor this and create an event handler in capabilities, some
     // `capabilitiesChanged` event perhaps?
-    capabilities.updateClasses();
+    treesaver.capabilities.updateClasses();
 
     // Fire Treesaver event
-    events.fireEvent(window,
-      onLine ? network.events.ONLINE : network.events.OFFLINE);
+    treesaver.events.fireEvent(window,
+      onLine ? treesaver.network.treesaver.events.ONLINE : treesaver.network.treesaver.events.OFFLINE);
   };
 
   /**
    * @private
    * @type {boolean}
    */
-  network.loadedFromCache_ =
-    capabilities.SUPPORTS_APPLICATIONCACHE &&
+  treesaver.network.loadedFromCache_ =
+    treesaver.capabilities.SUPPORTS_APPLICATIONCACHE &&
     // 0 = UNCACHED, anything else means page was cached on load
     !!window.applicationCache.status;
 
   /**
    * @return {boolean} True if the browser cache was active during boot.
    */
-  network.loadedFromCache = function() {
-    return network.loadedFromCache_;
+  treesaver.network.loadedFromCache = function() {
+    return treesaver.network.loadedFromCache_;
   };
 
   /**
@@ -168,25 +158,25 @@ goog.scope(function() {
    * @param {Event} e
    */
   network['handleEvent'] = function(e) {
-    debug.info('Network event recieved: ' + e);
+    treesaver.debug.info('Network event recieved: ' + e);
 
     switch (e.type) {
     case 'online':
-      debug.info('Application online');
+      treesaver.debug.info('Application online');
 
-      network.setOnlineStatus(true);
+      treesaver.network.setOnlineStatus(true);
 
       return;
 
     case 'offline':
-      debug.info('Application offline');
+      treesaver.debug.info('Application offline');
 
-      network.setOnlineStatus(false);
+      treesaver.network.setOnlineStatus(false);
 
       return;
 
     case 'updateready':
-      debug.info('Updating application cache');
+      treesaver.debug.info('Updating application cache');
 
       // New version of cached element is ready, hot swap
       window.applicationCache.swapCache();
@@ -196,7 +186,7 @@ goog.scope(function() {
       return;
 
     case 'error':
-      debug.warn('Application Cache Error: ' + e);
+      treesaver.debug.warn('Application Cache Error: ' + e);
 
       // TODO: ???
       return;
@@ -208,15 +198,15 @@ goog.scope(function() {
    * @const
    * @type {!RegExp}
    */
-  network.protocolRegex_ = /^https?:\/\//i;
+  treesaver.network.protocolRegex_ = /^https?:\/\//i;
 
   /**
    * @param {!string} rel_path
    * @return {!string} An absolute URL.
    */
-  network.absoluteURL = function(rel_path) {
+  treesaver.network.absoluteURL = function(rel_path) {
     // Shortcut anything that starts with slash
-    if (rel_path && rel_path[0] === '/' || network.protocolRegex_.test(rel_path)) {
+    if (rel_path && rel_path[0] === '/' || treesaver.network.protocolRegex_.test(rel_path)) {
       return rel_path;
     }
 
@@ -235,8 +225,8 @@ goog.scope(function() {
    * @param {?function()} callback
    * @param {number=} timeout
    */
-  network.get = function get(url, callback, timeout) {
-    debug.info('XHR request to: ' + url);
+  treesaver.network.get = function get(url, callback, timeout) {
+    treesaver.debug.info('XHR request to: ' + url);
 
     var request = {
       xhr: new XMLHttpRequest(),
@@ -244,17 +234,17 @@ goog.scope(function() {
       callback: callback
     };
 
-    scheduler.delay(
+    treesaver.scheduler.delay(
       function() {
-        network.requestTimeout_(request);
+        treesaver.network.requestTimeout_(request);
       },
-      timeout || network.DEFAULT_TIMEOUT,
+      timeout || treesaver.network.DEFAULT_TIMEOUT,
       [],
-      network.makeRequestId_(request)
+      treesaver.network.makeRequestId_(request)
     );
 
     // Setup timeout
-    request.xhr.onreadystatechange = network.createHandler_(request);
+    request.xhr.onreadystatechange = treesaver.network.createHandler_(request);
 
     try {
       // IE will throw if you try X-domain
@@ -262,16 +252,16 @@ goog.scope(function() {
       request.xhr.send(null);
     }
     catch (e) {
-      debug.warn('XHR Request exception: ' + e);
+      treesaver.debug.warn('XHR Request exception: ' + e);
 
-      network.requestError_(request);
+      treesaver.network.requestError_(request);
     }
   };
 
   /**
    * @private
    */
-  network.makeRequestId_ = function(request) {
+  treesaver.network.makeRequestId_ = function(request) {
     // TODO: Make unique across repeated requests?
     return 'fetch:' + request.url;
   };
@@ -279,21 +269,21 @@ goog.scope(function() {
   /**
    * @private
    */
-  network.createHandler_ = function createHandler_(request) {
+  treesaver.network.createHandler_ = function createHandler_(request) {
     return function() {
       if (request.xhr.readyState === 4) {
         // Requests from local file system give 0 status
         // This happens in IOS wrapper, as well as packaged Chrome web store
         if (request.xhr.status === 0 ||
             (request.xhr.status === 200 || request.xhr.status === 304)) {
-          debug.info('XHR response from: ' + request.url);
+          treesaver.debug.info('XHR response from: ' + request.url);
           request.callback(request.xhr.responseText, request.url);
-          network.cleanupRequest_(request);
+          treesaver.network.cleanupRequest_(request);
         }
         else {
-          debug.warn('XHR request failed for: ' + request.url);
+          treesaver.debug.warn('XHR request failed for: ' + request.url);
 
-          network.requestError_(request);
+          treesaver.network.requestError_(request);
         }
       }
     };
@@ -302,9 +292,9 @@ goog.scope(function() {
   /**
    * @private
    */
-  network.cleanupRequest_ = function cleanupRequest_(request) {
+  treesaver.network.cleanupRequest_ = function cleanupRequest_(request) {
     // Remove timeout
-    scheduler.clear(network.makeRequestId_(request));
+    treesaver.scheduler.clear(treesaver.network.makeRequestId_(request));
     // Clear reference
     request.xhr.onreadystatechange = null;
   };
@@ -312,21 +302,21 @@ goog.scope(function() {
   /**
    * @private
    */
-  network.requestError_ = function requestError_(request) {
+  treesaver.network.requestError_ = function requestError_(request) {
     // Failed for some reason; TODO: Error handling / event?
     request.callback(null, request.url);
-    network.cleanupRequest_(request);
+    treesaver.network.cleanupRequest_(request);
   };
 
   /**
    * @private
    */
-  network.requestTimeout_ = function requestTimeout_(request) {
+  treesaver.network.requestTimeout_ = function requestTimeout_(request) {
     request.xhr.abort();
-    network.requestError_(request);
+    treesaver.network.requestError_(request);
   };
 
   if (WITHIN_IOS_WRAPPER) {
-    goog.exportSymbol('treesaver.setOnlineStatus', network.setOnlineStatus);
+    goog.exportSymbol('treesaver.setOnlineStatus', treesaver.network.setOnlineStatus);
   }
-});
+

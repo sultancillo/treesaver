@@ -2,10 +2,13 @@
  * @fileoverview BreakRecord class.
  */
 
-goog.provide('treesaver.layout.BreakRecord');
+treesaver = treesaver || {};
+treesaver.layout = treesaver.layout || {};
+treesaver.layout.BreakRecord = treesaver.layout.BreakRecord || {};
 
-goog.require('treesaver.array');
-goog.require('treesaver.layout.ContentPosition');
+
+require('../lib/array');
+require('../layout/contentposition');
 
 /**
  * BreakRecord class
@@ -20,52 +23,49 @@ treesaver.layout.BreakRecord = function() {
   this.pageNumber = 0;
 };
 
-goog.scope(function() {
-  var BreakRecord = treesaver.layout.BreakRecord,
-      ContentPosition = treesaver.layout.ContentPosition,
-      array = treesaver.array;
+
 
   /**
    * @type {number}
    */
-  BreakRecord.prototype.index;
+   treesaver.layout.BreakRecord.prototype.index;
 
   /**
    * @type {number}
    */
-  BreakRecord.prototype.figureIndex;
+   treesaver.layout.BreakRecord.prototype.figureIndex;
 
   /**
    * @type {number}
    */
-  BreakRecord.prototype.overhang;
+   treesaver.layout.BreakRecord.prototype.overhang;
 
   /**
    * @type {boolean}
    */
-  BreakRecord.prototype.finished;
+   treesaver.layout.BreakRecord.prototype.finished;
 
   /**
    * @type {Array.<number>}
    */
-  BreakRecord.prototype.delayed;
+   treesaver.layout.BreakRecord.prototype.delayed;
 
   /**
    * @type {Array.<number>}
    */
-  BreakRecord.prototype.failed;
+   treesaver.layout.BreakRecord.prototype.failed;
 
   /**
    * @type {number}
    */
-  BreakRecord.prototype.pageNumber;
+   treesaver.layout.BreakRecord.prototype.pageNumber;
 
   /**
    * Create a new copy, and return
    *
    * @return {!treesaver.layout.BreakRecord} A deep clone of the original breakRecord.
    */
-  BreakRecord.prototype.clone = function() {
+   treesaver.layout.BreakRecord.prototype.clone = function() {
     var clone = new this.constructor();
     clone.index = this.index;
     clone.figureIndex = this.figureIndex;
@@ -84,7 +84,7 @@ goog.scope(function() {
    * @param {treesaver.layout.BreakRecord} other Object to check for equality.
    * @return {boolean} True if the breakRecord is equivalent.
    */
-  BreakRecord.prototype.equals = function(other) {
+   treesaver.layout.BreakRecord.prototype.equals = function(other) {
     return !!other &&
         other.index === this.index &&
         other.figureIndex === this.figureIndex &&
@@ -101,8 +101,8 @@ goog.scope(function() {
    *
    * @return {!treesaver.layout.ContentPosition}
    */
-  BreakRecord.prototype.getPosition = function() {
-    return new ContentPosition(this.index, this.figureIndex, this.overhang);
+   treesaver.layout.BreakRecord.prototype.getPosition = function() {
+    return new treesaver.layout.ContentPosition(this.index, this.figureIndex, this.overhang);
   };
 
   /**
@@ -111,7 +111,7 @@ goog.scope(function() {
    * @return {boolean} True if this breakRecord is at the start
    *                   of content.
    */
-  BreakRecord.prototype.atStart = function() {
+   treesaver.layout.BreakRecord.prototype.atStart = function() {
     return !this.index && !this.figureIndex && !this.overhang;
   };
 
@@ -121,7 +121,7 @@ goog.scope(function() {
    * @param {!treesaver.layout.Content} content The content for this breakRecord.
    * @return {boolean} True if there is no more content left to show.
    */
-  BreakRecord.prototype.atEnd = function(content) {
+   treesaver.layout.BreakRecord.prototype.atEnd = function(content) {
     if (this.overhang) {
       // Overhang means we're not finished, no matter what
       return false;
@@ -191,7 +191,7 @@ goog.scope(function() {
    *
    * @param {!number} figureIndex The index of the figure just used.
    */
-  BreakRecord.prototype.useFigure = function(figureIndex) {
+   treesaver.layout.BreakRecord.prototype.useFigure = function(figureIndex) {
     var delayedIndex;
 
     if (figureIndex < 0) {
@@ -203,11 +203,11 @@ goog.scope(function() {
     if (figureIndex < this.figureIndex) {
       if ((delayedIndex = this.delayed.indexOf(figureIndex)) !== -1) {
         // Remove from delayed
-        array.remove(this.delayed, delayedIndex);
+         treesaver.array.remove(this.delayed, delayedIndex);
       }
       else if ((delayedIndex = this.failed.indexOf(figureIndex)) !== -1) {
         // Was a failure, remove
-        array.remove(this.failed, delayedIndex);
+         treesaver.array.remove(this.failed, delayedIndex);
       }
       else {
         // Do nothing
@@ -232,7 +232,7 @@ goog.scope(function() {
    *
    * @param {!number} figureIndex
    */
-  BreakRecord.prototype.delayFigure = function(figureIndex) {
+   treesaver.layout.BreakRecord.prototype.delayFigure = function(figureIndex) {
     if (this.delayed.indexOf(figureIndex) === -1) {
       // Pretend the figure was used
       this.useFigure(figureIndex);
@@ -248,7 +248,7 @@ goog.scope(function() {
    * @param {!number} figureIndex
    * @return {boolean} True if the figure index has been used.
    */
-  BreakRecord.prototype.figureUsed = function(figureIndex) {
+   treesaver.layout.BreakRecord.prototype.figureUsed = function(figureIndex) {
     if (this.figureIndex <= figureIndex) {
       return false;
     }
@@ -269,7 +269,7 @@ goog.scope(function() {
    *
    * @param {!number} figureIndex The index of the figure just used.
    */
-  BreakRecord.prototype.failedFigure = function(figureIndex) {
+   treesaver.layout.BreakRecord.prototype.failedFigure = function(figureIndex) {
     // Pretend like we used the figure
     this.useFigure(figureIndex);
 
@@ -278,8 +278,8 @@ goog.scope(function() {
   };
 
   if (goog.DEBUG) {
-    BreakRecord.prototype.toString = function() {
+     treesaver.layout.BreakRecord.prototype.toString = function() {
       return '[BreakRecord ' + this.index + '/' + this.figureIndex + ']';
     };
   }
-});
+

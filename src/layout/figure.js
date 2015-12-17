@@ -1,18 +1,18 @@
-goog.provide('treesaver.layout.Figure');
 
-goog.require('treesaver.array');
-goog.require('treesaver.capabilities');
-goog.require('treesaver.dom');
+treesaver = treesaver || {};
+treesaver.layout = treesaver.layout || {};
+treesaver.layout.Figure = treesaver.layout.Figure || {};
+
+
+require('./lib/array');
+require('./lib/capabilities');
+require('./lib/dom');
 // Block requires Figure, so avoid a circular dependency
 //goog.require('treesaver.layout.Block');
-goog.require('treesaver.layout.FigureSize');
-goog.require('treesaver.string'); // String.trim
+require('./FigureSize');
+require('./lib/string'); // String.trim
 
-goog.scope(function() {
-  var array = treesaver.array,
-      capabilities = treesaver.capabilities,
-      dom = treesaver.dom,
-      FigureSize = treesaver.layout.FigureSize;
+
 
   /**
    * A figure element
@@ -29,12 +29,12 @@ goog.scope(function() {
     this.fallback = null;
     this.sizes = {};
 
-    this.optional = !dom.hasClass(el, 'required');
-    this.zoomable = dom.hasClass(el, 'zoomable');
-    this.scrollable = dom.hasClass(el, 'scroll');
+    this.optional = !treesaver.dom.hasClass(el, 'required');
+    this.zoomable = treesaver.dom.hasClass(el, 'zoomable');
+    this.scrollable = treesaver.dom.hasClass(el, 'scroll');
 
     // Go through and process our sizes
-    array.toArray(el.childNodes).forEach(function(childNode) {
+    treesaver.array.toArray(el.childNodes).forEach(function(childNode) {
       if (childNode.nodeType !== 1) {
         // TODO: What if content is just a ext node? (take parent?)
         if (childNode.data && childNode.data.trim()) {
@@ -57,53 +57,46 @@ goog.scope(function() {
       delete this.sizes['fallback'];
     }
   };
-});
 
-goog.scope(function() {
-  var Figure = treesaver.layout.Figure,
-      array = treesaver.array,
-      capabilities = treesaver.capabilities,
-      dom = treesaver.dom,
-      FigureSize = treesaver.layout.FigureSize;
 
   /**
    * @type {number}
    */
-  Figure.prototype.anchorIndex;
+  treesaver.layout.Figure.prototype.anchorIndex;
 
   /**
    * @type {number}
    */
-  Figure.prototype.figureIndex;
+  treesaver.layout.Figure.prototype.figureIndex;
 
   /**
    * @type {?treesaver.layout.Block}
    */
-  Figure.prototype.fallback;
+  treesaver.layout.Figure.prototype.fallback;
 
   /**
    * @type {Object.<string, Array.<treesaver.layout.FigureSize>>}
    */
-  Figure.prototype.sizes;
+  treesaver.layout.Figure.prototype.sizes;
 
   /**
    * Does this figure need to be displayed? If not, then it may be omitted
    * when there is not enough space.
    * @type {boolean}
    */
-  Figure.prototype.optional;
+  treesaver.layout.Figure.prototype.optional;
 
   /**
    * Does the figure support zooming/lightboxing?
    * @type {boolean}
    */
-  Figure.prototype.zoomable;
+  treesaver.layout.Figure.prototype.zoomable;
 
   /**
    * Does the figure support scrolling?
    * @type {boolean}
    */
-  Figure.prototype.scrollable;
+  treesaver.layout.Figure.prototype.scrollable;
 
   /**
    * @param {!string} html
@@ -112,7 +105,7 @@ goog.scope(function() {
    *                                 the article content (in pixels).
    * @param {!Object} indices Current block and figure index.
    */
-  Figure.prototype.processFallback = function processFallback(html,
+  treesaver.layout.Figure.prototype.processFallback = function processFallback(html,
       node, baseLineHeight, indices) {
     // Create the child node
     var parent = node.parentNode,
@@ -139,9 +132,9 @@ goog.scope(function() {
 
     // Add flags into DOM for zooming
     if (this.zoomable) {
-      dom.addClass(fallbackNode, 'zoomable');
+      treesaver.dom.addClass(fallbackNode, 'zoomable');
       fallbackNode.setAttribute('data-figureindex', this.figureIndex);
-      if (capabilities.IS_NATIVE_APP || treesaver.capabilities.SUPPORTS_TOUCH) {
+      if (treesaver.capabilities.IS_NATIVE_APP || treesaver.treesaver.capabilities.SUPPORTS_TOUCH) {
         // Need dummy handler in order to get bubbled events
         fallbackNode.setAttribute('onclick', 'void(0)');
       }
@@ -173,7 +166,7 @@ goog.scope(function() {
    * @param {!string} size
    * @return {?treesaver.layout.FigureSize} Null if not found.
    */
-  Figure.prototype.getSize = function(size) {
+  treesaver.layout.Figure.prototype.getSize = function(size) {
     var i, len;
 
     if (this.sizes[size]) {
@@ -195,7 +188,7 @@ goog.scope(function() {
    * @param {boolean=} isLightbox True if display is for a lightbox.
    * @return {?{name: string, figureSize: treesaver.layout.FigureSize}} Null if none fit
    */
-  Figure.prototype.getLargestSize = function(maxSize, isLightbox) {
+  treesaver.layout.Figure.prototype.getLargestSize = function(maxSize, isLightbox) {
     var maxArea = -Infinity,
         availArea = maxSize.w * maxSize.h,
         closest,
@@ -211,15 +204,15 @@ goog.scope(function() {
 
     for (current in sizes) {
       this.sizes[current].forEach(function(figureSize) {
-        if (!figureSize.meetsRequirements()) {
+        if (!treesaver.layout.FigureSize.meetsRequirements()) {
           // Not eligible
           return;
         }
 
-        var area = figureSize.minW * figureSize.minH;
+        var area = treesaver.layout.FigureSize.minW * treesaver.layout.FigureSize.minH;
 
-        if ((figureSize.minW && figureSize.minW > maxSize.w) ||
-            (figureSize.minH && figureSize.minH > maxSize.h)) {
+        if ((treesaver.layout.FigureSize.minW && treesaver.layout.FigureSize.minW > maxSize.w) ||
+            (treesaver.layout.FigureSize.minH && treesaver.layout.FigureSize.minH > maxSize.h)) {
           // Too big
           if (!max && this.scrollable) {
             // If nothing fits yet, find something at least near
@@ -259,9 +252,9 @@ goog.scope(function() {
    * @param {number} minH
    * @param {?Array.<string>} requirements
    */
-  Figure.prototype.saveSizes = function saveSizes(sizes, html, minW, minH, requirements) {
+  treesaver.layout.Figure.prototype.saveSizes = function saveSizes(sizes, html, minW, minH, requirements) {
     // First, create the FigureSize
-    var figureSize = new FigureSize(html, minW, minH, requirements);
+    var figureSize = new treesaver.layout.FigureSize(html, minW, minH, requirements);
 
     sizes.forEach(function(size) {
       if (this.sizes[size]) {
@@ -276,17 +269,17 @@ goog.scope(function() {
   /**
    * @param {!Element} el
    */
-  Figure.prototype.processElement = function processElement(el) {
+  treesaver.layout.Figure.prototype.processElement = function processElement(el) {
     var sizes = el.getAttribute('data-sizes'),
         // Use native width & height if available, otherwise use custom data- properties
-        minW = parseInt(el.getAttribute(dom.hasAttr(el, 'width') ? 'width' : 'data-minwidth'), 10),
-        minH = parseInt(el.getAttribute(dom.hasAttr(el, 'height') ? 'height' : 'data-minheight'), 10),
-        requirements = dom.hasAttr(el, 'data-requires') ?
+        minW = parseInt(el.getAttribute(treesaver.dom.hasAttr(el, 'width') ? 'width' : 'data-minwidth'), 10),
+        minH = parseInt(el.getAttribute(treesaver.dom.hasAttr(el, 'height') ? 'height' : 'data-minheight'), 10),
+        requirements = treesaver.dom.hasAttr(el, 'data-requires') ?
           el.getAttribute('data-requires').split(' ') : null,
         html;
 
     if (requirements) {
-      if (!capabilities.check(requirements)) {
+      if (!treesaver.capabilities.check(requirements)) {
         // Does not meet requirements, skip
         return;
       }
@@ -294,7 +287,7 @@ goog.scope(function() {
 
     // Remove class=hidden or hidden attribute in case used for display cloaking
     el.removeAttribute('hidden');
-    dom.removeClass(el, 'hidden');
+    treesaver.dom.removeClass(el, 'hidden');
 
     // TODO: Remove properties we don't need to store (data-*)
 
@@ -302,7 +295,7 @@ goog.scope(function() {
     treesaver.ui.Scrollable.initDomTree(el);
 
     // Grab HTML
-    html = dom.outerHTML(el);
+    html = treesaver.dom.outerHTML(el);
 
     if (!sizes) {
       sizes = ['fallback'];
@@ -318,15 +311,15 @@ goog.scope(function() {
    * @param {!Element} el
    * @return {boolean} True if the element is a figure.
    */
-  Figure.isFigure = function(el) {
+  treesaver.layout.Figure.isFigure = function(el) {
     var nodeName = el.nodeName.toLowerCase();
     return el.nodeType === 1 && nodeName === 'figure';
   };
 
   if (goog.DEBUG) {
     // Expose for testing
-    Figure.prototype.toString = function() {
+    treesaver.layout.Figure.prototype.toString = function() {
       return '[Figure: ' + this.index + '/' + this.figureIndex + ']';
     };
   }
-});
+

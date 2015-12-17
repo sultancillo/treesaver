@@ -2,6 +2,9 @@
  * @fileoverview The chrome class.
  */
 
+treesaver = treesaver || {};
+treesaver.ui = treesaver.ui || {};
+
 goog.provide('treesaver.ui.Chrome');
 
 goog.require('treesaver.array');

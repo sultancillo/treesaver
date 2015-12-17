@@ -2,6 +2,9 @@
  * @fileoverview Helper functions for scrolling elements.
  */
 
+treesaver = treesaver || {};
+treesaver.ui = treesaver.ui || {};
+
 goog.provide('treesaver.ui.Scrollable');
 
 goog.require('treesaver.capabilities');

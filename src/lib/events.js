@@ -2,11 +2,13 @@
  * @fileoverview Event helper functions.
  */
 
-goog.provide('treesaver.events');
+treesaver = treesaver || {};
+treesaver.events = treesaver.events || {};
 
-goog.require('treesaver.debug');
 
-goog.scope(function() {
+goog('./debug');
+
+
   var events = treesaver.events,
       debug = treesaver.debug;
 
@@ -17,7 +19,7 @@ goog.scope(function() {
    * @param {!string} type
    * @param {Object=} data
    */
-  events.fireEvent = function(obj, type, data) {
+  treesaver.events.fireEvent = function(obj, type, data) {
     var e = document.createEvent('UIEvents'),
         cur,
         val;
@@ -41,7 +43,7 @@ goog.scope(function() {
    * @param {!string} type
    * @param {!function()|!Object} fn
    */
-  events.addListener = function(obj, type, fn) {
+  treesaver.events.addListener = function(obj, type, fn) {
     // Help out while debugging, but don't pay the performance hit
     // for a try/catch in production
     if (goog.DEBUG) {
@@ -49,8 +51,8 @@ goog.scope(function() {
         obj.addEventListener(type, fn, false);
       }
       catch (ex) {
-        debug.error('Could not add ' + type + ' listener to: ' + obj);
-        debug.error('Exception ' + ex);
+        treesaver.debug.error('Could not add ' + type + ' listener to: ' + obj);
+        treesaver.debug.error('Exception ' + ex);
       }
     }
     else {
@@ -65,22 +67,22 @@ goog.scope(function() {
    * @param {!string} type
    * @param {!function()|!Object} fn
    */
-  events.removeListener = function(obj, type, fn) {
+  treesaver.events.removeListener = function(obj, type, fn) {
     // Help out with debugging, but only in debug
     if (goog.DEBUG) {
       try {
         obj.removeEventListener(type, fn, false);
       }
       catch (ex) {
-        debug.error('Could not remove ' + type + ' listener from: ' + obj);
-        debug.error('Exception ' + ex);
+        treesaver.debug.error('Could not remove ' + type + ' listener from: ' + obj);
+        treesaver.debug.error('Exception ' + ex);
       }
     }
     else {
       obj.removeEventListener(type, fn, false);
     }
   };
-});
+
 
 // Expose event helper functions via externs
 goog.exportSymbol('treesaver.addListener', treesaver.events.addListener);

@@ -1,8 +1,9 @@
 /**
  * @fileoverview CSS helper functions.
  */
+treesaver = treesaver || {};
+treesaver.css = treesaver.css || {};
 
-goog.provide('treesaver.css');
 
 /**
  * Return the computedStyle object, which varies based on

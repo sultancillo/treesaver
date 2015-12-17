@@ -2,7 +2,9 @@
  * @fileoverview Extract resources defined in an external HTML file.
  */
 
-goog.provide('treesaver.resources');
+treesaver = treesaver || {};
+treesaver.resources = treesaver.resources || {};
+
 
 goog.require('treesaver.array');
 goog.require('treesaver.constants');
@@ -10,7 +12,7 @@ goog.require('treesaver.debug');
 goog.require('treesaver.dom');
 goog.require('treesaver.network');
 
-goog.scope(function() {
+
   var resources = treesaver.resources,
       array = treesaver.array,
       debug = treesaver.debug,
@@ -22,11 +24,11 @@ goog.scope(function() {
    *
    * @param {!function()} callback
    */
-  resources.load = function(callback) {
-    var url = resources.getResourcesLinkUrl_();
+  treesaver.resources.load = function(callback) {
+    var url = treesaver.resources.getResourcesLinkUrl_();
 
     if (!url) {
-      debug.error('No link to resources found');
+      treesaver.debug.error('No link to resources found');
 
       // Technically, we're done loading
       callback();
@@ -35,42 +37,42 @@ goog.scope(function() {
     }
 
     // Are we in the loading process?
-    if (resources.loadStatus_) {
-      if (resources.loadStatus_ ===
-          resources.LoadStatus.LOADED) {
+    if (treesaver.resources.loadStatus_) {
+      if (treesaver.resources.loadStatus_ ===
+          treesaver.resources.LoadStatus.LOADED) {
         // Already loaded, callback immediately
         callback();
       }
       else {
         // Not loaded yet, add callback to list
-        resources.callbacks_.push(callback);
+        treesaver.resources.callbacks_.push(callback);
       }
 
       return;
     }
 
-    debug.info('Loading resources from: ' + url);
+    treesaver.debug.info('Loading resources from: ' + url);
 
     // Set loading flag
-    resources.loadStatus_ = resources.LoadStatus.LOADING;
+    treesaver.resources.loadStatus_ = treesaver.resources.LoadStatus.LOADING;
     // Create callback array
-    resources.callbacks_ = [callback];
+    treesaver.resources.callbacks_ = [callback];
 
-    network.get(url, resources.processResourceFile);
+    treesaver.network.get(url, treesaver.resources.processResourceFile);
   };
 
   /**
    * @type {RegExp}
    */
-  resources.bodyRegExp = /<body>\s*([\s\S]+?)\s*<\/body>/i;
+  treesaver.resources.bodyRegExp = /<body>\s*([\s\S]+?)\s*<\/body>/i;
 
   /**
    * Find and return any text within a <title>
    * @param {?string} html
    * @return {?string}
    */
-  resources.extractBody = function(html) {
-    var res = resources.bodyRegExp.exec(html);
+  treesaver.resources.extractBody = function(html) {
+    var res = treesaver.resources.bodyRegExp.exec(html);
     if (res && res[1]) {
       return res[1];
     }
@@ -81,12 +83,12 @@ goog.scope(function() {
    *
    * @param {string} html
    */
-  resources.processResourceFile = function(html) {
+  treesaver.resources.processResourceFile = function(html) {
     // Create the main container
-    resources.container_ = document.createElement('div');
+    treesaver.resources.container_ = document.createElement('div');
 
     if (html) {
-      var body = resources.extractBody(html);
+      var body = treesaver.resources.extractBody(html);
       if (body) {
         var div = document.createElement('div');
         // Prevent any layout
@@ -96,36 +98,36 @@ goog.scope(function() {
         div.innerHTML = body;
 
         // Grab all the direct <div> children and place them into the container
-        array.toArray(div.childNodes).forEach(function(child) {
+        treesaver.array.toArray(div.childNodes).forEach(function(child) {
           if (/^div$/i.test(child.nodeName)) {
-            resources.container_.appendChild(child);
+            treesaver.resources.container_.appendChild(child);
           }
         });
 
-        dom.clearChildren(div);
+        treesaver.dom.clearChildren(div);
       }
       else {
-        debug.error('Body not found in resource file');
+        treesaver.debug.error('Body not found in resource file');
       }
     }
     else {
-      debug.error('Could not load resource file');
+      treesaver.debug.error('Could not load resource file');
     }
 
-    resources.loadComplete_();
+    treesaver.resources.loadComplete_();
   };
 
   /**
    * Called when the resource file has finished processing
    */
-  resources.loadComplete_ = function() {
-    resources.loadStatus_ = resources.LoadStatus.LOADED;
+  treesaver.resources.loadComplete_ = function() {
+    treesaver.resources.loadStatus_ = treesaver.resources.LoadStatus.LOADED;
 
     // Clone callback array
-    var callbacks = resources.callbacks_.slice(0);
+    var callbacks = treesaver.resources.callbacks_.slice(0);
 
     // Clear out old callbacks
-    resources.callbacks_ = [];
+    treesaver.resources.callbacks_ = [];
 
     // Do callbacks
     callbacks.forEach(function(callback) {
@@ -139,18 +141,18 @@ goog.scope(function() {
    * @param {!string} className
    * @return {!Array.<Element>} Array of matching resource elements.
    */
-  resources.findByClassName = function(className) {
+  treesaver.resources.findByClassName = function(className) {
     // TODO: Restrict only to top-level children?
-    return resources.container_ ? dom.querySelectorAll('.' + className, resources.container_) : [];
+    return treesaver.resources.container_ ? treesaver.dom.querySelectorAll('.' + className, treesaver.resources.container_) : [];
   };
 
   /**
    * Clear all data structures
    */
-  resources.unload = function() {
-    resources.container_ = null;
-    resources.loadStatus_ = resources.LoadStatus.NOT_LOADED;
-    resources.callbacks_ = [];
+  treesaver.resources.unload = function() {
+    treesaver.resources.container_ = null;
+    treesaver.resources.loadStatus_ = treesaver.resources.LoadStatus.NOT_LOADED;
+    treesaver.resources.callbacks_ = [];
   };
 
   /**
@@ -160,7 +162,7 @@ goog.scope(function() {
    * @private
    * @return {?string} The url, if one was found.
    */
-  resources.getResourcesLinkUrl_ = function() {
+  treesaver.resources.getResourcesLinkUrl_ = function() {
     var links = document.querySelectorAll('link[rel~=resources]');
 
     if (links.length) {
@@ -174,7 +176,7 @@ goog.scope(function() {
    * Load status enum
    * @enum {number}
    */
-  resources.LoadStatus = {
+  treesaver.resources.LoadStatus = {
     LOADED: 2,
     LOADING: 1,
     NOT_LOADED: 0
@@ -184,9 +186,9 @@ goog.scope(function() {
    * Load status of resources
    *
    * @private
-   * @type {resources.LoadStatus}
+   * @type {treesaver.resources.LoadStatus}
    */
-  resources.loadStatus_;
+  treesaver.resources.loadStatus_;
 
   /**
    * Callbacks
@@ -194,7 +196,7 @@ goog.scope(function() {
    * @private
    * @type {Array.<function()>}
    */
-  resources.callbacks_;
+  treesaver.resources.callbacks_;
 
   /**
    * DOM container for all resource elements
@@ -202,5 +204,5 @@ goog.scope(function() {
    * @private
    * @type {Element}
    */
-  resources.container_;
-});
+  treesaver.resources.container_;
+

@@ -10,31 +10,24 @@
  * Licensed under MIT and GPLv2.
  */
 
-goog.provide('treesaver');
+treesaver = treesaver || {};
 
-goog.require('treesaver.capabilities');
-goog.require('treesaver.constants');
-goog.require('treesaver.debug');
-goog.require('treesaver.dom');
-goog.require('treesaver.events');
-goog.require('treesaver.fonts');
-goog.require('treesaver.history');
-goog.require('treesaver.resources');
-goog.require('treesaver.scheduler');
-goog.require('treesaver.styles');
-goog.require('treesaver.ui.Article');
-goog.require('treesaver.ui.ArticleManager');
-goog.require('treesaver.ui.Chrome');
-goog.require('treesaver.ui.StateManager');
 
-goog.scope(function() {
-  var debug = treesaver.debug,
-      dom = treesaver.dom,
-      events = treesaver.events,
-      fonts = treesaver.fonts,
-      capabilities = treesaver.capabilities,
-      ArticleManager = treesaver.ui.ArticleManager,
-      StateManager = treesaver.ui.StateManager;
+require('./lib/capabilities');
+require('./lib/constants');
+require('./lib/debug');
+require('./lib/dom');
+require('./lib/events');
+require('./lib/fonts');
+require('./lib/history');
+require('./lib/resources');
+require('./lib/scheduler');
+require('./lib/styles');
+require('./ui/Article');
+require('./ui/ArticleManager');
+require('./ui/Chrome');
+require('./ui/StateManager');
+
 
 
   /**
@@ -50,7 +43,7 @@ goog.scope(function() {
    * Load scripts and required resources
    */
   treesaver.boot = function() {
-    debug.info('Begin Treesaver booting');
+    treesaver.debug.info('Begin Treesaver booting');
 
     if (!goog.DEBUG || !window.TS_NO_AUTOLOAD) {
       // Hide content to avoid ugly flashes
@@ -61,7 +54,7 @@ goog.scope(function() {
     treesaver.network.load();
 
     // Set capability flags
-    capabilities.updateClasses();
+    treesaver.capabilities.updateClasses();
 
     // Load resources
     treesaver.resources.load(function() {
@@ -69,7 +62,7 @@ goog.scope(function() {
       treesaver.bootProgress_();
     });
 
-    fonts.load(function() {
+    treesaver.fonts.load(function() {
       treesaver.fontsLoaded_ = true;
       treesaver.bootProgress_();
     });
@@ -81,7 +74,7 @@ goog.scope(function() {
       treesaver.domReady();
     }
     else {
-      events.addListener(document, 'DOMContentLoaded', treesaver.domReady);
+      treesaver.events.addListener(document, 'DOMContentLoaded', treesaver.domReady);
     }
 
     if (!WITHIN_IOS_WRAPPER && (!goog.DEBUG || !window.TS_NO_AUTOLOAD)) {
@@ -99,7 +92,7 @@ goog.scope(function() {
    * Recover from errors and return the page to the original state
    */
   treesaver.unboot = function() {
-    debug.info('Treesaver unbooting');
+    treesaver.debug.info('Treesaver unbooting');
 
     // Restore HTML
     if (!WITHIN_IOS_WRAPPER && treesaver.inContainedMode) {
@@ -118,10 +111,10 @@ goog.scope(function() {
     // Clean up libraries
     treesaver.resources.unload();
     treesaver.network.unload();
-    treesaver.fonts.unload();
+    treesaver.treesaver.fonts.unload();
 
     // Setup classes
-    capabilities.resetClasses();
+    treesaver.capabilities.resetClasses();
 
     // Show content again
     document.documentElement.style.display = 'block';
@@ -136,7 +129,7 @@ goog.scope(function() {
     treesaver.scheduler.clear('unboot');
 
     // Remove DOM ready handler
-    events.removeListener(document, 'DOMContentLoaded', treesaver.domReady);
+    treesaver.events.removeListener(document, 'DOMContentLoaded', treesaver.domReady);
 
     // Kill loading flags
     delete treesaver.resourcesLoaded_;
@@ -169,7 +162,7 @@ goog.scope(function() {
       treesaver.originalHtml = document.body.innerHTML;
 
       // Remove main content
-      dom.clearChildren(/** @type {!Element} */(treesaver.tsContainer));
+      treesaver.dom.clearChildren(/** @type {!Element} */(treesaver.tsContainer));
 
       // Place a loading message
       treesaver.tsContainer.innerHTML =
@@ -177,7 +170,7 @@ goog.scope(function() {
       // Re-enable content display
       document.documentElement.style.display = 'block';
 
-      events.fireEvent(document, treesaver.customevents.LOADERSHOWN);
+      treesaver.events.fireEvent(document, treesaver.customevents.LOADERSHOWN);
     }
 
     // Update state
@@ -195,7 +188,7 @@ goog.scope(function() {
     }
 
     if (!treesaver.domReady_) {
-      debug.info('Load progress: DOM not ready yet');
+      treesaver.debug.info('Load progress: DOM not ready yet');
 
       // Can't do anything if the DOM isn't ready
       return;
@@ -203,13 +196,13 @@ goog.scope(function() {
     else {
       // TODO: Happens once in a while, need to track down
       if (!document.body) {
-        debug.error('document.body not available after DOM ready');
+        treesaver.debug.error('document.body not available after DOM ready');
 
         return;
       }
     }
 
-    debug.info('Treesaver boot complete');
+    treesaver.debug.info('Treesaver boot complete');
 
     // Clean up handlers and timers
     treesaver.cleanup_();
@@ -226,22 +219,22 @@ goog.scope(function() {
    * Load the UI
    */
   treesaver.load = function() {
-    debug.info('Load begin');
+    treesaver.debug.info('Load begin');
 
     // Make sure we clean up when leaving the page
-    events.addListener(window, 'unload', treesaver.unload);
+    treesaver.events.addListener(window, 'unload', treesaver.unload);
 
     // Root element for listening to UI events
     treesaver.ui.eventRoot = treesaver.inContainedMode ?
       treesaver.tsContainer : window;
 
     // Kick off boot process, but back up if any single item fails
-    if (StateManager.load() &&
+    if (treesaver.ui.StateManager.load() &&
         // Grids
-        ArticleManager.load(treesaver.originalHtml)) {
+        treesaver.ui.ArticleManager.sload(treesaver.originalHtml)) {
     }
     else {
-      debug.error('Load failed');
+      treesaver.debug.error('Load failed');
 
       treesaver.unload();
     }
@@ -251,21 +244,20 @@ goog.scope(function() {
    * Unload the UI and cleanup
    */
   treesaver.unload = function() {
-    debug.info('Unloading');
+    treesaver.debug.info('Unloading');
 
-    events.removeListener(window, 'unload', treesaver.unload);
+    treesaver.events.removeListener(window, 'unload', treesaver.unload);
 
-    ArticleManager.unload();
-    StateManager.unload();
+    treesaver.ui.ArticleManager.unload();
+    treesaver.ui.StateManager.unload();
 
     treesaver.unboot();
   };
 
   // Start the process
-  if (capabilities.SUPPORTS_TREESAVER) {
+  if (treesaver.capabilities.SUPPORTS_TREESAVER) {
     treesaver.boot();
   }
   else {
-    debug.warn('Treesaver not supported');
+    treesaver.debug.warn('Treesaver not supported');
   }
-});

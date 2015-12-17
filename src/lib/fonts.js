@@ -1,83 +1,79 @@
 /**
  * @fileoverview Extract fonts defined in an external HTML file.
  */
+treesaver = treesaver || {};
+treesaver.fonts = treesaver.fonts || {};
 
-goog.provide('treesaver.fonts');
 
-goog.require('treesaver.fonts.googleadapter');
-goog.require('treesaver.debug');
-goog.require('treesaver.dom');
-goog.require('treesaver.events');
+require('./fonts/googleadapter');
+require('./debug');
+require('./dom');
+require('./events');
 
-goog.scope(function() {
-  var fonts = treesaver.fonts,
-      debug = treesaver.debug,
-      dom = treesaver.dom,
-      events = treesaver.events,
-      googleadapter = treesaver.fonts.googleadapter;
+
 
   /**
    * Loads custom fonts for the current document
    *
    * @param {!function()} callback
    */
-   fonts.load = function(callback) {
+   treesaver.fonts.load = function(callback) {
     if (!window['treesaverFonts']) {
-      debug.info("No treesaverFonts specified; nothing to do here.");
+      treesaver.debug.info("No treesaverFonts specified; nothing to do here.");
       callback();
       return;
     }
 
-    if (fonts.loadStatus_) {
-      if (fonts.loadStatus_ ===
-          fonts.LoadStatus.LOADED) {
+    if (treesaver.fonts.loadStatus_) {
+      if (treesaver.fonts.loadStatus_ ===
+          treesaver.fonts.LoadStatus.LOADED) {
         // Already loaded, callback immediately
         callback();
       }
       else {
         // Not loaded yet, add callback to list
-        fonts.callbacks_.push(callback);
+        treesaver.fonts.callbacks_.push(callback);
       }
 
       return;
     }
 
-    fonts.loadStatus_ = fonts.LoadStatus.LOADING;
+    treesaver.fonts.loadStatus_ = treesaver.fonts.LoadStatus.LOADING;
     // Not loaded yet, add callback to list
-    fonts.callbacks_ = [callback];
+    treesaver.fonts.callbacks_ = [callback];
     // do the stuff
-    events.addListener(document, treesaver.customevents.LOADERSHOWN, fonts.load_);
+    treesaver.events.addListener(document, treesaver.customevents.LOADERSHOWN, treesaver.fonts.load_);
   };
 
-  fonts.load_ = function() {
-    googleadapter.load(window['treesaverFonts'], function(result) {
+  treesaver.fonts.load_ = function() {
+    treesaver.fonts.googleadapter.load(window['treesaverFonts'], function(result) {
       var classes = [], className, family;
       for (family in result) {
         if (result.hasOwnProperty(family)) {
-          className = 'ts-' + fonts.slugify(family) + (result[family] == 'active' ? '-active' : '-inactive');
+          className = 'ts-' + treesaver.fonts.slugify(family) + (result[family] == 'active' ? '-active' : '-inactive');
           classes.push(className);
         }
       }
-      dom.addClass(document.documentElement, classes.join(' '));
-      fonts.loadComplete_();
+      treesaver.dom.addClass(document.documentElement, classes.join(' '));
+      treesaver.fonts.loadComplete_();
     });
   };
 
-  fonts.slugify = function(name) {
+  treesaver.fonts.slugify = function(name) {
     return name.toLowerCase().replace(/[^a-z]+/g, '-');
   };
 
   /**
    * Called when custom fonts loading is finished
    */
-  fonts.loadComplete_ = function() {
-    fonts.loadStatus_ = fonts.LoadStatus.LOADED;
+  treesaver.fonts.loadComplete_ = function() {
+    treesaver.fonts.loadStatus_ = treesaver.fonts.LoadStatus.LOADED;
 
     // Clone callback array
-    var callbacks = fonts.callbacks_.slice(0);
+    var callbacks = treesaver.fonts.callbacks_.slice(0);
 
     // Clear out old callbacks
-    fonts.callbacks_ = [];
+    treesaver.fonts.callbacks_ = [];
 
     // Do callbacks
     callbacks.forEach(function(callback) {
@@ -85,17 +81,17 @@ goog.scope(function() {
     });
   };
 
-  fonts.unload = function() {
-    debug.info('fonts.unload');
-    fonts.loadStatus_ = fonts.LoadStatus.NOT_LOADED;
-    fonts.callbacks_ = [];
+  treesaver.fonts.unload = function() {
+    treesaver.debug.info('treesaver.fonts.unload');
+    treesaver.fonts.loadStatus_ = treesaver.fonts.LoadStatus.NOT_LOADED;
+    treesaver.fonts.callbacks_ = [];
   };
 
   /**
    * Load status enum
    * @enum {number}
    */
-  fonts.LoadStatus = {
+  treesaver.fonts.LoadStatus = {
     LOADED: 2,
     LOADING: 1,
     NOT_LOADED: 0
@@ -105,9 +101,9 @@ goog.scope(function() {
    * Load status of fonts
    *
    * @private
-   * @type {fonts.LoadStatus}
+   * @type {treesaver.fonts.LoadStatus}
    */
-  fonts.loadStatus_;
+  treesaver.fonts.loadStatus_;
 
   /**
    * Callbacks
@@ -115,5 +111,5 @@ goog.scope(function() {
    * @private
    * @type {Array.<function()>}
    */
-  fonts.callbacks_;
-});
+  treesaver.fonts.callbacks_;
+

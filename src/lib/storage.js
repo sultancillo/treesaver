@@ -1,23 +1,24 @@
 /**
  * @fileoverview Simple wrapper for localStorage.
  */
+treesaver = treesaver || {};
+treesaver.storage = treesaver.storage || {};
 
-goog.provide('treesaver.storage');
 
-goog.require('treesaver.debug');
+require('./debug');
 
-goog.scope(function() {
-  var storage = treesaver.storage,
-      debug = treesaver.debug,
-      localStore = window.localStorage,
-      sessionStore = window.sessionStorage;
+
+
+
+          localStore = window.localStorage,
+          sessionStore = window.sessionStorage;
 
   /**
    * @param {!string} key
    * @param {!*} value
    * @param {boolean=} persist
    */
-  storage.set = function set(key, value, persist) {
+  treesaver.treesaver.storage.set = function set(key, value, persist) {
     var store = persist ? localStore : sessionStore;
 
     // iPad throws QUOTA_EXCEEDED_ERR frequently here, even though we're not
@@ -38,7 +39,7 @@ goog.scope(function() {
    * @param {!string} key
    * @return {*} Previously stored value, if any.
    */
-  storage.get = function(key) {
+  treesaver.storage.get = function(key) {
     // Session take precedence over local
     var val = sessionStore.getItem(key) || localStore.getItem(key);
 
@@ -53,7 +54,7 @@ goog.scope(function() {
   /**
    * @param {!string} key
    */
-  storage.clear = function(key) {
+  treesaver.storage.clear = function(key) {
     sessionStore.removeItem(key);
     localStore.removeItem(key);
   };
@@ -64,7 +65,7 @@ goog.scope(function() {
    * @param {string=} prefix
    * @return {!Array.<string>}
    */
-  storage.getKeys_ = function(prefix) {
+  treesaver.storage.getKeys_ = function(prefix) {
     var all_keys = [],
         i, len, key,
         prefix_len;
@@ -95,17 +96,17 @@ goog.scope(function() {
    * @param {string=} prefix
    * @param {!Array.<string>=} whitelist
    */
-  storage.clean = function(prefix, whitelist) {
+  treesaver.storage.clean = function(prefix, whitelist) {
     if (!whitelist) {
       localStore.clear();
       sessionStore.clear();
     }
     else {
-      storage.getKeys_(prefix).forEach(function(key) {
+      treesaver.storage.getKeys_(prefix).forEach(function(key) {
         if (!whitelist || whitelist.indexOf(key) === -1) {
-          storage.clear(key);
+          treesaver.storage.clear(key);
         }
       });
     }
   };
-});
+

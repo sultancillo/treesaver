@@ -1,60 +1,59 @@
 /**
  * @fileoverview Helpers for measuring elements.
  */
+treesaver = treesaver || {}
+treesaver.dimensions = treesaver.dimensions || {};
 
-goog.provide('treesaver.dimensions');
 
-goog.require('treesaver.capabilities');
-goog.require('treesaver.css');
-goog.require('treesaver.debug');
 
-goog.scope(function() {
-  var dimensions = treesaver.dimensions,
-      capabilities = treesaver.capabilities,
-      css = treesaver.css,
-      debug = treesaver.debug;
+require('./capabilities');
+require('./css');
+require('./debug');
+
+
+
 
   /**
    * Alias for Size type
    *
    * @typedef {{ w: number, h: number }}
    */
-  dimensions.Size;
+  treesaver.dimensions.Size;
 
   /**
    * Alias for SizeRange type
    *
    * @typedef {{ w: number, h: number, maxW: number, maxH: number }}
    */
-  dimensions.SizeRange;
+  treesaver.dimensions.SizeRange;
 
   /**
    * Regex to determine whether a value is a pixel value.
    * @private
    */
-  dimensions.pixel = /^-?\d+(:?\.\d+)?(?:px)?$/i;
+  treesaver.dimensions.pixel = /^-?\d+(:?\.\d+)?(?:px)?$/i;
 
 
   /**
    * Regex to determine whether a value contains a number.
    * @private
    */
-  dimensions.number = /^-?\d(:?\.\d+)?/;
+  treesaver.dimensions.number = /^-?\d(:?\.\d+)?/;
 
   /**
    * Round fractional widths to 1/round_to.
    * @private
    */
-  dimensions.round_to = 1000;
+  treesaver.dimensions.round_to = 1000;
 
   /**
    * Whether the given size fits within the bounds set by the range
    *
-   * @param {treesaver.dimensions.SizeRange|treesaver.dimensions.Metrics} range
-   * @param {treesaver.dimensions.Size} size
+   * @param {treesaver.treesaver.dimensions.SizeRange|treesaver.treesaver.dimensions.Metrics} range
+   * @param {treesaver.treesaver.dimensions.Size} size
    * @return {boolean} True if both dimensions are within the min and max.
    */
-  dimensions.inSizeRange = function(range, size) {
+  treesaver.dimensions.inSizeRange = function(range, size) {
     if (!range) {
       return false;
     }
@@ -70,12 +69,12 @@ goog.scope(function() {
 
   /**
    *
-   * @param {treesaver.dimensions.SizeRange} range
-   * @param {treesaver.dimensions.Metrics} metrics
+   * @param {treesaver.treesaver.dimensions.SizeRange} range
+   * @param {treesaver.treesaver.dimensions.Metrics} metrics
    * @param {boolean} outer
-   * @return {treesaver.dimensions.SizeRange}
+   * @return {treesaver.treesaver.dimensions.SizeRange}
    */
-  dimensions.mergeSizeRange = function(range, metrics, outer) {
+  treesaver.dimensions.mergeSizeRange = function(range, metrics, outer) {
     var a = range || {},
         b = metrics || {};
 
@@ -97,8 +96,8 @@ goog.scope(function() {
    * @param {?string} val
    * @return {?number} Value in pixels.
    */
-  dimensions.toPixels = function(el, val) {
-    if (val && dimensions.pixel.test(val)) {
+  treesaver.dimensions.toPixels = function(el, val) {
+    if (val && treesaver.dimensions.pixel.test(val)) {
       return parseFloat(val) || 0;
     }
     return null;
@@ -108,12 +107,12 @@ goog.scope(function() {
    * Return the width and height element in a simple object
    *
    * @param {Element} el
-   * @return {!dimensions.Size}
+   * @return {!treesaver.dimensions.Size}
    */
-  dimensions.getSize = function(el) {
+  treesaver.dimensions.getSize = function(el) {
     return {
-      w: dimensions.getOffsetWidth(el),
-      h: dimensions.getOffsetHeight(el)
+      w: treesaver.dimensions.getOffsetWidth(el),
+      h: treesaver.dimensions.getOffsetHeight(el)
     };
   };
 
@@ -123,7 +122,7 @@ goog.scope(function() {
    * @param {?Element} el
    * @return {!number} Value in pixels.
    */
-  dimensions.getOffsetHeight = function(el) {
+  treesaver.dimensions.getOffsetHeight = function(el) {
     return el && el.offsetHeight || 0;
   };
 
@@ -133,8 +132,8 @@ goog.scope(function() {
    * @param {?Element} el
    * @return {!number} Value in pixels.
    */
-  dimensions.getOffsetWidth = function(el) {
-    return el && (Math.round(el.getBoundingClientRect()['width'] * dimensions.round_to) / dimensions.round_to) || 0;
+  treesaver.dimensions.getOffsetWidth = function(el) {
+    return el && (Math.round(el.getBoundingClientRect()['width'] * treesaver.dimensions.round_to) / treesaver.dimensions.round_to) || 0;
   };
 
   /**
@@ -143,7 +142,7 @@ goog.scope(function() {
    * @param {?Element} el
    * @return {!number} Value in pixels.
    */
-  dimensions.getOffsetTop = function(el) {
+  treesaver.dimensions.getOffsetTop = function(el) {
     return el && el.offsetTop || 0;
   }
 
@@ -155,7 +154,7 @@ goog.scope(function() {
    * @param {!number} val
    * @return {!number} The value supplied.
    */
-  dimensions.setCssPx = function(el, propName, val) {
+  treesaver.dimensions.setCssPx = function(el, propName, val) {
     el.style[propName] = val + 'px';
 
     return val;
@@ -167,13 +166,13 @@ goog.scope(function() {
     * @param {!Element} el
     * @param {!string} val
     */
-  dimensions.setTransformProperty_ = function(el, val) {
+  treesaver.dimensions.setTransformProperty_ = function(el, val) {
     // TODO: Detect once
     if ('transformProperty' in el.style) {
       el.style['transformProperty'] = val;
     }
     else {
-      el.style[capabilities.domCSSPrefix + 'Transform'] = val;
+      el.style[treesaver.capabilities.domCSSPrefix + 'Transform'] = val;
     }
   };
 
@@ -182,8 +181,8 @@ goog.scope(function() {
    *
    * @param {!Element} el
    */
-  dimensions.clearOffset = function(el) {
-    dimensions.setTransformProperty_(el, 'none');
+  treesaver.dimensions.clearOffset = function(el) {
+    treesaver.dimensions.setTransformProperty_(el, 'none');
   };
 
   /**
@@ -194,15 +193,15 @@ goog.scope(function() {
    * @param {!number} x
    * @param {!number} y
    */
-  dimensions.setOffset = function(el, x, y) {
-    dimensions.setTransformProperty_(el,
+  treesaver.dimensions.setOffset = function(el, x, y) {
+    treesaver.dimensions.setTransformProperty_(el,
       'translate(' + x + 'px,' + y + 'px)');
   };
 
   // Use hw-accelerated 3D transforms if present
-  if (capabilities.SUPPORTS_CSSTRANSFORMS3D) {
-    dimensions.setOffset = function(el, x, y) {
-      dimensions.setTransformProperty_(el,
+  if (treesaver.capabilities.SUPPORTS_CSSTRANSFORMS3D) {
+    treesaver.dimensions.setOffset = function(el, x, y) {
+      treesaver.dimensions.setTransformProperty_(el,
         'translate3d(' + x + 'px,' + y + 'px,0)');
     };
   }
@@ -213,8 +212,8 @@ goog.scope(function() {
    * @param {!Element} el
    * @param {!number} x
    */
-  dimensions.setOffsetX = function(el, x) {
-    dimensions.setOffset(el, x, 0);
+  treesaver.dimensions.setOffsetX = function(el, x) {
+    treesaver.dimensions.setOffset(el, x, 0);
   };
 
   /**
@@ -224,7 +223,7 @@ goog.scope(function() {
    * @param {!number} base
    * @return {number} A multiple of the base number.
    */
-  dimensions.roundUp = function(number, base) {
+  treesaver.dimensions.roundUp = function(number, base) {
     return Math.ceil(number) + base - Math.ceil(number % base);
   };
 
@@ -235,7 +234,7 @@ goog.scope(function() {
    * @constructor
    * @param {!Element=} el
    */
-  dimensions.Metrics = function(el) {
+  treesaver.dimensions.Metrics = function(el) {
     if (!el) {
       return;
     }
@@ -259,25 +258,25 @@ goog.scope(function() {
     // styling -- may affect the measurements anyway
 
     // Margin
-    this.marginTop = dimensions.toPixels(el, style.marginTop) || 0;
-    this.marginBottom = dimensions.toPixels(el, style.marginBottom) || 0;
-    this.marginLeft = dimensions.toPixels(el, style.marginLeft) || 0;
-    this.marginRight = dimensions.toPixels(el, style.marginRight) || 0;
+    this.marginTop = treesaver.dimensions.toPixels(el, style.marginTop) || 0;
+    this.marginBottom = treesaver.dimensions.toPixels(el, style.marginBottom) || 0;
+    this.marginLeft = treesaver.dimensions.toPixels(el, style.marginLeft) || 0;
+    this.marginRight = treesaver.dimensions.toPixels(el, style.marginRight) || 0;
     // Summed totals
     this.marginHeight = this.marginTop + this.marginBottom;
     this.marginWidth = this.marginLeft + this.marginRight;
 
     // Border
-    this.borderTop = dimensions.toPixels(el, style.borderTopWidth);
-    this.borderBottom = dimensions.toPixels(el, style.borderBottomWidth);
-    this.borderLeft = dimensions.toPixels(el, style.borderLeftWidth);
-    this.borderRight = dimensions.toPixels(el, style.borderRightWidth);
+    this.borderTop = treesaver.dimensions.toPixels(el, style.borderTopWidth);
+    this.borderBottom = treesaver.dimensions.toPixels(el, style.borderBottomWidth);
+    this.borderLeft = treesaver.dimensions.toPixels(el, style.borderLeftWidth);
+    this.borderRight = treesaver.dimensions.toPixels(el, style.borderRightWidth);
 
     // Padding
-    this.paddingTop = dimensions.toPixels(el, style.paddingTop);
-    this.paddingBottom = dimensions.toPixels(el, style.paddingBottom);
-    this.paddingLeft = dimensions.toPixels(el, style.paddingLeft);
-    this.paddingRight = dimensions.toPixels(el, style.paddingRight);
+    this.paddingTop = treesaver.dimensions.toPixels(el, style.paddingTop);
+    this.paddingBottom = treesaver.dimensions.toPixels(el, style.paddingBottom);
+    this.paddingLeft = treesaver.dimensions.toPixels(el, style.paddingLeft);
+    this.paddingRight = treesaver.dimensions.toPixels(el, style.paddingRight);
 
     // Summed totals for border & padding
     this.bpTop = this.borderTop + this.paddingTop;
@@ -288,26 +287,26 @@ goog.scope(function() {
     this.bpWidth = this.bpLeft + this.bpRight;
 
     // Outer Width & Height
-    this.outerW = dimensions.getOffsetWidth(el);
-    this.outerH = dimensions.getOffsetHeight(el);
+    this.outerW = treesaver.dimensions.getOffsetWidth(el);
+    this.outerH = treesaver.dimensions.getOffsetHeight(el);
 
     // Inner Width & Height
     this.w = this.outerW - this.bpWidth;
     this.h = this.outerH - this.bpHeight;
 
     // Min & Max : Width & Height
-    this.minW = dimensions.toPixels(el, style.minWidth) || 0;
-    this.minH = dimensions.toPixels(el, style.minHeight) || 0;
+    this.minW = treesaver.dimensions.toPixels(el, style.minWidth) || 0;
+    this.minH = treesaver.dimensions.toPixels(el, style.minHeight) || 0;
 
     // Opera returns -1 for a max-width or max-height that is not set.
-    tmp = dimensions.toPixels(el, style.maxWidth);
+    tmp = treesaver.dimensions.toPixels(el, style.maxWidth);
     this.maxW = (!tmp || tmp === -1) ? Infinity : tmp;
 
-    tmp = dimensions.toPixels(el, style.maxHeight);
+    tmp = treesaver.dimensions.toPixels(el, style.maxHeight);
     this.maxH = (!tmp || tmp === -1) ? Infinity : tmp;
 
     // Line height
-    this.lineHeight = dimensions.toPixels(el, style.lineHeight) || null;
+    this.lineHeight = treesaver.dimensions.toPixels(el, style.lineHeight) || null;
 
     // Restore the original position property on style
     //if (this.position !== 'absolute') {
@@ -321,10 +320,10 @@ goog.scope(function() {
   /**
    * Make a copy of the object
    *
-   * @return {!dimensions.Metrics}
+   * @return {!treesaver.dimensions.Metrics}
    */
-  dimensions.Metrics.prototype.clone = function() {
-    var copy = new dimensions.Metrics(),
+  treesaver.dimensions.Metrics.prototype.clone = function() {
+    var copy = new treesaver.dimensions.Metrics(),
         key;
 
     for (key in this) {
@@ -339,8 +338,8 @@ goog.scope(function() {
   // TODO: MergeSizeRange
 
   if (goog.DEBUG) {
-    dimensions.Metrics.prototype.toString = function() {
+    treesaver.dimensions.Metrics.prototype.toString = function() {
       return '[Metrics: ' + this.w + 'x' + this.h + ']';
     };
   }
-});
+

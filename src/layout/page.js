@@ -1,19 +1,17 @@
-goog.provide('treesaver.layout.Page');
 
-goog.require('treesaver.capabilities');
-goog.require('treesaver.debug');
-goog.require('treesaver.dimensions');
-goog.require('treesaver.dom');
-goog.require('treesaver.template');
-goog.require('treesaver.layout.Grid');
-goog.require('treesaver.ui.Scrollable');
+treesaver = treesaver || {};
+treesaver.layout = treesaver.layout || {};
+treesaver.layout.Page = treesaver.layout.Page || {};
 
-goog.scope(function() {
-  var capabilities = treesaver.capabilities,
-      debug = treesaver.debug,
-      dimensions = treesaver.dimensions,
-      dom = treesaver.dom,
-      Grid = treesaver.layout.Grid;
+
+require('../lib/capabilities');
+require('../lib/debug');
+require('../lib/dimensions');
+require('../lib/dom');
+require('../lib/template');
+require('../layout/Grid');
+require('../ui/Scrollable');
+
 
   /**
    * Page class
@@ -24,7 +22,7 @@ goog.scope(function() {
    *  @param {!Array.<string>} extra_classes Extra classes to apply.
    */
   treesaver.layout.Page = function(content, grids, br, extra_classes) {
-    var best = Grid.best(content, grids, br),
+    var best = treesaver.layout.Grid.best(content, grids, br),
         host = document.createElement('div'),
         originalBr = br.clone(),
         containerFilled = false;
@@ -35,11 +33,11 @@ goog.scope(function() {
       br.figureIndex === content.figures.length;
 
       if (br.finished) {
-        debug.info('Finished article in face of error.');
+        treesaver.debug.info('Finished article in face of error.');
         this.ignore = true;
       }
       else {
-        debug.error('No best grid found: ' + arguments);
+        treesaver.debug.error('No best grid found: ' + arguments);
         this.error = true;
       }
 
@@ -47,38 +45,38 @@ goog.scope(function() {
     }
 
     // Store state
-    this.size = best.grid.stretchedSize.clone();
+    this.size = best.treesaver.layout.Grid.stretchedSize.clone();
     this.begin = br.getPosition();
 
     // Create our host for measuring and producing HTML
-    dom.addClass(host, 'offscreen');
+    treesaver.dom.addClass(host, 'offscreen');
     // TODO: Only add to body if needed?
     // TODO: Perhaps not, since IE has innerHTML issues when disconnected
     document.body.appendChild(host);
-    host.innerHTML = best.grid.html;
+    host.innerHTML = best.treesaver.layout.Grid.html;
     host.firstChild.className += ' ' + extra_classes.join(' ');
     this.node = /** @type {!Element} */ (host.firstChild);
 
     // Manually set dimensions on the page
-    dimensions.setCssPx(this.node, 'width', this.size.w);
-    dimensions.setCssPx(this.node, 'height', this.size.h);
+    treesaver.dimensions.setCssPx(this.node, 'width', this.size.w);
+    treesaver.dimensions.setCssPx(this.node, 'height', this.size.h);
 
-    dom.querySelectorAll(
-      '[' + dom.customAttributePrefix + 'template=document]',
+    treesaver.dom.querySelectorAll(
+      '[' + treesaver.dom.customAttributePrefix + 'template=document]',
       this.node
     ).forEach(function(el) {
       treesaver.template.expand(el, el.innerHTML, content.doc.meta);
     });
 
     // Containers
-    dom.querySelectorAll('.container', this.node).forEach(function(containerNode, i) {
+    treesaver.dom.querySelectorAll('.container', this.node).forEach(function(containerNode, i) {
       var mapping = best.containers[i],
           figure, figureIndex, success;
 
       if (mapping) {
         figureIndex = mapping.figureIndex;
         figure = /** @type {!treesaver.layout.Figure} */ (content.figures[figureIndex]);
-        success = treesaver.layout.Page.fillContainer(containerNode, figure, mapping,
+        success = treesaver.layout.treesaver.layout.Page.fillContainer(containerNode, figure, mapping,
           content.lineHeight);
 
         // Account for the figure we used
@@ -88,24 +86,24 @@ goog.scope(function() {
 
           // Need to store some extra data when supporting zoom
           if (figure.zoomable) {
-            dom.addClass(containerNode, 'zoomable');
+            treesaver.dom.addClass(containerNode, 'zoomable');
             containerNode.setAttribute('data-figureindex', figureIndex);
-            if (capabilities.IS_NATIVE_APP || capabilities.SUPPORTS_TOUCH) {
+            if (treesaver.capabilities.IS_NATIVE_APP || treesaver.capabilities.SUPPORTS_TOUCH) {
               // Need dummy handler in order to get bubbled events
               containerNode.setAttribute('onclick', 'void(0)');
             }
           }
 
           // Size to the container
-          if (i === 0 && best.grid.scoringFlags['sizetocontainer']) {
-            this.size.h = dimensions.getOffsetHeight(containerNode) +
-              best.grid.containers[0].delta;
+          if (i === 0 && best.treesaver.layout.Grid.scoringFlags['sizetocontainer']) {
+            this.size.h = treesaver.dimensions.getOffsetHeight(containerNode) +
+              best.treesaver.layout.Grid.containers[0].delta;
             this.size.outerH = this.size.h + this.size.bpHeight;
-            dimensions.setCssPx(/** @type {!Element} */ (this.node), 'height', this.size.h);
+            treesaver.dimensions.setCssPx(/** @type {!Element} */ (this.node), 'height', this.size.h);
           }
         }
         else {
-          debug.info('Container failure, figureIndex: ' + figureIndex);
+          treesaver.debug.info('Container failure, figureIndex: ' + figureIndex);
 
           // TODO: Note more info about failure? E.g. target size and actual size, etc
           if (!figure.optional && figure.fallback) {
@@ -116,7 +114,7 @@ goog.scope(function() {
           }
           else {
             // Don't mark the figure as failed if the container was reduced in size
-            if (!dom.hasClass(containerNode, 'flexed')) {
+            if (!treesaver.dom.hasClass(containerNode, 'flexed')) {
               br.failedFigure(figureIndex);
             }
           }
@@ -132,33 +130,33 @@ goog.scope(function() {
     }, this);
 
     // Columns
-    dom.querySelectorAll('.column', this.node).forEach(function(colNode, i) {
-      var col = best.grid.cols[i];
-      treesaver.layout.Page.fillColumn(content, br, colNode,
-        best.grid.maxColHeight, col.minH);
+    treesaver.dom.querySelectorAll('.column', this.node).forEach(function(colNode, i) {
+      var col = best.treesaver.layout.Grid.cols[i];
+      treesaver.layout.treesaver.layout.Page.fillColumn(content, br, colNode,
+        best.treesaver.layout.Grid.maxColHeight, col.minH);
     });
 
     // Check if there was forward progress made
     if (originalBr.equals(br)) {
-      debug.error('No progress made in pagination: ' + arguments + best);
+      treesaver.debug.error('No progress made in pagination: ' + arguments + best);
       this.error = true;
     }
-    else if (!containerFilled && best.grid.scoringFlags['sizetocontainer']) {
-      debug.warn('sizetocontainer not filled, page ignored');
+    else if (!containerFilled && best.treesaver.layout.Grid.scoringFlags['sizetocontainer']) {
+      treesaver.debug.warn('sizetocontainer not filled, page ignored');
       // Couldn't fill the container, ignore this page
       this.ignore = true;
     }
     else {
       // Centers the page vertically & horizontally with less work for us
-      dimensions.setCssPx(this.node, 'marginTop', -this.size.outerH / 2);
-      dimensions.setCssPx(this.node, 'marginLeft', -this.size.outerW / 2);
+      treesaver.dimensions.setCssPx(this.node, 'marginTop', -this.size.outerH / 2);
+      treesaver.dimensions.setCssPx(this.node, 'marginLeft', -this.size.outerW / 2);
 
       // Are we finished?
-      br.finished = best.grid.scoringFlags['onlypage'] || br.atEnd(content);
+      br.finished = best.treesaver.layout.Grid.scoringFlags['onlypage'] || br.atEnd(content);
 
       // Add last page flag if complete
       if (br.finished) {
-        dom.addClass(this.node, 'last-page');
+        treesaver.dom.addClass(this.node, 'last-page');
       }
 
       this.html = host.innerHTML;
@@ -172,9 +170,9 @@ goog.scope(function() {
     this.deactivate();
     document.body.removeChild(host);
   };
-});
 
-goog.scope(function() {
+
+
   var Page = treesaver.layout.Page,
       debug = treesaver.debug,
       dimensions = treesaver.dimensions,
@@ -184,46 +182,46 @@ goog.scope(function() {
   /**
    * @type {boolean}
    */
-  Page.prototype.ignore;
+  treesaver.layout.Page.prototype.ignore;
 
   /**
-   * @type {!treesaver.dimensions.Metrics}
+   * @type {!treesaver.treesaver.dimensions.Metrics}
    */
-  Page.prototype.size;
+  treesaver.layout.Page.prototype.size;
 
   /**
    * @type {!treesaver.layout.ContentPosition}
    */
-  Page.prototype.begin;
+  treesaver.layout.Page.prototype.begin;
 
   /**
    * @type {?Element}
    */
-  Page.prototype.node;
+  treesaver.layout.Page.prototype.node;
 
   /**
    * @type {string}
    */
-  Page.prototype.html;
+  treesaver.layout.Page.prototype.html;
 
   /**
    * @type {!treesaver.layout.ContentPosition}
    */
-  Page.prototype.end;
+  treesaver.layout.Page.prototype.end;
 
   /**
    * @type {boolean}
    */
-  Page.prototype.active;
+  treesaver.layout.Page.prototype.active;
 
   /**
    * @param {!Element} container
    * @param {!treesaver.layout.Figure} figure
-   * @param {!treesaver.layout.Grid.ContainerMap} map
+   * @param {!treesaver.layout.treesaver.layout.Grid.ContainerMap} map
    * @param {?number} lineHeight
    * @return {boolean} True if the figure fit within the container.
    */
-  Page.fillContainer = function(container, figure, map,
+  treesaver.layout.Page.fillContainer = function(container, figure, map,
       lineHeight) {
     var size, figureSize,
         containerHeight, sibling,
@@ -236,15 +234,15 @@ goog.scope(function() {
 
     if (goog.DEBUG) {
       if (!size) {
-        debug.error('Empty size!');
+        treesaver.debug.error('Empty size!');
       }
 
       if (!figureSize) {
-        debug.error('Empty figureSize!');
+        treesaver.debug.error('Empty figureSize!');
       }
     }
 
-    maxContainerHeight = dimensions.getOffsetHeight(container);
+    maxContainerHeight = treesaver.dimensions.getOffsetHeight(container);
 
     // Do any content switching that needs to happen
     figureSize.applySize(container, size);
@@ -257,7 +255,7 @@ goog.scope(function() {
     // Adjust flexible containers
 
     // Unhinge from a side before measuring
-    if (dom.hasClass(container, 'bottom')) {
+    if (treesaver.dom.hasClass(container, 'bottom')) {
       anchoredTop = false;
       container.style.top = 'auto';
     }
@@ -266,7 +264,7 @@ goog.scope(function() {
     }
 
     // TODO: Query only needed properties
-    metrics = new dimensions.Metrics(container);
+    metrics = new treesaver.dimensions.Metrics(container);
     containerHeight = metrics.outerH;
 
     // Did not fit :(
@@ -278,11 +276,11 @@ goog.scope(function() {
         containerHeight = maxContainerHeight;
 
         // Fix the height (prevents overflow in case of mis-measuring)
-        dimensions.setCssPx(container, 'height', containerHeight - metrics.bpHeight);
+        treesaver.dimensions.setCssPx(container, 'height', containerHeight - metrics.bpHeight);
       }
       else {
         // Not scrollable, can't be displayed
-        debug.info('Container failure: ' + containerHeight + ':' + maxContainerHeight);
+        treesaver.debug.info('Container failure: ' + containerHeight + ':' + maxContainerHeight);
 
         if (goog.DEBUG) {
           container.setAttribute('data-containerHeight', containerHeight);
@@ -301,14 +299,14 @@ goog.scope(function() {
     else {
       // Round to nearest for column adjustment to maintain grid
       if (lineHeight && containerHeight % lineHeight) {
-        containerHeight = dimensions.roundUp(containerHeight, lineHeight);
+        containerHeight = treesaver.dimensions.roundUp(containerHeight, lineHeight);
       }
     }
 
     if (figure.scrollable) {
       // Make the container scroll
-      dom.addClass(container, 'scroll');
-      Scrollable.initDom(container);
+      treesaver.dom.addClass(container, 'scroll');
+      treesaver.ui.Scrollable.initDom(container);
     }
 
     // Go through this containers siblings, adjusting their sizes
@@ -323,35 +321,35 @@ goog.scope(function() {
       sibling = /** @type {!Element} */ (sibling);
 
       // Don't touch fixed items
-      if (dom.hasClass(sibling, 'fixed')) {
+      if (treesaver.dom.hasClass(sibling, 'fixed')) {
         continue;
       }
 
-      if (dom.hasClass(sibling, 'column') ||
-          dom.hasClass(sibling, 'container') ||
-          dom.hasClass(sibling, 'group')) {
+      if (treesaver.dom.hasClass(sibling, 'column') ||
+          treesaver.dom.hasClass(sibling, 'container') ||
+          treesaver.dom.hasClass(sibling, 'group')) {
         // Add a flag for debugging / later detection
-        dom.addClass(sibling, 'flexed');
+        treesaver.dom.addClass(sibling, 'flexed');
 
         // Make sure we don't go negative
-        if (dimensions.getOffsetHeight(sibling) <= containerHeight) {
-          debug.info('Sibling shrunk to zero height: ' + sibling);
+        if (treesaver.dimensions.getOffsetHeight(sibling) <= containerHeight) {
+          treesaver.debug.info('Sibling shrunk to zero height: ' + sibling);
           // TODO: Remove from tree?
-          dimensions.setCssPx(sibling, 'height', 0);
+          treesaver.dimensions.setCssPx(sibling, 'height', 0);
         }
         else {
           // Since items are always absolutely positioned, we can
           // adjust the position of the column directly based on it's
           // offsets
           if (anchoredTop) {
-            dimensions.setCssPx(sibling, 'top',
-              dimensions.getOffsetTop(sibling) + containerHeight);
+            treesaver.dimensions.setCssPx(sibling, 'top',
+              treesaver.dimensions.getOffsetTop(sibling) + containerHeight);
           }
           else {
             // Compute the current 'bottom' value by using the parent's offsetHeight
-            dimensions.setCssPx(sibling, 'bottom',
-              dimensions.getOffsetHeight(sibling.offsetParent) -
-              (dimensions.getOffsetTop(sibling) + dimensions.getOffsetHeight(sibling)) + containerHeight);
+            treesaver.dimensions.setCssPx(sibling, 'bottom',
+              treesaver.dimensions.getOffsetHeight(sibling.offsetParent) -
+              (treesaver.dimensions.getOffsetTop(sibling) + treesaver.dimensions.getOffsetHeight(sibling)) + containerHeight);
           }
         }
       }
@@ -367,8 +365,8 @@ goog.scope(function() {
    * @param {number} maxColHeight
    * @param {number} minH Minimum height of the column.
    */
-  Page.fillColumn = function(content, br, node, maxColHeight, minH) {
-    var colHeight = dimensions.getOffsetHeight(node),
+  treesaver.layout.Page.fillColumn = function(content, br, node, maxColHeight, minH) {
+    var colHeight = treesaver.dimensions.getOffsetHeight(node),
         height = 0,
         remainingHeight,
         firstBlock,
@@ -404,7 +402,7 @@ goog.scope(function() {
 
     // Can we fit any content within this column?
     if (!colHeight || colHeight < minH) {
-      debug.info('Column below minHeight: ' + block + ':' + colHeight);
+      treesaver.debug.info('Column below minHeight: ' + block + ':' + colHeight);
 
       // No height, we are done here
       // TODO: Remove column element altogether?
@@ -435,7 +433,7 @@ goog.scope(function() {
       block = content.blocks[br.index];
       nextSibling = block.nextSibling;
       nextNonChild = nextSibling || block.getNextNonChildBlock();
-      nextNotUsed = nextSibling && Page.nextNotUsedBlock(content, br, nextSibling, blockCount);
+      nextNotUsed = nextSibling && treesaver.layout.Page.nextNotUsedBlock(content, br, nextSibling, blockCount);
 
       // First, we must check if this block is a figure's fallback content.
       // If so, then we must see if the figure has been used
@@ -450,7 +448,7 @@ goog.scope(function() {
         // TODO: Back it out completely
         if (block.parent && !block.nextSibling) {
           // TODO: Close out tags by looping up parents
-          debug.error('Must close out parent tags on unused fallback!');
+          treesaver.debug.error('Must close out parent tags on unused fallback!');
         }
 
         // Go to the next block, skipping any children of this block
@@ -529,7 +527,7 @@ goog.scope(function() {
             (effectiveBlockHeight + marginBottom + nextNotUsed.firstLine));
 
         if (finishColumn) {
-          debug.info('Leaving column due to keepwithnext');
+          treesaver.debug.info('Leaving column due to keepwithnext');
         }
       }
 
@@ -545,14 +543,14 @@ goog.scope(function() {
 
         if (finishColumn) {
           if (shortColumn) {
-            debug.info('Leaving column empty due to being short');
+            treesaver.debug.info('Leaving column empty due to being short');
           }
           else if (!isFirstBlock) {
-            debug.info('Ending column early due to non-fit');
+            treesaver.debug.info('Ending column early due to non-fit');
           }
         }
         else {
-          debug.info('Staying in virgin column despite non-fit');
+          treesaver.debug.info('Staying in virgin column despite non-fit');
         }
       }
 
@@ -591,7 +589,7 @@ goog.scope(function() {
           // We know that an element is the first child of it's parent if their
           // indices are off by one.
           while (parent && parent.index === block.index - 1) {
-            debug.info('Backing out opened tag: ' + parent.openTag);
+            treesaver.debug.info('Backing out opened tag: ' + parent.openTag);
 
             // The current tag level has no children, let's remove the string from
             // our stack, and adjust the break record
@@ -647,7 +645,7 @@ goog.scope(function() {
           (block.blocks.length && remainingHeight < effectiveBlockHeight)) {
         // Should never have an overhang when opening a parent
         if (br.overhang) {
-          debug.error('Overhang present when opening a parent block');
+          treesaver.debug.error('Overhang present when opening a parent block');
         }
 
         // Note: we are accumulating top margin, so we only add the margin in
@@ -783,7 +781,7 @@ goog.scope(function() {
         // Advance the breakRecord, so we don't repeat the block
         br.index = nextNonChild ? nextNonChild.index : blockCount;
 
-        debug.warn('Unbreakable element shoved into column');
+        treesaver.debug.warn('Unbreakable element shoved into column');
       }
       else {
         // Make sure we don't process as if we have overhang, because
@@ -797,7 +795,7 @@ goog.scope(function() {
         }
 
         if (block.keeptogether) {
-          debug.warn('keeptogether element shoved into column');
+          treesaver.debug.warn('keeptogether element shoved into column');
         }
 
         // Do not advance the break record, since we need to stay on this
@@ -809,7 +807,7 @@ goog.scope(function() {
     } // block_loop
 
     // Do overhang calculation
-    colHeight = Page.computeOverhang(br, block, colHeight, height);
+    colHeight = treesaver.layout.Page.computeOverhang(br, block, colHeight, height);
 
     // In DEBUG, sprinkle the dom with hints
     if (goog.DEBUG) {
@@ -824,7 +822,7 @@ goog.scope(function() {
     }
 
     // Do a tight fix on the column height
-    dimensions.setCssPx(node, 'height', colHeight);
+    treesaver.dimensions.setCssPx(node, 'height', colHeight);
 
     // Join string array and insert into column node
     node.innerHTML = blockStrings.join("");
@@ -858,7 +856,7 @@ goog.scope(function() {
               block.style.marginTop = 0;
             }
             else {
-              debug.error('No block on bad code');
+              treesaver.debug.error('No block on bad code');
             }
           }
         }
@@ -878,10 +876,10 @@ goog.scope(function() {
       }
     }
     else {
-      debug.warn('Clearing column contents since no block was added');
+      treesaver.debug.warn('Clearing column contents since no block was added');
 
       // Clear out column contents, since no block was added
-      dom.clearChildren(node);
+      treesaver.dom.clearChildren(node);
     }
   };
 
@@ -891,7 +889,7 @@ goog.scope(function() {
    * @param {!treesaver.layout.Block} nextBlock
    * @param {number} blockCount
    */
-  Page.nextNotUsedBlock = function(content, br, nextBlock, blockCount) {
+  treesaver.layout.Page.nextNotUsedBlock = function(content, br, nextBlock, blockCount) {
     var index,
         block;
     for (index = nextBlock.index; index < blockCount; index++) {
@@ -911,7 +909,7 @@ goog.scope(function() {
    * @param {number} height
    * @return {number} The final column height required for this
    */
-  Page.computeOverhang = function(br, lastBlock, colHeight, height) {
+  treesaver.layout.Page.computeOverhang = function(br, lastBlock, colHeight, height) {
     var contentOnlyOverhang,
         excess;
 
@@ -923,11 +921,11 @@ goog.scope(function() {
     // Some sanity checks
     if (!lastBlock.breakable) {
       // Should never get to this point
-      debug.error('Overhang on unbreakable element');
+      treesaver.debug.error('Overhang on unbreakable element');
     }
     if (lastBlock.blocks.length) {
       // Should never get to this point
-      debug.error('Overhang on element with children');
+      treesaver.debug.error('Overhang on element with children');
     }
 
     // We have some content peaking out from the bottom of the
@@ -976,14 +974,14 @@ goog.scope(function() {
    * Initialize page as necessary before displaying
    * @return {Element}
    */
-  Page.prototype.activate = function() {
+  treesaver.layout.Page.prototype.activate = function() {
     // Run only once
     if (this.active) {
       return this.node;
     }
 
     // Re-hydrate the HTML
-    this.node = dom.createElementFromHTML(this.html);
+    this.node = treesaver.dom.createElementFromHTML(this.html);
 
     // Flag
     this.active = true;
@@ -994,15 +992,15 @@ goog.scope(function() {
   /**
    * Deactivate page
    */
-  Page.prototype.deactivate = function() {
+  treesaver.layout.Page.prototype.deactivate = function() {
     this.active = false;
 
     // Remove hw-accelerated transition properties
-    dimensions.clearOffset(/** @type {!Element} */ (this.node));
+    treesaver.dimensions.clearOffset(/** @type {!Element} */ (this.node));
 
     // Dispose images properly to avoid memory leaks
-    dom.querySelectorAll('img', this.node).
-      forEach(dom.disposeImg);
+    treesaver.dom.querySelectorAll('img', this.node).
+      forEach(treesaver.dom.disposeImg);
 
     // Lose page reference
     this.node = null;
@@ -1012,7 +1010,7 @@ goog.scope(function() {
    * Clone this page.
    * @return {!treesaver.layout.Page} A clone of this page
    */
-  Page.prototype.clone = function() {
+  treesaver.layout.Page.prototype.clone = function() {
     var p = Object.clone(this);
     // We override the properties that are different by creating a clone
     // and setting those properties explicitly.
@@ -1022,8 +1020,8 @@ goog.scope(function() {
   };
 
   if (goog.DEBUG) {
-    Page.prototype.toString = function() {
+    treesaver.layout.Page.prototype.toString = function() {
       return "[Page]";
     };
   }
-});
+

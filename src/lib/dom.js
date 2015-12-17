@@ -1,16 +1,14 @@
 /**
  * @fileoverview DOM helper functions.
  */
+treesaver = treesaver || {};
+treesaver.dom = treesaver.dom || {};
 
-goog.provide('treesaver.dom');
 
-goog.require('treesaver.array');
-goog.require('treesaver.scheduler');
+require('./array');
+require('./scheduler');
 
-goog.scope(function() {
-  var dom = treesaver.dom,
-      array = treesaver.array,
-      scheduler = treesaver.scheduler;
+
 
   // Mozilla doesn't support element.contains()
   if ('Node' in window && Node.prototype && !('contains' in Node.prototype)) {
@@ -29,7 +27,7 @@ goog.scope(function() {
      * @param {!Element} el
      * @param {!string} className
      */
-    dom.addClass = function(el, className) {
+    treesaver.dom.addClass = function(el, className) {
       className.split(/\s+/).forEach(function(name) {
         el.classList.add(name);
       });
@@ -41,7 +39,7 @@ goog.scope(function() {
      * @param {!Element} el
      * @param {!string} className
      */
-    dom.removeClass = function(el, className) {
+    treesaver.dom.removeClass = function(el, className) {
       return el.classList.remove(className);
     };
 
@@ -53,7 +51,7 @@ goog.scope(function() {
      * @param {!string} className
      * @return {boolean} True if the element has that class.
      */
-    dom.hasClass = function(el, className) {
+    treesaver.dom.hasClass = function(el, className) {
       return el.classList.contains(className);
     };
 
@@ -61,8 +59,8 @@ goog.scope(function() {
      * @param {!Element} el
      * @return {!Array.<string>} Array of all the element's classes.
      */
-    dom.classes = function(el) {
-      return array.toArray(el.classList);
+    treesaver.dom.classes = function(el) {
+      return treesaver.array.toArray(el.classList);
     };
   }
   else {
@@ -71,9 +69,9 @@ goog.scope(function() {
     //
     // All functions here courtesy Dean Edwards:
     // http://dean.edwards.name/IE7/caveats/
-    dom.addClass = function(el, className) {
+    treesaver.dom.addClass = function(el, className) {
       if (el.className) {
-        if (!treesaver.dom.hasClass(el, className)) {
+        if (!treesaver.treesaver.dom.hasClass(el, className)) {
           el.className += ' ' + className;
         }
       }
@@ -82,17 +80,17 @@ goog.scope(function() {
       }
     };
 
-    dom.removeClass = function(el, className) {
+    treesaver.dom.removeClass = function(el, className) {
       var regexp = new RegExp('(^|\\s)' + className + '(\\s|$)');
       el.className = el.className.replace(regexp, '$2');
     };
 
-    dom.hasClass = function(el, className) {
+    treesaver.dom.hasClass = function(el, className) {
       var regexp = new RegExp('(^|\\s)' + className + '(\\s|$)');
       return !!(el.className && regexp.test(el.className));
     };
 
-    dom.classes = function(el) {
+    treesaver.dom.classes = function(el) {
       if (!el.className) {
         return [];
       }
@@ -108,12 +106,12 @@ goog.scope(function() {
    * @param {HTMLDocument|Element=} root Element root (optional).
    * @return {!Array.<Element>} Array of matching elements.
    */
-  dom.querySelectorAll = function(queryString, root) {
+  treesaver.dom.querySelectorAll = function(queryString, root) {
     if (!root) {
       root = document;
     }
 
-    return array.toArray(root.querySelectorAll(queryString));
+    return treesaver.array.toArray(root.querySelectorAll(queryString));
   };
 
   /**
@@ -124,7 +122,7 @@ goog.scope(function() {
    * @param {!string}  propName
    * @return {boolean}
    */
-  dom.hasAttr = function(el, propName) {
+  treesaver.dom.hasAttr = function(el, propName) {
     return el.hasAttribute(propName);
   };
 
@@ -134,7 +132,7 @@ goog.scope(function() {
    * @const
    * @type {string}
    */
-  dom.customAttributePrefix = 'data-ts-';
+  treesaver.dom.customAttributePrefix = 'data-ts-';
 
   /**
    * Whether the element has a custom Treesaver-namespaced attribute
@@ -143,8 +141,8 @@ goog.scope(function() {
    * @param {!string} propName Unescaped.
    * @return {boolean}
    */
-  dom.hasCustomAttr = function(el, propName) {
-    return dom.hasAttr(el, dom.customAttributePrefix + propName);
+  treesaver.dom.hasCustomAttr = function(el, propName) {
+    return treesaver.dom.hasAttr(el, treesaver.dom.customAttributePrefix + propName);
   };
 
   /**
@@ -154,8 +152,8 @@ goog.scope(function() {
    * @param {!string} propName Unescaped.
    * @return {string}
    */
-  dom.getCustomAttr = function(el, propName) {
-    return el.getAttribute(dom.customAttributePrefix + propName);
+  treesaver.dom.getCustomAttr = function(el, propName) {
+    return el.getAttribute(treesaver.dom.customAttributePrefix + propName);
   };
 
   /**
@@ -163,7 +161,7 @@ goog.scope(function() {
    *
    * @param {!Element} el
    */
-  dom.clearChildren = function(el) {
+  treesaver.dom.clearChildren = function(el) {
     // TODO: Blank innerHTML instead?
     while (el.firstChild) {
       el.removeChild(el.firstChild);
@@ -176,7 +174,7 @@ goog.scope(function() {
    * @param {!Node} node
    * @return {!string} The text content of the node.
    */
-  dom.innerText = function(node) {
+  treesaver.dom.innerText = function(node) {
     return node.textContent;
   };
 
@@ -186,7 +184,7 @@ goog.scope(function() {
    * @param {!Element} el
    * @return {!string} The outer HTML of the element.
    */
-  dom.outerHTML = function(el) {
+  treesaver.dom.outerHTML = function(el) {
     // IE, WebKit, and Opera all have outerHTML
     if ('outerHTML' in el) {
       return el.outerHTML;
@@ -198,9 +196,9 @@ goog.scope(function() {
 
     // Temporarily place the clone into an empty element
     // and extract its innerHTML
-    dom.dummyDiv_.appendChild(clone);
-    html = dom.dummyDiv_.innerHTML;
-    dom.dummyDiv_.removeChild(clone);
+    treesaver.dom.dummyDiv_.appendChild(clone);
+    html = treesaver.dom.dummyDiv_.innerHTML;
+    treesaver.dom.dummyDiv_.removeChild(clone);
 
     return html;
   };
@@ -211,11 +209,11 @@ goog.scope(function() {
    * @param {!string} html
    * @return {?Element}
    */
-  dom.createElementFromHTML = function(html) {
-    dom.dummyDiv_.innerHTML = html;
+  treesaver.dom.createElementFromHTML = function(html) {
+    treesaver.dom.dummyDiv_.innerHTML = html;
     // Only ever return the first child
-    var node = dom.dummyDiv_.firstChild;
-    dom.clearChildren(dom.dummyDiv_);
+    var node = treesaver.dom.dummyDiv_.firstChild;
+    treesaver.dom.clearChildren(treesaver.dom.dummyDiv_);
 
     // Make sure it's an actual Element
     if (!node || node.nodeType !== 1) {
@@ -232,21 +230,21 @@ goog.scope(function() {
    * @return {?Node} Returns the parsed representation of the
    * html as a DOM node.
    */
-  dom.createDocumentFragmentFromHTML = function(html) {
+  treesaver.dom.createDocumentFragmentFromHTML = function(html) {
     var node;
 
-    dom.dummyDiv_.innerHTML = html;
+    treesaver.dom.dummyDiv_.innerHTML = html;
 
-    if (dom.dummyDiv_.childNodes.length === 1) {
-      node = dom.dummyDiv_.firstChild;
+    if (treesaver.dom.dummyDiv_.childNodes.length === 1) {
+      node = treesaver.dom.dummyDiv_.firstChild;
     }
     else {
       node = document.createDocumentFragment();
-      while (dom.dummyDiv_.firstChild) {
-        node.appendChild(dom.dummyDiv_.firstChild);
+      while (treesaver.dom.dummyDiv_.firstChild) {
+        node.appendChild(treesaver.dom.dummyDiv_.firstChild);
       }
     }
-    dom.clearChildren(dom.dummyDiv_);
+    treesaver.dom.clearChildren(treesaver.dom.dummyDiv_);
 
     // Make sure it's an actual Node
     if (!node || !(node.nodeType === 1 || node.nodeType === 11)) {
@@ -263,7 +261,7 @@ goog.scope(function() {
    * @param {!string} tagName
    * @return {?Node}
    */
-  dom.getAncestor = function(el, tagName) {
+  treesaver.dom.getAncestor = function(el, tagName) {
     var parent = el,
         tag = tagName.toUpperCase();
 
@@ -282,22 +280,22 @@ goog.scope(function() {
    * @private
    * @type {Array.<Element>}
    */
-  dom.imgCache_ = [];
+  treesaver.dom.imgCache_ = [];
 
   /**
    * Helper for disposing of images in order to avoid memory leaks in iOS
    *
    * @param {!Element} img
    */
-  dom.disposeImg = function(img) {
-    dom.imgCache_.push(img);
+  treesaver.dom.disposeImg = function(img) {
+    treesaver.dom.imgCache_.push(img);
 
     // Clear out <img> src before unload due to iOS hw-accel bugs
     // Set source to empty gif
     img.setAttribute('src', 'data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs=');
 
     // Pause to let collection happen
-    scheduler.limit(treesaver.dom.clearImgCache_, 3000, [], 'clearImgCache');
+    treesaver.scheduler.limit(treesaver.treesaver.dom.clearImgCache_, 3000, [], 'clearImgCache');
   };
 
   /**
@@ -305,9 +303,9 @@ goog.scope(function() {
    *
    * @private
    */
-  dom.clearImgCache_ = function() {
+  treesaver.dom.clearImgCache_ = function() {
     // Lose all references
-    dom.imgCache_ = [];
+    treesaver.dom.imgCache_ = [];
   };
 
   /**
@@ -316,7 +314,7 @@ goog.scope(function() {
    * @private
    * @type {!Element}
    */
-  dom.dummyDiv_ = document.createElement('div');
+  treesaver.dom.dummyDiv_ = document.createElement('div');
   // Prevent all layout on the element
-  dom.dummyDiv_.style.display = 'none';
-});
+  treesaver.dom.dummyDiv_.style.display = 'none';
+

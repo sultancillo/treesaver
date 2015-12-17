@@ -1,8 +1,9 @@
 /**
  * @fileoverview String helper functions.
  */
+treesaver = treesaver || {};
+treesaver.string = treesaver.string || {};
 
-goog.provide('treesaver.string');
 
 // Add string.trim() if it's not there, which happens in Safari pre-5 and
 // IE pre 9

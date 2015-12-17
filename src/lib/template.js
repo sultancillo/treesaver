@@ -1,8 +1,10 @@
-goog.provide('treesaver.template');
-goog.require('treesaver.dom');
+treesaver = treesaver || {};
+treesaver.template = treesaver.template || {};
 
-goog.scope(function() {
-  var dom = treesaver.dom;
+
+require('./dom');
+
+
 
   /**
    * @param {!Element} container
@@ -14,11 +16,11 @@ goog.scope(function() {
   treesaver.template.expand = function (container, template, view, partials, send_fun) {
     container.innerHTML = Mustache.to_html(template, view, partials, send_fun);
 
-    dom.querySelectorAll('img[data-src], iframe[data-src], video[data-src]', container).forEach(function(e) {
+    treesaver.dom.querySelectorAll('img[data-src], iframe[data-src], video[data-src]', container).forEach(function(e) {
       e.setAttribute('src', e.getAttribute('data-src'));
     });
-    dom.querySelectorAll('a[data-href]', container).forEach(function(e) {
+    treesaver.dom.querySelectorAll('a[data-href]', container).forEach(function(e) {
       e.setAttribute('href', e.getAttribute('data-href'));
     });
   };
-});
+

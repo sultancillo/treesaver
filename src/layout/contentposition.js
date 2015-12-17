@@ -1,4 +1,8 @@
-goog.provide('treesaver.layout.ContentPosition');
+
+treesaver = treesaver || {};
+treesaver.layout = treesaver.layout || {};
+treesaver.layout.ContentPosition = treesaver.layout.ContentPosition || {};
+
 
 /**
  * Helper class for indicating a relative position within a
@@ -15,23 +19,23 @@ treesaver.layout.ContentPosition = function(block, figure, overhang) {
   this.overhang = overhang;
 };
 
-goog.scope(function() {
-  var ContentPosition = treesaver.layout.ContentPosition;
+
+
 
   /**
    * @type {number}
    */
-  ContentPosition.prototype.block;
+  treesaver.layout.ContentPosition.prototype.block;
 
   /**
    * @type {number}
    */
-  ContentPosition.prototype.figure;
+  treesaver.layout.ContentPosition.prototype.figure;
 
   /**
    * @type {number}
    */
-  ContentPosition.prototype.overhang;
+  treesaver.layout.ContentPosition.prototype.overhang;
 
   /**
    * Position at the end of content
@@ -39,7 +43,7 @@ goog.scope(function() {
    * @const
    * @type {!treesaver.layout.ContentPosition}
    */
-  ContentPosition.END =
+  treesaver.layout.ContentPosition.END =
     new ContentPosition(Infinity, Infinity, Infinity);
 
   /**
@@ -47,7 +51,7 @@ goog.scope(function() {
    *
    * @return {boolean} True if at beginning of content.
    */
-  ContentPosition.prototype.atBeginning = function() {
+  treesaver.layout.ContentPosition.prototype.atBeginning = function() {
     return !this.block && !this.figure && !this.overhang;
   };
 
@@ -58,7 +62,7 @@ goog.scope(function() {
    * @param {!treesaver.layout.ContentPosition} b
    * @return {number} Negative if b is greater, 0 if equal, positive if be is lesser.
    */
-  ContentPosition.sort = function(a, b) {
+  treesaver.layout.ContentPosition.sort = function(a, b) {
     if (a.block !== b.block) {
       return b.block - a.block;
     }
@@ -74,16 +78,16 @@ goog.scope(function() {
    * @param {!treesaver.layout.ContentPosition} other
    * @return {boolean} True if the other breakRecord is ahead of this one.
    */
-  ContentPosition.prototype.lessOrEqual = function(other) {
-    return ContentPosition.sort(this, other) >= 0;
+  treesaver.layout.ContentPosition.prototype.lessOrEqual = function(other) {
+    return treesaver.layout.ContentPosition.sort(this, other) >= 0;
   };
 
   /**
    * @param {!treesaver.layout.ContentPosition} other
    * @return {boolean} True if the other breakRecord is behind this one.
    */
-  ContentPosition.prototype.greater = function(other) {
-    return ContentPosition.sort(this, other) < 0;
+  treesaver.layout.ContentPosition.prototype.greater = function(other) {
+    return treesaver.layout.ContentPosition.sort(this, other) < 0;
   };
 
   /**
@@ -92,7 +96,7 @@ goog.scope(function() {
    *
    * @return {!treesaver.layout.ContentPosition}
    */
-  ContentPosition.prototype.clone = function() {
+  treesaver.layout.ContentPosition.prototype.clone = function() {
     return new this.constructor(this.block, this.figure, this.overhang);
   };
-});
+

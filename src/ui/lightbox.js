@@ -2,6 +2,9 @@
  * @fileoverview The lightbox class.
  */
 
+treesaver = treesaver || {};
+treesaver.ui = treesaver.ui || {};
+
 goog.provide('treesaver.ui.LightBox');
 
 goog.require('treesaver.capabilities');

@@ -2,6 +2,9 @@
  * @fileoverview Responsible for managing the application state. Should really be called ChromeManager.
  */
 
+treesaver = treesaver || {};
+treesaver.ui = treesaver.ui || {};
+
 goog.provide('treesaver.ui.StateManager');
 
 goog.require('treesaver.capabilities');

@@ -2,16 +2,19 @@
  * @fileoverview A skeleton of page, later filled with content.
  */
 
-goog.provide('treesaver.layout.Grid');
+treesaver = treesaver || {};
+treesaver.layout = treesaver.layout || {};
+treesaver.layout.Grid = treesaver.layout.Grid || {};
 
-goog.require('treesaver.capabilities');
-goog.require('treesaver.debug');
-goog.require('treesaver.dom');
-goog.require('treesaver.dimensions');
-goog.require('treesaver.layout.Column');
-goog.require('treesaver.layout.Container');
 
-goog.scope(function() {
+require('./lib/capabilities');
+require('./lib/debug');
+require('./lib/dom');
+require('./lib/dimensions');
+require('./Column');
+require('./Container');
+
+
   var debug = treesaver.debug,
       dom = treesaver.dom,
       dimensions = treesaver.dimensions,
@@ -25,8 +28,8 @@ goog.scope(function() {
    */
   treesaver.layout.Grid = function(node) {
     if (goog.DEBUG) {
-      if (!node || !dom.hasClass(node, 'grid')) {
-        debug.error('Non grid passed to initGrid');
+      if (!node || !treesaver.dom.hasClass(node, 'grid')) {
+        treesaver.debug.error('Non grid passed to initGrid');
       }
     }
 
@@ -34,22 +37,22 @@ goog.scope(function() {
     document.body.appendChild(node);
 
     // TODO: Only store mutable capabilities
-    this.requirements = dom.hasAttr(node, 'data-requires') ?
+    this.requirements = treesaver.dom.hasAttr(node, 'data-requires') ?
       node.getAttribute('data-requires').split(' ') : null;
 
-    this.classes = dom.classes(node).map(function(c) {
+    this.classes = treesaver.dom.classes(node).map(function(c) {
       // Force lowercase
       return c.toLowerCase();
     });
 
-    this.flexible = !dom.hasClass(node, 'fixed');
+    this.flexible = !treesaver.dom.hasClass(node, 'fixed');
 
     // Calculate all page scoring flags
     this.findScoringFlags();
 
     // Sizing
     // Flex grids get stretched later
-    this.stretchedSize = this.size = new dimensions.Metrics(node);
+    this.stretchedSize = this.size = new treesaver.dimensions.Metrics(node);
     if (!this.flexible) {
       this.size.minH = this.size.h;
       this.size.minW = this.size.w;
@@ -67,8 +70,8 @@ goog.scope(function() {
     this.colWidth = 0;
 
     this.cols = [];
-    dom.querySelectorAll('.column', node).forEach(function(colNode) {
-      var cur = new Column(colNode, this.size.h);
+    treesaver.dom.querySelectorAll('.column', node).forEach(function(colNode) {
+      var cur = new treesaver.layout.Column(colNode, this.size.h);
       this.cols.push(cur);
 
       // Calculate total height
@@ -80,31 +83,31 @@ goog.scope(function() {
         this.colWidth = cur.w;
       }
       else if (this.colWidth !== cur.w) {
-        debug.error('Inconsistent column widths in grid');
+        treesaver.debug.error('Inconsistent column widths in grid');
 
         this.error = true;
       }
     }, this);
 
     this.containers = [];
-    dom.querySelectorAll('.container', node).forEach(function(containerNode) {
-      var cur = new Container(containerNode, this.size.h);
+    treesaver.dom.querySelectorAll('.container', node).forEach(function(containerNode) {
+      var cur = new treesaver.layout.Container(containerNode, this.size.h);
       this.containers.push(cur);
     }, this);
 
     // Save out the HTML after processing Columns and Containers, in order to maintain
     // any sanitization that may have occurred.
-    this.html = dom.outerHTML(node);
+    this.html = treesaver.dom.outerHTML(node);
 
-    this.bonus = dom.hasCustomAttr(node, 'bonus') ?
-      parseInt(dom.getCustomAttr(node, 'bonus'), 10) : 0;
+    this.bonus = treesaver.dom.hasCustomAttr(node, 'bonus') ?
+      parseInt(treesaver.dom.getCustomAttr(node, 'bonus'), 10) : 0;
 
     // Remove the child
     document.body.removeChild(node);
   };
-});
 
-goog.scope(function() {
+
+
   var Grid = treesaver.layout.Grid,
       capabilities = treesaver.capabilities,
       debug = treesaver.debug,
@@ -143,12 +146,12 @@ goog.scope(function() {
   Grid.prototype.pageNumberNegationFlags;
 
   /**
-   * @type {!treesaver.dimensions.Metrics}
+   * @type {!treesaver.treesaver.dimensions.Metrics}
    */
   Grid.prototype.stretchedSize;
 
   /**
-   * @type {!treesaver.dimensions.Metrics}
+   * @type {!treesaver.treesaver.dimensions.Metrics}
    */
   Grid.prototype.size;
 
@@ -486,7 +489,7 @@ goog.scope(function() {
   /**
    * Eliminate a grid if it does not fit within the specified size
    *
-   * @param {!treesaver.dimensions.Size} size
+   * @param {!treesaver.treesaver.dimensions.Size} size
    * @return {boolean} False if the grid does not qualify
    */
   Grid.prototype.sizeFilter = function(size) {
@@ -495,7 +498,7 @@ goog.scope(function() {
       h: size.h - this.size.bpHeight - this.size.marginHeight
     };
 
-    return dimensions.inSizeRange(this.size, innerSize);
+    return treesaver.dimensions.inSizeRange(this.size, innerSize);
   };
 
   Grid.SCORING = {
@@ -530,13 +533,13 @@ goog.scope(function() {
   Grid.best = function(content, grids, breakRecord) {
     if (goog.DEBUG) {
       if (!content) {
-        debug.error('No content passed to grid.best');
+        treesaver.debug.error('No content passed to grid.best');
       }
       else if (!grids.length) {
-        debug.error('No grids passed to grid.best');
+        treesaver.debug.error('No grids passed to grid.best');
       }
       else if (!breakRecord) {
-        debug.error('No breakRecord passed to grid.best');
+        treesaver.debug.error('No breakRecord passed to grid.best');
       }
     }
 
@@ -657,7 +660,7 @@ goog.scope(function() {
           if (block && block.figure && !block.figure.optional) {
             // If so, check if we've already started displaying the fallback for this figure
             if (br.overhang || block.withinFallback) {
-              debug.warn('No forward progress on required figure fallback');
+              treesaver.debug.warn('No forward progress on required figure fallback');
               // Must make forward progress on open required figure, penalize severely
               score = -Infinity;
             }
@@ -673,7 +676,7 @@ goog.scope(function() {
         percentEmpty -= filledContainerCount * .2;
 
         if (percentEmpty > .5) {
-          debug.info('Grid penalized for emptiness percentage: ' + percentEmpty * 100);
+          treesaver.debug.info('Grid penalized for emptiness percentage: ' + percentEmpty * 100);
           score -= remaining_height;
           score -= percentEmpty * percentEmpty *
             Grid.SCORING.EMPTINESS_PENALTY;
@@ -697,4 +700,4 @@ goog.scope(function() {
       return "[Grid " + this.classes + "]";
     };
   }
-});
+

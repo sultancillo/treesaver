@@ -1,24 +1,23 @@
-goog.provide('treesaver.uri');
+treesaver = treesaver || {};
+treesaver.uri = treesaver.uri || {};
 
-goog.scope(function() {
-  var uri = treesaver.uri;
 
   // URI parser, based on parseUri by Steven Levithan <stevenlevithan.com> (MIT License)
-  uri._parserRegex = /^(?:([^:\/?#]+):)?(?:\/\/((?:(([^:@]*)(?::([^:@]*))?)?@)?([^:\/?#]*)(?::(\d*))?))?((((?:[^?#\/]*\/)*)([^?#]*))(?:\?([^#]*))?(?:#(.*))?)/;
-  uri._keys = ['source', 'scheme', 'authority', 'userInfo', 'user', 'password', 'host', 'port', 'relative', 'path', 'directory', 'file', 'query', 'anchor'];
+  treesaver.uri._parserRegex = /^(?:([^:\/?#]+):)?(?:\/\/((?:(([^:@]*)(?::([^:@]*))?)?@)?([^:\/?#]*)(?::(\d*))?))?((((?:[^?#\/]*\/)*)([^?#]*))(?:\?([^#]*))?(?:#(.*))?)/;
+  treesaver.uri._keys = ['source', 'scheme', 'authority', 'userInfo', 'user', 'password', 'host', 'port', 'relative', 'path', 'directory', 'file', 'query', 'anchor'];
 
-  uri.parse = function(str) {
-      var i = uri._keys.length,
-          m = uri._parserRegex.exec(str),
+  treesaver.uri.parse = function(str) {
+      var i = treesaver.uri._keys.length,
+          m = treesaver.uri._parserRegex.exec(str),
           result = {};
 
       while (i--) {
-          result[uri._keys[i]] = m[i] || null;
+          result[treesaver.uri._keys[i]] = m[i] || null;
       }
       return result;
   };
 
-  uri.stringify = function(o) {
+  treesaver.uri.stringify = function(o) {
       var result = '';
 
       if (o['scheme']) {
@@ -62,8 +61,8 @@ goog.scope(function() {
       return result;
   };
 
-  uri.isIndex = function(str) {
-    var url = uri.parse(str);
+  treesaver.uri.isIndex = function(str) {
+    var url = treesaver.uri.parse(str);
 
     if (url.file) {
       return (/^(index|default)\.(html?|php|asp|aspx)$/i.test(url.file) || (treesaver.ui.ArticleManager.index && treesaver.ui.ArticleManager.index.get('DirectoryIndex', 'index.html') === url.file));
@@ -73,15 +72,15 @@ goog.scope(function() {
     }
   };
 
-  uri.stripHash = function(str) {
-    var tmp = uri.parse(str);
+  treesaver.uri.stripHash = function(str) {
+    var tmp = treesaver.uri.parse(str);
     tmp.anchor = null;
-    return uri.stringify(tmp);
+    return treesaver.uri.stringify(tmp);
   };
 
-  uri.stripFile = function(str) {
-    var tmp = uri.parse(str);
+  treesaver.uri.stripFile = function(str) {
+    var tmp = treesaver.uri.parse(str);
     tmp.file = null;
-    return uri.stringify(tmp);
+    return treesaver.uri.stringify(tmp);
   };
-});
+

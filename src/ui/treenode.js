@@ -1,3 +1,6 @@
+
+treesaver = treesaver || {};
+treesaver.ui = treesaver.ui || {};
 goog.provide('treesaver.ui.TreeNode');
 
 /**

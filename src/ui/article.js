@@ -2,7 +2,10 @@
  * @fileoverview Article class.
  */
 
-goog.provide('treesaver.ui.Article');
+treesaver = treesaver || {};
+treesaver.ui = treesaver.ui || {};
+treesaver.ui.Article = treesaver.ui.Article || {};
+
 
 goog.require('treesaver.array');
 goog.require('treesaver.debug');
@@ -16,7 +19,7 @@ goog.require('treesaver.layout.Grid');
 goog.require('treesaver.layout.Page');
 goog.require('treesaver.scheduler');
 
-goog.scope(function() {
+
   /**
    * A chunk of content
    *
@@ -35,9 +38,9 @@ goog.scope(function() {
       this.processHTML(node);
     }
   };
-});
 
-goog.scope(function() {
+
+
   var Article = treesaver.ui.Article,
       array = treesaver.array,
       debug = treesaver.debug,
@@ -584,4 +587,4 @@ goog.scope(function() {
       return '[treesaver.ui.Article]';
     };
   }
-});
+
