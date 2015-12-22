@@ -44,7 +44,7 @@ treesaver.layout.ContentPosition = function(block, figure, overhang) {
    * @type {!treesaver.layout.ContentPosition}
    */
   treesaver.layout.ContentPosition.END =
-    new ContentPosition(Infinity, Infinity, Infinity);
+    new treesaver.layout.ContentPosition(Infinity, Infinity, Infinity);
 
   /**
    * Is the current content position at the beginning?

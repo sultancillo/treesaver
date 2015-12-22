@@ -6,11 +6,11 @@ treesaver = treesaver || {};
 treesaver.layout = treesaver.layout || {};
 treesaver.layout.Block = treesaver.layout.Block || {};
 
-goog.require('../lib/array');
-goog.require('../lib/debug');
-goog.require('../lib/dimensions');
-goog.require('../lib/dom');
-goog.require('./figure');
+require('../lib/array');
+require('../lib/debug');
+require('../lib/dimensions');
+require('../lib/dom');
+require('../layout/figure');
 
 
 
@@ -24,7 +24,7 @@ goog.require('./figure');
    * @constructor
    */
   treesaver.layout.Block = function(node, baseLineHeight, indices, isFallback) {
-    var isReplacedElement = treesaver.layout.treesaver.layout.Block.isReplacedElement(node),
+    var isReplacedElement = treesaver.layout.Block.isReplacedElement(node),
         hasFigures,
         figureSizes,
         html_zero = '',
@@ -69,7 +69,7 @@ goog.require('./figure');
     indices.index += 1;
 
     this.hasBlockChildren = !isReplacedElement &&
-      treesaver.layout.treesaver.layout.Block.hasBlockChildren(node);
+      treesaver.layout.Block.hasBlockChildren(node);
 
     ///////////////
     // Hierarchy
@@ -279,7 +279,7 @@ goog.require('./figure');
    treesaver.layout.Block.prototype.keeptogether;
 
   /**
-   * @type {!treesaver.treesaver.dimensions.Metrics}
+   * @type {!treesaver.dimensions.Metrics}
    */
    treesaver.layout.Block.prototype.metrics;
 
@@ -343,7 +343,7 @@ goog.require('./figure');
   treesaver.layout.Block.processChildren =
     function(owner, node, baseLineHeight, indices, isFallback) {
     var prev,
-        isBlock = owner instanceof Block,
+        isBlock = owner instanceof treesaver.layout.Block,
         // Is checking 'start' enough here?
         isList = node.nodeName.toLowerCase() === 'ol' && 'start' in node,
         listIndex = isList ? node.start : null;

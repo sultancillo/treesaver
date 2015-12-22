@@ -4,13 +4,13 @@ treesaver.layout = treesaver.layout || {};
 treesaver.layout.Figure = treesaver.layout.Figure || {};
 
 
-require('./lib/array');
-require('./lib/capabilities');
-require('./lib/dom');
+require('../lib/array');
+require('../lib/capabilities');
+require('../lib/dom');
 // Block requires Figure, so avoid a circular dependency
 //goog.require('treesaver.layout.Block');
-require('./FigureSize');
-require('./lib/string'); // String.trim
+require('./figuresize');
+require('../lib/string'); // String.trim
 
 
 
@@ -134,7 +134,7 @@ require('./lib/string'); // String.trim
     if (this.zoomable) {
       treesaver.dom.addClass(fallbackNode, 'zoomable');
       fallbackNode.setAttribute('data-figureindex', this.figureIndex);
-      if (treesaver.capabilities.IS_NATIVE_APP || treesaver.treesaver.capabilities.SUPPORTS_TOUCH) {
+      if (treesaver.capabilities.IS_NATIVE_APP || treesaver.capabilities.SUPPORTS_TOUCH) {
         // Need dummy handler in order to get bubbled events
         fallbackNode.setAttribute('onclick', 'void(0)');
       }

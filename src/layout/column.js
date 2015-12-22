@@ -6,8 +6,8 @@ treesaver = treesaver || {};
 treesaver.layout = treesaver.layout || {};
 treesaver.layout.Column = treesaver.layout.Column || {};
 
-require('./lib/dimensions');
-require('./lib/dom');
+require('../lib/dimensions');
+require('../lib/dom');
 
 
   /**

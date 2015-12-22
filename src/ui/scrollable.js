@@ -4,23 +4,19 @@
 
 treesaver = treesaver || {};
 treesaver.ui = treesaver.ui || {};
+treesaver.ui.Scrollable = treesaver.ui.Scrollable || {};
 
-goog.provide('treesaver.ui.Scrollable');
+require('../lib/capabilities');
+require('../lib/dom');
 
-goog.require('treesaver.capabilities');
-goog.require('treesaver.dom');
 
-goog.scope(function() {
-  var Scrollable = treesaver.ui.Scrollable,
-      capabilities = treesaver.capabilities,
-      dom = treesaver.dom;
 
   /**
    * Can this scroller scroll horizontally?
    * @param {!Element} el
    * @return {boolean}
    */
-  Scrollable.canScrollHorizontally = function(el) {
+  treesaver.ui.Scrollable.canScrollHorizontally = function(el) {
     return el.scrollWidth !== el.clientWidth;
   };
 
@@ -32,7 +28,7 @@ goog.scope(function() {
    * @param {number} y
    * @return {boolean} true if scrolling happened.
    */
-  Scrollable.setOffset = function(el, x, y) {
+  treesaver.ui.Scrollable.setOffset = function(el, x, y) {
     var left = el.scrollLeft,
         top = el.scrollTop;
 
@@ -49,8 +45,8 @@ goog.scope(function() {
    *
    * @param {!Element} el
    */
-  Scrollable.initDom = function(el) {
-    if (WITHIN_IOS_WRAPPER || capabilities.SUPPORTS_TOUCH) {
+  treesaver.ui.Scrollable.initDom = function(el) {
+    if (WITHIN_IOS_WRAPPER || treesaver.capabilities.SUPPORTS_TOUCH) {
       // Need dummy handler in order to get bubbled events
       el.setAttribute('onclick', 'void(0)');
     }
@@ -63,15 +59,15 @@ goog.scope(function() {
    *
    * @param {!Element} root
    */
-  Scrollable.initDomTree = function(root) {
-    var els = dom.querySelectorAll('.scroll', root);
+  treesaver.ui.Scrollable.initDomTree = function(root) {
+    var els = treesaver.dom.querySelectorAll('.scroll', root);
 
     // Root element can be scrollable as well
-    if (dom.hasClass(root, 'scroll')) {
+    if (treesaver.dom.hasClass(root, 'scroll')) {
       els.unshift(root);
     }
 
     // Initialize all
-    els.forEach(Scrollable.initDom);
+    els.forEach(treesaver.ui.Scrollable.initDom);
   };
-});
+

@@ -7,8 +7,8 @@ treesaver.layout = treesaver.layout || {};
 treesaver.layout.Container = treesaver.layout.Container || {};
 
 
-require('./lib/dimensions');
-require('./lib/dom');
+require('../lib/dimensions');
+require('../lib/dom');
 
 
 

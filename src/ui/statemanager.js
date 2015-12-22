@@ -4,116 +4,107 @@
 
 treesaver = treesaver || {};
 treesaver.ui = treesaver.ui || {};
+treesaver.ui.StateManager = treesaver.ui.StateManager || {};
 
-goog.provide('treesaver.ui.StateManager');
 
-goog.require('treesaver.capabilities');
-goog.require('treesaver.constants');
-goog.require('treesaver.debug');
-goog.require('treesaver.dimensions');
-goog.require('treesaver.dom');
-goog.require('treesaver.events');
-goog.require('treesaver.resources');
-goog.require('treesaver.scheduler');
-goog.require('treesaver.ui.Chrome');
-goog.require('treesaver.ui.LightBox');
+require('../lib/capabilities');
+require('../lib/constants');
+require('../lib/debug');
+require('../lib/dimensions');
+require('../lib/dom');
+require('../lib/events');
+require('../lib/resources');
+require('../lib/scheduler');
+require('../ui/chrome');
+require('../ui/lightbox');
 
-goog.scope(function() {
-  var StateManager = treesaver.ui.StateManager,
-      capabilities = treesaver.capabilities,
-      debug = treesaver.debug,
-      dimensions = treesaver.dimensions,
-      dom = treesaver.dom,
-      events = treesaver.events,
-      resources = treesaver.resources,
-      scheduler = treesaver.scheduler,
-      Chrome = treesaver.ui.Chrome,
-      LightBox = treesaver.ui.LightBox;
+
+
 
   /**
    * Current state
    */
-  StateManager.state_;
+  treesaver.ui.StateManager.state_;
 
   /**
    * Storage for all the chromes
    *
    * @type {Array.<treesaver.ui.Chrome>}
    */
-  StateManager.chromes_;
+  treesaver.ui.StateManager.chromes_;
 
   /**
    * Initialize the state manager
    *
    * @return {boolean}
    */
-  StateManager.load = function() {
+  treesaver.ui.StateManager.load = function() {
     // Setup state
-    StateManager.state_ = {
+    treesaver.ui.StateManager.state_ = {
       orientation: 0,
       size: { w: 0, h: 0 }
     };
 
     // Clean the body
-    dom.clearChildren(/** @type {!Element} */ (treesaver.tsContainer));
+    treesaver.dom.clearChildren(/** @type {!Element} */ (treesaver.tsContainer));
 
     // Install container for chrome used to measure screen space, etc
-    StateManager.state_.chromeContainer = StateManager.getChromeContainer_();
+    treesaver.ui.StateManager.state_.chromeContainer = treesaver.ui.StateManager.getChromeContainer_();
 
     // Get or install the viewport
-    StateManager.state_.viewport = StateManager.getViewport_();
+    treesaver.ui.StateManager.state_.viewport = treesaver.ui.StateManager.getViewport_();
 
     // Get the chromes and lightboxes
-    StateManager.chromes_ = StateManager.getChromes_();
-    StateManager.lightboxes_ = StateManager.getLightBoxes_();
+    treesaver.ui.StateManager.chromes_ = treesaver.ui.StateManager.getChromes_();
+    treesaver.ui.StateManager.lightboxes_ = treesaver.ui.StateManager.getLightBoxes_();
 
     // Can't do anything without mah chrome
-    if (!StateManager.chromes_.length) {
-      debug.error('No chromes');
+    if (!treesaver.ui.StateManager.chromes_.length) {
+      treesaver.debug.error('No chromes');
 
       return false;
     }
 
     // Find and install the first chrome by calling checkState manually (this will also set up the size)
-    StateManager.checkState();
+    treesaver.ui.StateManager.checkState();
 
     // Setup checkstate timer
-    scheduler.repeat(StateManager.checkState, CHECK_STATE_INTERVAL, Infinity, [], 'checkState');
+    treesaver.scheduler.repeat(treesaver.ui.StateManager.checkState, CHECK_STATE_INTERVAL, Infinity, [], 'checkState');
 
-    if (capabilities.SUPPORTS_ORIENTATION &&
+    if (treesaver.capabilities.SUPPORTS_ORIENTATION &&
         !treesaver.inContainedMode &&
-        !capabilities.IS_FULLSCREEN) {
-      events.addListener(window, 'orientationchange',
-        StateManager.onOrientationChange);
+        !treesaver.capabilities.IS_FULLSCREEN) {
+      treesaver.events.addListener(window, 'orientationchange',
+        treesaver.ui.StateManager.onOrientationChange);
 
       // Hide the address bar on iPhone
-      scheduler.delay(window.scrollTo, 100, [0, 0]);
+      treesaver.scheduler.delay(window.scrollTo, 100, [0, 0]);
     }
 
     return true;
   };
 
-  StateManager.unload = function() {
+  treesaver.ui.StateManager.unload = function() {
     // Remove handler
-    if (capabilities.SUPPORTS_ORIENTATION && !treesaver.inContainedMode) {
-      events.removeListener(window, 'orientationchange', StateManager.onOrientationChange);
+    if (treesaver.capabilities.SUPPORTS_ORIENTATION && !treesaver.inContainedMode) {
+      treesaver.events.removeListener(window, 'orientationchange', treesaver.ui.StateManager.onOrientationChange);
     }
 
     // Deactive any active chrome
-    if (StateManager.state_.chrome) {
-      StateManager.state_.chrome.deactivate();
+    if (treesaver.ui.StateManager.state_.chrome) {
+      treesaver.ui.StateManager.state_.chrome.deactivate();
     }
 
     // Lose references
-    StateManager.state_ = null;
-    StateManager.chromes_ = null;
-    StateManager.lightboxes_ = null;
+    treesaver.ui.StateManager.state_ = null;
+    treesaver.ui.StateManager.chromes_ = null;
+    treesaver.ui.StateManager.lightboxes_ = null;
   };
 
   /**
    * @type {Object.<string, string>}
    */
-  StateManager.events = {
+  treesaver.ui.StateManager.events = {
     CHROMECHANGED: 'treesaver.chromechanged'
   };
 
@@ -121,7 +112,7 @@ goog.scope(function() {
    * @private
    * @return {!Element}
    */
-  StateManager.getChromeContainer_ = function() {
+  treesaver.ui.StateManager.getChromeContainer_ = function() {
     if (treesaver.inContainedMode) {
       return treesaver.tsContainer;
     }
@@ -137,14 +128,14 @@ goog.scope(function() {
    * @private
    * @return {!Element}
    */
-  StateManager.getViewport_ = function() {
-    var viewport = dom.querySelectorAll('meta[name=viewport]')[0];
+  treesaver.ui.StateManager.getViewport_ = function() {
+    var viewport = treesaver.dom.querySelectorAll('meta[name=viewport]')[0];
 
     if (!viewport) {
       // Create a viewport if one doesn't exist
       viewport = document.createElement('meta');
       viewport.setAttribute('name', 'viewport');
-      dom.querySelectorAll('head')[0].appendChild(viewport);
+      treesaver.dom.querySelectorAll('head')[0].appendChild(viewport);
     }
 
     return viewport;
@@ -154,24 +145,24 @@ goog.scope(function() {
    * @private
    * @return {!Array.<treesaver.ui.Chrome>}
    */
-  StateManager.getChromes_ = function() {
+  treesaver.ui.StateManager.getChromes_ = function() {
     var chromes = [];
 
-    resources.findByClassName('chrome').forEach(function(node) {
+    treesaver.resources.findByClassName('chrome').forEach(function(node) {
       var chrome,
           requires = node.getAttribute('data-requires');
 
-      if (requires && !capabilities.check(requires.split(' '))) {
+      if (requires && !treesaver.capabilities.check(requires.split(' '))) {
         // Doesn't meet our requirements, skip
         return;
       }
 
-      StateManager.state_.chromeContainer.appendChild(node);
+      treesaver.ui.StateManager.state_.chromeContainer.appendChild(node);
 
-      chrome = new Chrome(node);
+      chrome = new treesaver.ui.Chrome(node);
       chromes.push(chrome);
 
-      StateManager.state_.chromeContainer.removeChild(node);
+      treesaver.ui.StateManager.state_.chromeContainer.removeChild(node);
     });
 
     return chromes;
@@ -181,24 +172,24 @@ goog.scope(function() {
    * @private
    * @return {!Array.<treesaver.ui.LightBox>}
    */
-  StateManager.getLightBoxes_ = function() {
+  treesaver.ui.StateManager.getLightBoxes_ = function() {
     var lightboxes = [];
 
-    resources.findByClassName('lightbox').forEach(function(node) {
+    treesaver.resources.findByClassName('lightbox').forEach(function(node) {
       var lightbox,
           requires = node.getAttribute('data-requires');
 
-      if (requires && !capabilities.check(requires.split(' '))) {
+      if (requires && !treesaver.capabilities.check(requires.split(' '))) {
         // Doesn't meet our requirements, skip
         return;
       }
 
-      StateManager.state_.chromeContainer.appendChild(node);
+      treesaver.ui.StateManager.state_.chromeContainer.appendChild(node);
 
-      lightbox = new LightBox(node);
+      lightbox = new treesaver.ui.LightBox(node);
       lightboxes.push(lightbox);
 
-      StateManager.state_.chromeContainer.removeChild(node);
+      treesaver.ui.StateManager.state_.chromeContainer.removeChild(node);
     });
 
     return lightboxes;
@@ -207,8 +198,8 @@ goog.scope(function() {
   /**
    * Detect any changes in orientation, and update the viewport accordingly
    */
-  StateManager.onOrientationChange = function() {
-    if (StateManager.state_.orientation === window['orientation']) {
+  treesaver.ui.StateManager.onOrientationChange = function() {
+    if (treesaver.ui.StateManager.state_.orientation === window['orientation']) {
       // Nothing to do (false alarm?)
       return;
     }
@@ -216,25 +207,25 @@ goog.scope(function() {
     // TODO: Fire event?
     //
     // TODO: Refactor this manual update
-    capabilities.updateClasses();
+    treesaver.capabilities.updateClasses();
 
-    StateManager.state_.orientation = window['orientation'];
+    treesaver.ui.StateManager.state_.orientation = window['orientation'];
 
-    if (StateManager.state_.orientation % 180) {
+    if (treesaver.ui.StateManager.state_.orientation % 180) {
       // Rotated (landscape)
-      StateManager.state_.viewport.setAttribute('content',
+      treesaver.ui.StateManager.state_.viewport.setAttribute('content',
         'width=device-height, height=device-width');
     }
     else {
       // Normal
-      StateManager.state_.viewport.setAttribute('content',
+      treesaver.ui.StateManager.state_.viewport.setAttribute('content',
         'width=device-width, height=device-height');
     }
 
     // Hide the address bar on iOS & others
-    if (capabilities.SUPPORTS_ORIENTATION &&
+    if (treesaver.capabilities.SUPPORTS_ORIENTATION &&
         !treesaver.inContainedMode &&
-        !capabilities.IS_FULLSCREEN) {
+        !treesaver.capabilities.IS_FULLSCREEN) {
       window.scrollTo(0, 0);
     }
 
@@ -249,8 +240,8 @@ goog.scope(function() {
    * @private
    * @return {{ w: number, h: number }}
    */
-  StateManager.getAvailableSize_ = function() {
-    if (capabilities.IS_NATIVE_APP || !treesaver.inContainedMode) {
+  treesaver.ui.StateManager.getAvailableSize_ = function() {
+    if (treesaver.capabilities.IS_NATIVE_APP || !treesaver.inContainedMode) {
       if (window.pageYOffset || window.pageXOffset) {
         window.scrollTo(0, 0);
       }
@@ -261,7 +252,7 @@ goog.scope(function() {
       };
     }
     else {
-      return dimensions.getSize(treesaver.tsContainer);
+      return treesaver.dimensions.getSize(treesaver.tsContainer);
     }
   };
 
@@ -270,29 +261,29 @@ goog.scope(function() {
    *
    * @return {?treesaver.ui.LightBox}
    */
-  StateManager.getLightBox = function() {
-    var availSize = StateManager.getAvailableSize_();
+  treesaver.ui.StateManager.getLightBox = function() {
+    var availSize = treesaver.ui.StateManager.getAvailableSize_();
 
-    return LightBox.select(StateManager.lightboxes_, availSize);
+    return treesaver.ui.LightBox.select(treesaver.ui.StateManager.lightboxes_, availSize);
   };
 
   /**
    * Tick function
    */
-  StateManager.checkState = function() {
-    var availSize = StateManager.getAvailableSize_(),
+  treesaver.ui.StateManager.checkState = function() {
+    var availSize = treesaver.ui.StateManager.getAvailableSize_(),
         newChrome;
 
     // Check if we're at a new size
-    if (availSize.h !== StateManager.state_.size.h || availSize.w !== StateManager.state_.size.w) {
-      StateManager.state_.size = availSize;
+    if (availSize.h !== treesaver.ui.StateManager.state_.size.h || availSize.w !== treesaver.ui.StateManager.state_.size.w) {
+      treesaver.ui.StateManager.state_.size = availSize;
 
       // Check if chrome still fits
-      if (!StateManager.state_.chrome ||
-          !StateManager.state_.chrome.meetsRequirements() ||
-          !StateManager.state_.chrome.fits(availSize)) {
+      if (!treesaver.ui.StateManager.state_.chrome ||
+          !treesaver.ui.StateManager.state_.chrome.meetsRequirements() ||
+          !treesaver.ui.StateManager.state_.chrome.fits(availSize)) {
         // Chrome doesn't fit, need to install a new one
-        newChrome = Chrome.select(StateManager.chromes_, availSize);
+        newChrome = treesaver.ui.Chrome.select(treesaver.ui.StateManager.chromes_, availSize);
 
         if (!newChrome) {
           // TODO: Fire chrome failed event
@@ -301,31 +292,31 @@ goog.scope(function() {
         }
 
         // Remove existing chrome
-        dom.clearChildren(StateManager.state_.chromeContainer);
+        treesaver.dom.clearChildren(treesaver.ui.StateManager.state_.chromeContainer);
         // Deactivate previous
-        if (StateManager.state_.chrome) {
-          StateManager.state_.chrome.deactivate();
+        if (treesaver.ui.StateManager.state_.chrome) {
+          treesaver.ui.StateManager.state_.chrome.deactivate();
         }
 
         // Activate and store
-        StateManager.state_.chromeContainer.appendChild(newChrome.activate());
-        StateManager.state_.chrome = newChrome;
+        treesaver.ui.StateManager.state_.chromeContainer.appendChild(newChrome.activate());
+        treesaver.ui.StateManager.state_.chrome = newChrome;
 
         // Fire chrome change event
-        events.fireEvent(
-          document, StateManager.events.CHROMECHANGED, {
+        treesaver.events.fireEvent(
+          document, treesaver.ui.StateManager.events.CHROMECHANGED, {
             'node': newChrome.node
           }
         );
       }
 
       // Chrome handles page re-layout, if necessary
-      StateManager.state_.chrome.setSize(availSize);
+      treesaver.ui.StateManager.state_.chrome.setSize(availSize);
     }
   };
 
   // Expose special functions for use by the native app wrappers
-  if (capabilities.IS_NATIVE_APP) {
+  if (treesaver.capabilities.IS_NATIVE_APP) {
     // UI is shown/hidden based on the active and idle events fired by the
     // currently visible chrome.
     //
@@ -337,8 +328,8 @@ goog.scope(function() {
     treesaver.activeFunctionWrapper = function(f) {
       return (function() {
         // Manually call the chrome's function, if it exists
-        if (StateManager.state_.chrome) {
-          StateManager.state_.chrome.setUiActive_();
+        if (treesaver.ui.StateManager.state_.chrome) {
+          treesaver.ui.StateManager.state_.chrome.setUiActive_();
         }
 
         // Call original function
@@ -355,4 +346,4 @@ goog.scope(function() {
     goog.exportSymbol('treesaver.previousArticle',
       treesaver.activeFunctionWrapper(treesaver.ui.ArticleManager.previousArticle));
   }
-});
+

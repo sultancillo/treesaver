@@ -49,8 +49,8 @@ require('./debug');
   /**
    * Whether the given size fits within the bounds set by the range
    *
-   * @param {treesaver.treesaver.dimensions.SizeRange|treesaver.treesaver.dimensions.Metrics} range
-   * @param {treesaver.treesaver.dimensions.Size} size
+   * @param {treesaver.dimensions.SizeRange|treesaver.dimensions.Metrics} range
+   * @param {treesaver.dimensions.Size} size
    * @return {boolean} True if both dimensions are within the min and max.
    */
   treesaver.dimensions.inSizeRange = function(range, size) {
@@ -69,10 +69,10 @@ require('./debug');
 
   /**
    *
-   * @param {treesaver.treesaver.dimensions.SizeRange} range
-   * @param {treesaver.treesaver.dimensions.Metrics} metrics
+   * @param {treesaver.dimensions.SizeRange} range
+   * @param {treesaver.dimensions.Metrics} metrics
    * @param {boolean} outer
-   * @return {treesaver.treesaver.dimensions.SizeRange}
+   * @return {treesaver.dimensions.SizeRange}
    */
   treesaver.dimensions.mergeSizeRange = function(range, metrics, outer) {
     var a = range || {},
@@ -239,7 +239,7 @@ require('./debug');
       return;
     }
 
-    var style = css.getStyleObject(el),
+    var style = treesaver.css.getStyleObject(el),
         oldPosition = el.style.position,
         oldStyleAttribute = el.getAttribute('style'),
         tmp;

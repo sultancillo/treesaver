@@ -1,8 +1,8 @@
 
 treesaver = treesaver || {};
 treesaver.ui = treesaver.ui || {};
+treesaver.ui.ArticlePosition = treesaver.ui.ArticlePosition || {};
 
-goog.provide('treesaver.ui.ArticlePosition');
 
 /**
  * Representation of the position of an article within a document.
@@ -15,14 +15,14 @@ treesaver.ui.ArticlePosition = function(index, anchor) {
   this.anchor = anchor;
 };
 
-goog.scope(function() {
-  var ArticlePosition = treesaver.ui.ArticlePosition;
+
+
 
   /** @type {number} */
-  ArticlePosition.prototype.index;
+  treesaver.ui.ArticlePosition.prototype.index;
 
   /** @type {string|undefined} */
-  ArticlePosition.prototype.anchor;
+  treesaver.ui.ArticlePosition.prototype.anchor;
 
   /**
    * Position at the end of a document
@@ -30,7 +30,7 @@ goog.scope(function() {
    * @const
    * @type {!treesaver.ui.ArticlePosition}
    */
-  ArticlePosition.END = new ArticlePosition(Infinity);
+  treesaver.ui.ArticlePosition.END = new treesaver.ui.ArticlePosition(Infinity);
 
   /**
    * Position at the beginning of a document
@@ -38,13 +38,13 @@ goog.scope(function() {
    * @const
    * @type {!treesaver.ui.ArticlePosition}
    */
-  ArticlePosition.BEGINNING = new ArticlePosition(0);
+  treesaver.ui.ArticlePosition.BEGINNING = new treesaver.ui.ArticlePosition(0);
 
   /**
    * Returns true if the position is at the beginning of a document.
    * @return {!boolean}
    */
-  ArticlePosition.prototype.atBeginning = function() {
+  treesaver.ui.ArticlePosition.prototype.atBeginning = function() {
     return this.index === 0;
   };
 
@@ -52,7 +52,7 @@ goog.scope(function() {
    * Returns true if the position is at the end of a document.
    * @return {!boolean}
    */
-  ArticlePosition.prototype.atEnding = function() {
+  treesaver.ui.ArticlePosition.prototype.atEnding = function() {
     return this.index === Infinity;
   };
 
@@ -60,7 +60,7 @@ goog.scope(function() {
    * Returns true if this instance represents an anchor.
    * @return {!boolean}
    */
-  ArticlePosition.prototype.isAnchor = function() {
+  treesaver.ui.ArticlePosition.prototype.isAnchor = function() {
     return !!this.anchor;
   };
 
@@ -68,7 +68,7 @@ goog.scope(function() {
    * Compares two article positions. Only compares the article indices, not their anchors.
    * @return {!boolean}
    */
-  ArticlePosition.prototype.equals = function(other) {
+  treesaver.ui.ArticlePosition.prototype.equals = function(other) {
     return this.index === other.index;
   };
-});
+

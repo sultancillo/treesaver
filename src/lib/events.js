@@ -6,7 +6,7 @@ treesaver = treesaver || {};
 treesaver.events = treesaver.events || {};
 
 
-goog('./debug');
+require('./debug');
 
 
   var events = treesaver.events,

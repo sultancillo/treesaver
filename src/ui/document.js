@@ -1,20 +1,21 @@
 
 treesaver = treesaver || {};
 treesaver.ui = treesaver.ui || {};
-goog.provide('treesaver.ui.Document');
+treesaver.ui.Document = treesaver.ui.Document || {};
 
-goog.require('treesaver.capabilities');
-goog.require('treesaver.debug');
-goog.require('treesaver.dom');
-goog.require('treesaver.events');
-goog.require('treesaver.dom');
-goog.require('treesaver.storage');
-goog.require('treesaver.ui.Article');
+
+require('../lib/capabilities');
+require('../lib/debug');
+require('../lib/dom');
+require('../lib/events');
+require('../lib/dom');
+require('../lib/storage');
+require('../ui/article');
 // Avoid circular ref
-// goog.require('treesaver.ui.ArticleManager');
-goog.require('treesaver.ui.TreeNode');
-goog.require('treesaver.object');
-goog.require('treesaver.uri');
+// require('treesaver.ui.ArticleManager');
+require('../ui/treenode');
+require('../lib/object');
+require('../lib/uri');
 
 /**
  * Class representing "documents" which are usually HTML pages that contain one or
@@ -40,7 +41,7 @@ treesaver.ui.Document = function(url, meta) {
   this.contents = [];
 };
 
-goog.scope(function() {
+
   var Document = treesaver.ui.Document,
       capabilities = treesaver.capabilities,
       debug = treesaver.debug,
@@ -54,82 +55,82 @@ goog.scope(function() {
   /**
    * @type {!string}
    */
-  Document.prototype.url;
+  treesaver.ui.Document.prototype.url;
 
   /**
    * @type {!string}
    */
-  Document.prototype.path;
+  treesaver.ui.Document.prototype.path;
 
   /**
    * @type {!Object}
    */
-  Document.prototype.meta;
+  treesaver.ui.Document.prototype.meta;
 
   /**
    * @type {Array.<treesaver.ui.Article>}
    */
-  Document.prototype.articles;
+  treesaver.ui.Document.prototype.articles;
 
   /**
    * Maps identifiers to articles
    * @type {!Object}
    */
-  Document.prototype.articleMap;
+  treesaver.ui.Document.prototype.articleMap;
 
   /**
    * Maps article positions to anchors
    * @type {Array.<!string>}
    */
-  Document.prototype.anchorMap;
+  treesaver.ui.Document.prototype.anchorMap;
 
   /**
    * @type {boolean}
    */
-  Document.prototype.loaded;
+  treesaver.ui.Document.prototype.loaded;
 
   /**
    * @type {boolean}
    */
-  Document.prototype.loading;
+  treesaver.ui.Document.prototype.loading;
 
   /**
    * @type {boolean}
    */
-  Document.prototype.loadFailed;
+  treesaver.ui.Document.prototype.loadFailed;
 
   /**
    * @type {boolean}
    */
-  Document.prototype.error;
+  treesaver.ui.Document.prototype.error;
 
   /**
    * @type {!Array.<treesaver.ui.Document>}
    */
-  Document.prototype.contents;
+  treesaver.ui.Document.prototype.contents;
 
   /**
    * A list of all (mutable) capability requirements for this document.
    *
    * @type {?Array.<string>}
    */
-  Document.prototype.requirements;
+  treesaver.ui.Document.prototype.requirements;
 
   /**
    * @type {?string}
    */
-  Document.prototype.title;
+  treesaver.ui.Document.prototype.title;
 
-  Document.CACHE_STORAGE_PREFIX = 'cache:';
+  treesaver.ui.Document.CACHE_STORAGE_PREFIX = 'cache:';
 
-  Document.events = {
+  treesaver.ui.Document.events = {
     LOADFAILED: 'treesaver.loadfailed',
     LOADED: 'treesaver.loaded'
   };
 
-  Document.titleRegExp = /<title>\s*(.+?)\s*<\/title>/i;
+  treesaver.ui.Document.titleRegExp = /<title>\s*(.+?)\s*<\/title>/i;
 
-  Document.prototype = new TreeNode();
+  treesaver.ui.Document.prototype = new treesaver.ui.TreeNode();
 
   /**
    * Parse the content of a document, creating articles where necessary.
@@ -137,7 +138,7 @@ goog.scope(function() {
    * @param {!string} text The HTML text of a document.
    * @return {Array.<!treesaver.ui.Article>} A list of Article instances that were extracted from the text.
    */
-  Document.prototype.parse = function(text) {
+  treesaver.ui.Document.prototype.parse = function(text) {
     var node = document.createElement('div'),
         articles = [];
 
@@ -150,7 +151,7 @@ goog.scope(function() {
     // Copy all meta tags with a name and content into the meta-data
     // object. The values specified in the <meta> tag take precendence
     // over values in the index file.
-    dom.querySelectorAll('meta[name]', node).forEach(function (meta) {
+    treesaver.dom.querySelectorAll('meta[name]', node).forEach(function (meta) {
       var name = meta.getAttribute('name'),
           content = meta.getAttribute('content');
 
@@ -161,8 +162,8 @@ goog.scope(function() {
 
     // We have the body of the document at 'requestUrl` in a node now,
     // and we try and find all top level articles.
-    articles = dom.querySelectorAll('article', node).filter(function(article) {
-      return dom.getAncestor(article, 'article') === null;
+    articles = treesaver.dom.querySelectorAll('article', node).filter(function(article) {
+      return treesaver.dom.getAncestor(article, 'article') === null;
     });
 
     // We don't have any articles so we'll just copy the entire body and call it an article
@@ -179,7 +180,7 @@ goog.scope(function() {
       // referenced by the requestUrl.)
       var identifier = articleNode.getAttribute('id') || (index === 0 ? null : ('_' + index)),
           // FIXME: get rid of the global reference to ArticleManager
-          article = new Article(treesaver.ui.ArticleManager.grids_, articleNode, this);
+          article = new treesaver.ui.Article(treesaver.ui.ArticleManager.grids_, articleNode, this);
 
       if (identifier) {
         this.articleMap[identifier] = index;
@@ -197,7 +198,7 @@ goog.scope(function() {
    * @param {treesaver.ui.Document|string} o A document to compare against, or a url.
    * @return {boolean} True if this document equals `o`.
    */
-  Document.prototype.equals = function(o) {
+  treesaver.ui.Document.prototype.equals = function(o) {
     var url = o;
 
     if (!url) {
@@ -226,12 +227,12 @@ goog.scope(function() {
    * Returns true if this document meets the (mutable) capabilities
    * @return {!boolean}
    */
-  Document.prototype.capabilityFilter = function() {
+  treesaver.ui.Document.prototype.capabilityFilter = function() {
     if (!this.requirements) {
       return true;
     }
     else {
-      return capabilities.check(this.requirements, true);
+      return treesaver.capabilities.check(this.requirements, true);
     }
   };
 
@@ -240,47 +241,47 @@ goog.scope(function() {
    * @param {!number} index
    * @return {?treesaver.ui.Article}
    */
-  Document.prototype.getArticle = function(index) {
+  treesaver.ui.Document.prototype.getArticle = function(index) {
     return this.articles[index] || null;
   };
 
   /**
-   * Manually set the articles for this Document.
+   * Manually set the articles for this treesaver.ui.Document.
    * @param {Array.<treesaver.ui.Article>} articles
    */
-  Document.prototype.setArticles = function(articles) {
+  treesaver.ui.Document.prototype.setArticles = function(articles) {
     this.articles = articles;
   };
 
   /**
-   * Retrieve the meta data for this Document.
+   * Retrieve the meta data for this treesaver.ui.Document.
    * @return {!Object}
    */
-  Document.prototype.getMeta = function() {
+  treesaver.ui.Document.prototype.getMeta = function() {
     return this.meta;
   };
 
   /**
-   * Return the canonical URL for this Document.
+   * Return the canonical URL for this treesaver.ui.Document.
    * @return {!string}
    */
-  Document.prototype.getUrl = function() {
+  treesaver.ui.Document.prototype.getUrl = function() {
     return this.url;
   };
 
   /**
-   * Set the canonical URL for this Document.
+   * Set the canonical URL for this treesaver.ui.Document.
    * @param {!string} url
    */
-  Document.prototype.setUrl = function(url) {
+  treesaver.ui.Document.prototype.setUrl = function(url) {
     this.url = url;
   };
 
   /**
-   * Returns the number of articles in this Document. Does not include any child documents.
+   * Returns the number of articles in this treesaver.ui.Document. Does not include any child documents.
    * @return {!number}
    */
-  Document.prototype.getNumberOfArticles = function() {
+  treesaver.ui.Document.prototype.getNumberOfArticles = function() {
     return this.articles.length;
   };
 
@@ -289,7 +290,7 @@ goog.scope(function() {
    * @param {!number} index
    * @return {?string} The anchor or null if the article does not exist or does not have an anchor.
    */
-  Document.prototype.getArticleAnchor = function(index) {
+  treesaver.ui.Document.prototype.getArticleAnchor = function(index) {
     return this.anchorMap[index] || null;
   };
 
@@ -298,7 +299,7 @@ goog.scope(function() {
    * @param {!string} anchor
    * @return {!number} The index for the given anchor, or zero (the first article, which is a sensible fallback when the anchor is not found.).
    */
-  Document.prototype.getArticleIndex = function(anchor) {
+  treesaver.ui.Document.prototype.getArticleIndex = function(anchor) {
     return this.articleMap[anchor] || 0;
   };
 
@@ -308,8 +309,8 @@ goog.scope(function() {
    * @param {!string} text
    * @return {?string}
    */
-  Document.prototype.extractTitle = function(text) {
-    var res = Document.titleRegExp.exec(text);
+  treesaver.ui.Document.prototype.extractTitle = function(text) {
+    var res = treesaver.ui.Document.titleRegExp.exec(text);
 
     if (res && res[1]) {
       return res[1];
@@ -320,7 +321,7 @@ goog.scope(function() {
   /**
    * Load this document by an XHR, if it hasn't already been loaded.
    */
-  Document.prototype.load = function() {
+  treesaver.ui.Document.prototype.load = function() {
     var that = this,
         cached_text = null;
 
@@ -331,71 +332,71 @@ goog.scope(function() {
 
     this.loading = true;
 
-    if (!capabilities.IS_NATIVE_APP) {
-      cached_text = /** @type {?string} */ (storage.get(Document.CACHE_STORAGE_PREFIX + this.url));
+    if (!treesaver.capabilities.IS_NATIVE_APP) {
+      cached_text = /** @type {?string} */ (treesaver.storage.get(treesaver.ui.Document.CACHE_STORAGE_PREFIX + this.url));
 
       if (cached_text) {
-        debug.log('Document.load: Processing cached HTML content for document: ' + this.url);
+        treesaver.debug.log('treesaver.ui.Document.load: Processing cached HTML content for document: ' + this.url);
         this.articles = this.parse(cached_text);
         this.title = this.extractTitle(cached_text);
         this.loaded = true;
 
-        treesaver.events.fireEvent(document, Document.events.LOADED, {
+        treesaver.events.fireEvent(document, treesaver.ui.Document.events.LOADED, {
           'document': this
         });
       }
     }
 
-    debug.info('Document.load: Downloading document: ' + this.url);
+    treesaver.debug.info('treesaver.ui.Document.load: Downloading document: ' + this.url);
 
     treesaver.network.get(this.url, function(text) {
       that.loading = false;
 
       if (!text) {
-        if (capabilities.IS_NATIVE_APP || !cached_text) {
-          debug.info('Document.load: Load failed, no content: ' + that.url);
+        if (treesaver.capabilities.IS_NATIVE_APP || !cached_text) {
+          treesaver.debug.info('treesaver.ui.Document.load: Load failed, no content: ' + that.url);
           that.loadFailed = true;
           that.loaded = false;
 
-          treesaver.events.fireEvent(document, Document.events.LOADFAILED, {
+          treesaver.events.fireEvent(document, treesaver.ui.Document.events.LOADFAILED, {
             'document': that
           });
           return;
         }
         else {
           // Stick with cached content
-          debug.log('Document.load: Using cached content for document: ' + that.url);
+          treesaver.debug.log('treesaver.ui.Document.load: Using cached content for document: ' + that.url);
         }
       }
-      else if (capabilities.IS_NATIVE_APP || cached_text !== text) {
-        if (!capabilities.IS_NATIVE_APP) {
-          debug.log('Document.load: Fetched content newer than cache for document: ' + that.url);
+      else if (treesaver.capabilities.IS_NATIVE_APP || cached_text !== text) {
+        if (!treesaver.capabilities.IS_NATIVE_APP) {
+          treesaver.debug.log('treesaver.ui.Document.load: Fetched content newer than cache for document: ' + that.url);
 
           // Save the HTML in the cache
-          storage.set(Document.CACHE_STORAGE_PREFIX + that.url, text, true);
+          treesaver.storage.set(treesaver.ui.Document.CACHE_STORAGE_PREFIX + that.url, text, true);
         }
 
-        debug.log('Document.load: Processing HTML content for document: ' + that.url);
+        treesaver.debug.log('treesaver.ui.Document.load: Processing HTML content for document: ' + that.url);
         that.articles = that.parse(text);
         that.title = that.extractTitle(text);
         that.loaded = true;
 
-        treesaver.events.fireEvent(document, Document.events.LOADED, {
+        treesaver.events.fireEvent(document, treesaver.ui.Document.events.LOADED, {
           'document': that
         });
       }
       else {
-        debug.log('Document.load: Fetched document content same as cached');
+        treesaver.debug.log('treesaver.ui.Document.load: Fetched document content same as cached');
       }
     });
   };
 
   goog.exportSymbol('treesaver.Document', Document);
-  goog.exportSymbol('treesaver.Document.prototype.setArticles', Document.prototype.setArticles);
-  goog.exportSymbol('treesaver.Document.prototype.getNumberOfArticles', Document.prototype.getNumberOfArticles);
-  goog.exportSymbol('treesaver.Document.prototype.getArticle', Document.prototype.getArticle);
-  goog.exportSymbol('treesaver.Document.prototype.parse', Document.prototype.parse);
-  goog.exportSymbol('treesaver.Document.prototype.getUrl', Document.prototype.getUrl);
-  goog.exportSymbol('treesaver.Document.prototype.setUrl', Document.prototype.setUrl);
-  goog.exportSymbol('treesaver.Document.prototype.getMeta', Document.prototype.getMeta);
-});
+  goog.exportSymbol('treesaver.ui.Document.prototype.setArticles', treesaver.ui.Document.prototype.setArticles);
+  goog.exportSymbol('treesaver.ui.Document.prototype.getNumberOfArticles', treesaver.ui.Document.prototype.getNumberOfArticles);
+  goog.exportSymbol('treesaver.ui.Document.prototype.getArticle', treesaver.ui.Document.prototype.getArticle);
+  goog.exportSymbol('treesaver.ui.Document.prototype.parse', treesaver.ui.Document.prototype.parse);
+  goog.exportSymbol('treesaver.ui.Document.prototype.getUrl', treesaver.ui.Document.prototype.getUrl);
+  goog.exportSymbol('treesaver.ui.Document.prototype.setUrl', treesaver.ui.Document.prototype.setUrl);
+  goog.exportSymbol('treesaver.ui.Document.prototype.getMeta', treesaver.ui.Document.prototype.getMeta);
+

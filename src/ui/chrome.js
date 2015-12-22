@@ -4,28 +4,8 @@
 
 treesaver = treesaver || {};
 treesaver.ui = treesaver.ui || {};
+treesaver.ui.Chrome = treesaver.ui.Chrome || {};
 
-goog.provide('treesaver.ui.Chrome');
-
-goog.require('treesaver.array');
-goog.require('treesaver.capabilities');
-goog.require('treesaver.debug');
-goog.require('treesaver.dimensions');
-goog.require('treesaver.dom');
-goog.require('treesaver.events');
-goog.require('treesaver.network');
-goog.require('treesaver.scheduler');
-goog.require('treesaver.template');
-goog.require('treesaver.ui.ArticleManager');
-goog.require('treesaver.ui.Document');
-goog.require('treesaver.ui.Index');
-goog.require('treesaver.ui.Scrollable');
-
-goog.scope(function() {
-  var debug = treesaver.debug,
-      dimensions = treesaver.dimensions,
-      dom = treesaver.dom,
-      Scrollable = treesaver.ui.Scrollable;
 
   /**
    * Chrome
@@ -35,224 +15,209 @@ goog.scope(function() {
   treesaver.ui.Chrome = function(node) {
     // DEBUG-only validation checks
     if (goog.DEBUG) {
-      if (!dom.querySelectorAll('.viewer', node).length) {
-        debug.error('Chrome does not have a viewer');
+      if (!treesaver.dom.querySelectorAll('.viewer', node).length) {
+        treesaver.debug.error('Chrome does not have a viewer');
       }
 
       if (node.parentNode.childNodes.length !== 1) {
-        debug.error('Chrome is not only child in container');
+        treesaver.debug.error('Chrome is not only child in container');
       }
     }
 
     // TODO: Only store mutable capabilities
-    this.requirements = dom.hasAttr(node, 'data-requires') ?
+    this.requirements = treesaver.dom.hasAttr(node, 'data-requires') ?
       node.getAttribute('data-requires').split(' ') : null;
 
     // Create DOM infrastructure for scrolling elements
-    Scrollable.initDomTree(node);
+    treesaver.ui.Scrollable.initDomTree(node);
 
     // Save out the HTML now that the DOM is prepped
     this.html = node.parentNode.innerHTML;
 
     // Measure the chrome
-    this.size = new dimensions.Metrics(node);
+    this.size = new treesaver.dimensions.Metrics(node);
 
     // Clean up metrics object
     delete this.size.w;
     delete this.size.h;
   };
-});
 
-goog.scope(function() {
-  var Chrome = treesaver.ui.Chrome,
-      Document = treesaver.ui.Document,
-      array = treesaver.array,
-      capabilities = treesaver.capabilities,
-      debug = treesaver.debug,
-      dimensions = treesaver.dimensions,
-      dom = treesaver.dom,
-      events = treesaver.events,
-      network = treesaver.network,
-      scheduler = treesaver.scheduler,
-      ArticleManager = treesaver.ui.ArticleManager,
-      Index = treesaver.ui.Index,
-      Scrollable = treesaver.ui.Scrollable;
 
   /**
    * List of required capabilities for this Chrome
    *
    * @type {?Array.<string>}
    */
-  Chrome.prototype.requirements;
+  treesaver.ui.Chrome.prototype.requirements;
 
   /**
    * @type {?Element}
    */
-  Chrome.prototype.node;
+  treesaver.ui.Chrome.prototype.node;
 
   /**
    * @type {string}
    */
-  Chrome.prototype.html;
+  treesaver.ui.Chrome.prototype.html;
 
   /**
    * The measurements of the chrome
    * @type {!treesaver.dimensions.Metrics}
    */
-  Chrome.prototype.size;
+  treesaver.ui.Chrome.prototype.size;
 
   /**
    * The area available to pages (i.e. the size of the viewer)
    * @type {?treesaver.dimensions.Size}
    */
-  Chrome.prototype.pageArea;
+  treesaver.ui.Chrome.prototype.pageArea;
 
   /**
    * @type {number}
    */
-  Chrome.prototype.pageOffset;
+  treesaver.ui.Chrome.prototype.pageOffset;
 
   /**
    * @type {number|undefined}
    */
-  Chrome.prototype.pageShift_;
+  treesaver.ui.Chrome.prototype.pageShift_;
 
   /**
    * @type {boolean}
    */
-  Chrome.prototype.active;
+  treesaver.ui.Chrome.prototype.active;
 
   /**
    * Cached reference to viewer DOM
    * @type {?Element}
    */
-  Chrome.prototype.viewer;
+  treesaver.ui.Chrome.prototype.viewer;
 
   /**
    * Cached reference to page width DOM
    * @type {?Array.<Element>}
    */
-  Chrome.prototype.pageWidth;
+  treesaver.ui.Chrome.prototype.pageWidth;
 
   /**
    * @type {?Array.<treesaver.layout.Page>}
    */
-  Chrome.prototype.pages;
+  treesaver.ui.Chrome.prototype.pages;
 
   /**
    * Whether the UI is current in active state
    * @type {boolean}
    */
-  Chrome.prototype.uiActive;
+  treesaver.ui.Chrome.prototype.uiActive;
 
   /**
    * Cached references to the menu TOC
    * @type {?Array.<Element>}
    */
-  Chrome.prototype.menus;
+  treesaver.ui.Chrome.prototype.menus;
 
   /**
    * @type {boolean}
    */
-  Chrome.prototype.lightBoxActive;
+  treesaver.ui.Chrome.prototype.lightBoxActive;
 
   /**
    * @type {?treesaver.ui.LightBox}
    */
-  Chrome.prototype.lightBox;
+  treesaver.ui.Chrome.prototype.lightBox;
 
   /**
    * @type {?Array.<Element>}
    */
-  Chrome.prototype.sidebars;
+  treesaver.ui.Chrome.prototype.sidebars;
 
   /**
    * Cached reference to the next page DOM
    * @type {?Array.<Element>}
    */
-  Chrome.prototype.nextPage;
+  treesaver.ui.Chrome.prototype.nextPage;
 
   /**
    * Cached reference to the next article DOM
    * @type {?Array.<Element>}
    */
-  Chrome.prototype.nextArticle;
+  treesaver.ui.Chrome.prototype.nextArticle;
 
   /**
    * Cached reference to the previous page DOM
    * @type {?Array.<Element>}
    */
-  Chrome.prototype.prevPage;
+  treesaver.ui.Chrome.prototype.prevPage;
 
   /**
    * Cached reference to the previous article DOM
    * @type {?Array.<Element>}
    */
-  Chrome.prototype.prevArticle;
+  treesaver.ui.Chrome.prototype.prevArticle;
 
   /**
    * Cached references to the position templates elements
    * @type {?Array.<Element>}
    */
-  Chrome.prototype.positionElements;
+  treesaver.ui.Chrome.prototype.positionElements;
 
   /**
    * Cached reference to the original position templates
    * @type {?Array.<string>}
    */
-  Chrome.prototype.positionTemplates;
+  treesaver.ui.Chrome.prototype.positionTemplates;
 
   /**
    * Cached references to the index templates elements
    * @type {?Array.<Element>}
    */
-  Chrome.prototype.indexElements;
+  treesaver.ui.Chrome.prototype.indexElements;
 
   /**
    * Cached reference to the original index templates
    * @type {?Array.<string>}
    */
-  Chrome.prototype.indexTemplates;
+  treesaver.ui.Chrome.prototype.indexTemplates;
 
   /**
    * Cached references to the current-document template elements
    * @type {?Array.<Element>}
    */
-  Chrome.prototype.currentDocumentElements;
+  treesaver.ui.Chrome.prototype.currentDocumentElements;
 
   /**
    * Cached reference to the original current-document templates
    * @type {?Array.<string>}
    */
-  Chrome.prototype.currentDocumentTemplates;
+  treesaver.ui.Chrome.prototype.currentDocumentTemplates;
 
   /**
    * Cached references to the publication template elements
    * @type {?Array.<Element>}
    */
-  Chrome.prototype.publicationElements;
+  treesaver.ui.Chrome.prototype.publicationElements;
 
   /**
    * Cached reference to the original publication templates
    * @type {?Array.<string>}
    */
-  Chrome.prototype.publicationTemplates;
+  treesaver.ui.Chrome.prototype.publicationTemplates;
 
   /**
    * @return {!Element} The activated node.
    */
-  Chrome.prototype.activate = function() {
+  treesaver.ui.Chrome.prototype.activate = function() {
     if (!this.active) {
       this.active = true;
 
-      this.node = dom.createElementFromHTML(this.html);
+      this.node = treesaver.dom.createElementFromHTML(this.html);
       // Store references to the portions of the UI we must update
-      this.viewer = dom.querySelectorAll('.viewer', this.node)[0];
-      this.pageWidth = dom.querySelectorAll('.pagewidth', this.node);
-      this.nextPage = dom.querySelectorAll('.next', this.node);
-      this.nextArticle = dom.querySelectorAll('.nextArticle', this.node);
-      this.prevPage = dom.querySelectorAll('.prev', this.node);
-      this.prevArticle = dom.querySelectorAll('.prevArticle', this.node);
+      this.viewer = treesaver.dom.querySelectorAll('.viewer', this.node)[0];
+      this.pageWidth = treesaver.dom.querySelectorAll('.pagewidth', this.node);
+      this.nextPage = treesaver.dom.querySelectorAll('.next', this.node);
+      this.nextArticle = treesaver.dom.querySelectorAll('.nextArticle', this.node);
+      this.prevPage = treesaver.dom.querySelectorAll('.prev', this.node);
+      this.prevArticle = treesaver.dom.querySelectorAll('.prevArticle', this.node);
 
       this.positionElements = [];
       this.positionTemplates = [];
@@ -263,8 +228,8 @@ goog.scope(function() {
       this.publicationElements = [];
       this.publicationTemplates = [];
 
-      dom.querySelectorAll('[' + dom.customAttributePrefix + 'template]', this.node).forEach(function(el) {
-        var template_name = dom.getCustomAttr(el, 'template'),
+      treesaver.dom.querySelectorAll('[' + treesaver.dom.customAttributePrefix + 'template]', this.node).forEach(function(el) {
+        var template_name = treesaver.dom.getCustomAttr(el, 'template'),
             elementArray, templateArray, newEl;
 
         switch (template_name) {
@@ -299,14 +264,14 @@ goog.scope(function() {
         elementArray.push(el);
       }, this);
 
-      this.menus = dom.querySelectorAll('.menu', this.node);
-      this.sidebars = dom.querySelectorAll('.sidebar', this.node);
+      this.menus = treesaver.dom.querySelectorAll('.menu', this.node);
+      this.sidebars = treesaver.dom.querySelectorAll('.sidebar', this.node);
 
       this.pages = [];
 
       // Setup event handlers
-      Chrome.watchedEvents.forEach(function(evt) {
-        events.addListener(document, evt, this);
+      treesaver.ui.Chrome.watchedEvents.forEach(function(evt) {
+        treesaver.events.addListener(document, evt, this);
       }, this);
 
       // Always start off active
@@ -320,7 +285,7 @@ goog.scope(function() {
   /**
    * Deactivate the chrome
    */
-  Chrome.prototype.deactivate = function() {
+  treesaver.ui.Chrome.prototype.deactivate = function() {
     if (!this.active) {
       return;
     }
@@ -329,8 +294,8 @@ goog.scope(function() {
     this.active = false;
 
     // Remove event handlers
-    Chrome.watchedEvents.forEach(function(evt) {
-      events.removeListener(document, evt, this);
+    treesaver.ui.Chrome.watchedEvents.forEach(function(evt) {
+      treesaver.events.removeListener(document, evt, this);
     }, this);
 
     // Make sure to drop references
@@ -362,8 +327,8 @@ goog.scope(function() {
     this.pageArea = null;
 
     // Clear out tasks
-    scheduler.clear('idletimer');
-    scheduler.clear('updateTOC');
+    treesaver.scheduler.clear('idletimer');
+    treesaver.scheduler.clear('updateTOC');
     this.stopDelayedFunctions();
   };
 
@@ -371,9 +336,9 @@ goog.scope(function() {
    * Stop any delayed functions
    * @private
    */
-  Chrome.prototype.stopDelayedFunctions = function() {
-    scheduler.clear('selectPages');
-    scheduler.clear('animatePages');
+  treesaver.ui.Chrome.prototype.stopDelayedFunctions = function() {
+    treesaver.scheduler.clear('selectPages');
+    treesaver.scheduler.clear('animatePages');
   };
 
   /**
@@ -382,7 +347,7 @@ goog.scope(function() {
    * @const
    * @type {!Object.<string, string>}
    */
-  Chrome.events = {
+  treesaver.ui.Chrome.events = {
     ACTIVE: 'treesaver.active',
     IDLE: 'treesaver.idle',
     SIDEBARACTIVE: 'treesaver.sidebaractive',
@@ -392,10 +357,10 @@ goog.scope(function() {
   /**
    * @type {Array.<string>}
    */
-  Chrome.watchedEvents = [
-    Index.events.UPDATED,
-    ArticleManager.events.PAGESCHANGED,
-    ArticleManager.events.DOCUMENTCHANGED,
+  treesaver.ui.Chrome.watchedEvents = [
+    treesaver.ui.Index.events.UPDATED,
+    treesaver.ui.ArticleManager.events.PAGESCHANGED,
+    treesaver.ui.ArticleManager.events.DOCUMENTCHANGED,
     'keydown',
     'click',
     'mousewheel',
@@ -403,16 +368,16 @@ goog.scope(function() {
   ];
 
   // Add touch events only if the browser supports touch
-  if (capabilities.SUPPORTS_TOUCH) {
+  if (treesaver.capabilities.SUPPORTS_TOUCH) {
     // Note that we hook up all the event handlers immediately,
     // instead of waiting to do so during touchstart. This is
     // because removing the touch handlers causes Android 2.1
     // to stop sending all touch events
-    Chrome.watchedEvents.push('touchstart', 'touchmove', 'touchend', 'touchcancel');
+    treesaver.ui.Chrome.watchedEvents.push('touchstart', 'touchmove', 'touchend', 'touchcancel');
   }
   else {
     // Used for activity detection
-    Chrome.watchedEvents.push('mouseover');
+    treesaver.ui.Chrome.watchedEvents.push('mouseover');
     // TODO: Move mousewheel in here as well?
   }
 
@@ -420,20 +385,20 @@ goog.scope(function() {
    * Event dispatcher for all events
    * @param {Event} e
    */
-  Chrome.prototype['handleEvent'] = function(e) {
+  treesaver.ui.Chrome.prototype['handleEvent'] = function(e) {
     switch (e.type) {
     // Both these events mean that the pages we are displaying
     // (or trying to display) may have changed. Make sure to
     // fetch them again
     // Article changed and TOC changed will affect nav indicators
-    case ArticleManager.events.PAGESCHANGED:
+    case treesaver.ui.ArticleManager.events.PAGESCHANGED:
       return this.selectPagesDelayed();
 
-    case Index.events.UPDATED:
+    case treesaver.ui.Index.events.UPDATED:
       this.updateTOCDelayed();
       return this.selectPagesDelayed();
 
-    case ArticleManager.events.DOCUMENTCHANGED:
+    case treesaver.ui.ArticleManager.events.DOCUMENTCHANGED:
       this.updateTOCActive();
       this.updatePosition();
       return;
@@ -473,7 +438,7 @@ goog.scope(function() {
    * @param {!Event} e
    * @return {boolean} True if at least one of those keys was pressed.
    */
-  Chrome.specialKeyPressed_ = function(e) {
+  treesaver.ui.Chrome.specialKeyPressed_ = function(e) {
     return e.ctrlKey || e.shiftKey || e.altKey || e.metaKey;
   };
 
@@ -481,7 +446,7 @@ goog.scope(function() {
    * Handle keyboard events
    * @param {!Event} e
    */
-  Chrome.prototype.keyDown = function(e) {
+  treesaver.ui.Chrome.prototype.keyDown = function(e) {
     // Lightbox active? Hide it
     if (this.lightBoxActive) {
       this.hideLightBox();
@@ -497,7 +462,7 @@ goog.scope(function() {
     }
 
     // Don't override keyboard commands
-    if (!Chrome.specialKeyPressed_(e)) {
+    if (!treesaver.ui.Chrome.specialKeyPressed_(e)) {
       switch (e.keyCode) {
       case 34: // PageUp
       case 39: // Right && down
@@ -515,11 +480,11 @@ goog.scope(function() {
         break;
 
       case 72: // h
-        ArticleManager.previousArticle();
+        treesaver.ui.ArticleManager.previousArticle();
         break;
 
       case 76: // l
-        ArticleManager.nextArticle();
+        treesaver.ui.ArticleManager.nextArticle();
         break;
 
       default: // Let the event through if not handled
@@ -538,20 +503,20 @@ goog.scope(function() {
    * Handle click event
    * @param {!Event} e
    */
-  Chrome.prototype.click = function(e) {
+  treesaver.ui.Chrome.prototype.click = function(e) {
     // Ignore if done with a modifier key (could be opening in new tab, etc)
-    if (Chrome.specialKeyPressed_(e)) {
+    if (treesaver.ui.Chrome.specialKeyPressed_(e)) {
       return true;
     }
 
     // Ignore if it's not a left-click
     if ('which' in e && e.which !== 1 || e.button) {
-      debug.info('Click ignored due to non-left click');
+      treesaver.debug.info('Click ignored due to non-left click');
 
       return;
     }
 
-    var el = Chrome.findTarget_(e.target),
+    var el = treesaver.ui.Chrome.findTarget_(e.target),
         ancestor,
         url,
         withinCurrentPage = false,
@@ -570,14 +535,14 @@ goog.scope(function() {
           ancestor = el;
         }
         else {
-          ancestor = dom.getAncestor(el, 'A');
+          ancestor = treesaver.dom.getAncestor(el, 'A');
         }
 
         // Was it a link?
         if (ancestor && ancestor.href) {
-          url = network.absoluteURL(ancestor.href);
+          url = treesaver.network.absoluteURL(ancestor.href);
           // Try to go to the article
-          if (!ArticleManager.goToDocumentByURL(url)) {
+          if (!treesaver.ui.ArticleManager.goToDocumentByURL(url)) {
             // The URL is not an article, let the navigation happen normally
             return;
           }
@@ -611,7 +576,7 @@ goog.scope(function() {
       }, this);
     } else {
       if ((nearestSidebar = this.getNearestSidebar(el))) {
-        if (dom.hasClass(nearestSidebar, 'sidebar') && dom.hasClass(nearestSidebar, 'close-on-click')) {
+        if (treesaver.dom.hasClass(nearestSidebar, 'sidebar') && treesaver.dom.hasClass(nearestSidebar, 'close-on-click')) {
           this.sidebars.forEach(function(sidebar) {
             this.sidebarInactive(sidebar);
           }, this);
@@ -641,42 +606,42 @@ goog.scope(function() {
       // Go up the tree and see if there's anything we want to process
       while (!handled && el && el !== treesaver.tsContainer) {
         if (!withinCurrentPage) {
-          if (dom.hasClass(el, 'prev')) {
+          if (treesaver.dom.hasClass(el, 'prev')) {
             this.previousPage_();
 
             handled = true;
           }
-          else if (dom.hasClass(el, 'next')) {
+          else if (treesaver.dom.hasClass(el, 'next')) {
             this.nextPage_();
 
             handled = true;
           }
-          else if (dom.hasClass(el, 'prevArticle')) {
-            ArticleManager.previousArticle();
+          else if (treesaver.dom.hasClass(el, 'prevArticle')) {
+            treesaver.ui.ArticleManager.previousArticle();
 
             handled = true;
           }
-          else if (dom.hasClass(el, 'nextArticle')) {
-            ArticleManager.nextArticle();
+          else if (treesaver.dom.hasClass(el, 'nextArticle')) {
+            treesaver.ui.ArticleManager.nextArticle();
 
             handled = true;
           }
-          else if (dom.hasClass(el, 'menu')) {
+          else if (treesaver.dom.hasClass(el, 'menu')) {
             if (!withinMenu) {
               this.menuActive(el);
             }
             handled = true;
           }
-          else if (dom.hasClass(el, 'sidebar') ||
-                  dom.hasClass(el, 'open-sidebar') ||
-                  dom.hasClass(el, 'toggle-sidebar') ||
-                  dom.hasClass(el, 'close-sidebar')) {
+          else if (treesaver.dom.hasClass(el, 'sidebar') ||
+                  treesaver.dom.hasClass(el, 'open-sidebar') ||
+                  treesaver.dom.hasClass(el, 'toggle-sidebar') ||
+                  treesaver.dom.hasClass(el, 'close-sidebar')) {
 
             if ((nearestSidebar = this.getNearestSidebar(el))) {
-              if (dom.hasClass(el, 'sidebar') || dom.hasClass(el, 'open-sidebar')) {
+              if (treesaver.dom.hasClass(el, 'sidebar') || treesaver.dom.hasClass(el, 'open-sidebar')) {
                 this.sidebarActive(nearestSidebar);
               }
-              else if (dom.hasClass(el, 'toggle-sidebar')) {
+              else if (treesaver.dom.hasClass(el, 'toggle-sidebar')) {
                 this.sidebarToggle(nearestSidebar);
               }
               else {
@@ -687,7 +652,7 @@ goog.scope(function() {
             }
           }
         }
-        else if (dom.hasClass(el, 'zoomable')) {
+        else if (treesaver.dom.hasClass(el, 'zoomable')) {
           // Counts as handling the event only if showing is successful
           handled = this.showLightBox(el);
         }
@@ -696,7 +661,7 @@ goog.scope(function() {
         // Links can occur in-page or in the chrome
         if (!handled && el.href) {
           target = el.getAttribute('target');
-          url = network.absoluteURL(el.href);
+          url = treesaver.network.absoluteURL(el.href);
 
           if (target === '_blank') {
             return;
@@ -709,16 +674,16 @@ goog.scope(function() {
             el = /** @type {!Element} */ (el.parentNode);
             continue;
           }
-          else if (ArticleManager.goToDocumentByURL(url)) {
+          else if (treesaver.ui.ArticleManager.goToDocumentByURL(url)) {
             handled = true;
           }
           // Target is not blank a lightbox and it is not in the index.
           else if (target === 'ts-treesaver') {
             // Force processing the document as a Treesaver document by
             // adding it to the index.
-            ArticleManager.index.appendChild(new Document(url));
-            ArticleManager.index.update();
-            if (ArticleManager.goToDocumentByURL(url)) {
+            treesaver.ui.ArticleManager.index.appendChild(new Document(url));
+            treesaver.ui.ArticleManager.index.update();
+            if (treesaver.ui.ArticleManager.goToDocumentByURL(url)) {
               handled = true;
             }
           }
@@ -739,19 +704,19 @@ goog.scope(function() {
    * @private
    * @type {number}
    */
-  Chrome.prototype.lastMouseWheel_;
+  treesaver.ui.Chrome.prototype.lastMouseWheel_;
 
   /**
    * Handle the mousewheel event
    * @param {!Event} e
    */
-  Chrome.prototype.mouseWheel = function(e) {
-    if (Chrome.specialKeyPressed_(e)) {
+  treesaver.ui.Chrome.prototype.mouseWheel = function(e) {
+    if (treesaver.ui.Chrome.specialKeyPressed_(e)) {
       // Ignore if special key is down (user could be zooming)
       return true;
     }
 
-    var target = Chrome.findTarget_(e.target);
+    var target = treesaver.ui.Chrome.findTarget_(e.target);
 
     // Is the mousewheel within a scrolling element? If so, ignore
     if (this.isWithinScroller_(target)) {
@@ -778,7 +743,7 @@ goog.scope(function() {
     // Firefox handles this differently than others
     // http://adomas.org/javascript-mouse-wheel/
     var delta = e.wheelDelta ? e.wheelDelta : e.detail ? -e.detail : 0,
-        withinViewer = this.viewer.contains(Chrome.findTarget_(e.target));
+        withinViewer = this.viewer.contains(treesaver.ui.Chrome.findTarget_(e.target));
 
     if (!delta || !withinViewer) {
       return;
@@ -806,7 +771,7 @@ goog.scope(function() {
    * @param {?EventTarget} node
    * @return {!Element}
    */
-  Chrome.findTarget_ = function(node) {
+  treesaver.ui.Chrome.findTarget_ = function(node) {
     if (!node) {
       node = treesaver.tsContainer;
     }
@@ -823,19 +788,19 @@ goog.scope(function() {
    * @private
    * @type {Object}
    */
-  Chrome.prototype.touchData_;
+  treesaver.ui.Chrome.prototype.touchData_;
 
   /**
    * Handle the touchstart event
    * @param {!Event} e
    */
-  Chrome.prototype.touchStart = function(e) {
-    var target = Chrome.findTarget_(e.target),
+  treesaver.ui.Chrome.prototype.touchStart = function(e) {
+    var target = treesaver.ui.Chrome.findTarget_(e.target),
         scroller = this.isWithinScroller_(target),
         withinViewer, node, id,
         x, y, now;
 
-    if (!treesaver.tsContainer.contains(Chrome.findTarget_(e.target))) {
+    if (!treesaver.tsContainer.contains(treesaver.ui.Chrome.findTarget_(e.target))) {
       return;
     }
 
@@ -887,7 +852,7 @@ goog.scope(function() {
       withinViewer: withinViewer,
       originalOffset: this.pageOffset,
       scroller: scroller,
-      canScrollHorizontally: scroller && Scrollable.canScrollHorizontally(scroller)
+      canScrollHorizontally: scroller && treesaver.ui.Scrollable.canScrollHorizontally(scroller)
     };
 
     if (this.touchData_.touchCount === 2) {
@@ -895,14 +860,14 @@ goog.scope(function() {
     }
 
     // Pause other work for better swipe performance
-    scheduler.pause(['resumeTasks']);
+    treesaver.scheduler.pause(['resumeTasks']);
   };
 
   /**
    * Handle the touchmove event
    * @param {!Event} e
    */
-  Chrome.prototype.touchMove = function(e) {
+  treesaver.ui.Chrome.prototype.touchMove = function(e) {
     var touchData = this.touchData_,
         now, x, y;
 
@@ -941,7 +906,7 @@ goog.scope(function() {
         (touchData.canScrollHorizontally || !touchData.swipe))) {
       touchData.didScroll = touchData.didScroll || touchData.canScrollHorizontally ||
         Math.abs(touchData.totalY) >= SWIPE_THRESHOLD;
-      Scrollable.setOffset(touchData.scroller, -touchData.deltaX, -touchData.deltaY);
+      treesaver.ui.Scrollable.setOffset(touchData.scroller, -touchData.deltaX, -touchData.deltaY);
 
       if (!touchData.withinViewer) {
         // Scrolling outside viewer means active, in case of long scroll
@@ -962,12 +927,12 @@ goog.scope(function() {
    * Handle the touchend event
    * @param {!Event} e
    */
-  Chrome.prototype.touchEnd = function(e) {
+  treesaver.ui.Chrome.prototype.touchEnd = function(e) {
     // Hold onto a reference before clearing
     var touchData = this.touchData_,
         // Flag to track whether we need to reset positons, etc
         actionTaken = false,
-        target = Chrome.findTarget_(e.target),
+        target = treesaver.ui.Chrome.findTarget_(e.target),
         // Lightbox is an honorary viewer
         withinViewer = this.lightBoxActive || this.viewer.contains(target);
 
@@ -1047,10 +1012,10 @@ goog.scope(function() {
       // Two finger swipe in the same direction is next/previous article
       if (Math.abs(touchData.totalX2) >= SWIPE_THRESHOLD) {
         if (touchData.totalX < 0 && touchData.totalX2 < 0) {
-          actionTaken = ArticleManager.nextArticle();
+          actionTaken = treesaver.ui.ArticleManager.nextArticle();
         }
         else if (touchData.totalX > 0 && touchData.totalX2 > 0) {
-          actionTaken = ArticleManager.previousArticle();
+          actionTaken = treesaver.ui.ArticleManager.previousArticle();
         }
 
         if (!actionTaken) {
@@ -1076,9 +1041,9 @@ goog.scope(function() {
    * Handle the touchcancel event
    * @param {!Event} e
    */
-  Chrome.prototype.touchCancel = function(e) {
+  treesaver.ui.Chrome.prototype.touchCancel = function(e) {
     // Let the tasks begin again (in a bit)
-    scheduler.queue(scheduler.resume, [], 'resumeTasks');
+    treesaver.scheduler.queue(treesaver.scheduler.resume, [], 'resumeTasks');
 
     this.touchData_ = null;
   };
@@ -1088,7 +1053,7 @@ goog.scope(function() {
    * to use it
    * @param {!Event} e
    */
-  Chrome.prototype.mouseOver = function(e) {
+  treesaver.ui.Chrome.prototype.mouseOver = function(e) {
     // Don't do anything on touch devices
     if (!e.touches) {
       // Need to make sure UI is visible if a user is trying to click on it
@@ -1102,11 +1067,11 @@ goog.scope(function() {
    * @param {!Element} el
    * @return {?Element}
    */
-  Chrome.prototype.isWithinScroller_ = function(el) {
+  treesaver.ui.Chrome.prototype.isWithinScroller_ = function(el) {
     var node = el;
 
     while (node && node != document.documentElement) {
-      if (dom.hasClass(node, 'scroll')) {
+      if (treesaver.dom.hasClass(node, 'scroll')) {
           return node;
       }
       node = /** @type {?Element} */ (node.parentNode);
@@ -1120,13 +1085,13 @@ goog.scope(function() {
    *
    * @private
    */
-  Chrome.prototype.previousPage_ = function() {
-    if (ArticleManager.canGoToPreviousPage()) {
+  treesaver.ui.Chrome.prototype.previousPage_ = function() {
+    if (treesaver.ui.ArticleManager.canGoToPreviousPage()) {
       // Adjust the offset immediately for animation
       this.layoutPages(-1);
 
       // Change the page in the article manager in a bit
-      scheduler.delay(ArticleManager.previousPage, 50, [], 'prevPage');
+      treesaver.scheduler.delay(treesaver.ui.ArticleManager.previousPage, 50, [], 'prevPage');
 
       return true;
     }
@@ -1137,13 +1102,13 @@ goog.scope(function() {
    *
    * @private
    */
-  Chrome.prototype.nextPage_ = function() {
-    if (ArticleManager.canGoToNextPage()) {
+  treesaver.ui.Chrome.prototype.nextPage_ = function() {
+    if (treesaver.ui.ArticleManager.canGoToNextPage()) {
       // Adjust the offset immediately for animation
       this.layoutPages(1);
 
       // Change the page in the article manager in a bit
-      scheduler.delay(ArticleManager.nextPage, 50, [], 'nextPage');
+      treesaver.scheduler.delay(treesaver.ui.ArticleManager.nextPage, 50, [], 'nextPage');
 
       return true;
     }
@@ -1153,18 +1118,18 @@ goog.scope(function() {
    * Show hidden UI controls
    * @private
    */
-  Chrome.prototype.setUiActive_ = function() {
+  treesaver.ui.Chrome.prototype.setUiActive_ = function() {
     // Don't fire events needlessly
     if (!this.uiActive) {
       this.uiActive = true;
-      dom.addClass(/** @type {!Element} */ (this.node), 'active');
+      treesaver.dom.addClass(/** @type {!Element} */ (this.node), 'active');
 
-      events.fireEvent(document, Chrome.events.ACTIVE);
+      treesaver.events.fireEvent(document, treesaver.ui.Chrome.events.ACTIVE);
     }
 
     // Fire the idle event on a timer using debouncing, which delays
     // the function when receiving multiple calls
-    scheduler.debounce(
+    treesaver.scheduler.debounce(
       this.setUiIdle_,
       UI_IDLE_INTERVAL,
       null,
@@ -1178,24 +1143,24 @@ goog.scope(function() {
    * Hide UI controls
    * @private
    */
-  Chrome.prototype.setUiIdle_ = function() {
+  treesaver.ui.Chrome.prototype.setUiIdle_ = function() {
     // Don't fire events unless needed
     if (this.uiActive) {
       this.uiActive = false;
-      dom.removeClass(/** @type {!Element} */ (this.node), 'active');
+      treesaver.dom.removeClass(/** @type {!Element} */ (this.node), 'active');
 
-      events.fireEvent(document, Chrome.events.IDLE);
+      treesaver.events.fireEvent(document, treesaver.ui.Chrome.events.IDLE);
     }
 
     // Clear anything that might debounce
-    scheduler.clear('idletimer');
+    treesaver.scheduler.clear('idletimer');
   };
 
   /**
    * Toggle Active state
    * @private
    */
-  Chrome.prototype.toggleUiActive_ = function() {
+  treesaver.ui.Chrome.prototype.toggleUiActive_ = function() {
     if (!this.uiActive) {
       this.setUiActive_();
     }
@@ -1207,50 +1172,50 @@ goog.scope(function() {
   /**
    * Show menu
    */
-  Chrome.prototype.menuActive = function(menu) {
-    dom.addClass(/** @type {!Element} */ (menu), 'menu-active');
+  treesaver.ui.Chrome.prototype.menuActive = function(menu) {
+    treesaver.dom.addClass(/** @type {!Element} */ (menu), 'menu-active');
   };
 
   /**
    * Hide menu
    */
-  Chrome.prototype.menuInactive = function(menu) {
-    dom.removeClass(/** @type {!Element} */ (menu), 'menu-active');
+  treesaver.ui.Chrome.prototype.menuInactive = function(menu) {
+    treesaver.dom.removeClass(/** @type {!Element} */ (menu), 'menu-active');
   };
 
   /**
    * Returns the current state of the menu.
    */
-  Chrome.prototype.isMenuActive = function(menu) {
-    return dom.hasClass(/** @type {!Element} */ (menu), 'menu-active');
+  treesaver.ui.Chrome.prototype.isMenuActive = function(menu) {
+    return treesaver.dom.hasClass(/** @type {!Element} */ (menu), 'menu-active');
   };
 
   /**
    * Show sidebar
    */
-  Chrome.prototype.sidebarActive = function(sidebar) {
-    events.fireEvent(document, Chrome.events.SIDEBARACTIVE, {
+  treesaver.ui.Chrome.prototype.sidebarActive = function(sidebar) {
+    treesaver.events.fireEvent(document, treesaver.ui.Chrome.events.SIDEBARACTIVE, {
       sidebar: sidebar
     });
-    dom.addClass(/** @type {!Element} */ (sidebar), 'sidebar-active');
+    treesaver.dom.addClass(/** @type {!Element} */ (sidebar), 'sidebar-active');
   };
 
   /**
    * Hide sidebar
    */
-  Chrome.prototype.sidebarInactive = function(sidebar) {
+  treesaver.ui.Chrome.prototype.sidebarInactive = function(sidebar) {
     if (this.isSidebarActive(sidebar)) {
-      events.fireEvent(document, Chrome.events.SIDEBARINACTIVE, {
+      treesaver.events.fireEvent(document, treesaver.ui.Chrome.events.SIDEBARINACTIVE, {
         sidebar: sidebar
       });
     }
-    dom.removeClass(/** @type {!Element} */ (sidebar), 'sidebar-active');
+    treesaver.dom.removeClass(/** @type {!Element} */ (sidebar), 'sidebar-active');
   };
 
   /**
    * Toggle sidebar state
    */
-  Chrome.prototype.sidebarToggle = function(sidebar) {
+  treesaver.ui.Chrome.prototype.sidebarToggle = function(sidebar) {
     if (this.isSidebarActive(sidebar)) {
       this.sidebarInactive(sidebar);
     }
@@ -1264,23 +1229,23 @@ goog.scope(function() {
    *
    * @return {boolean} true if the sidebar is active, false otherwise.
    */
-  Chrome.prototype.isSidebarActive = function(sidebar) {
-    return dom.hasClass(/** @type {!Element} */ (sidebar), 'sidebar-active');
+  treesaver.ui.Chrome.prototype.isSidebarActive = function(sidebar) {
+    return treesaver.dom.hasClass(/** @type {!Element} */ (sidebar), 'sidebar-active');
   };
 
   /**
    * Returns the nearest ancestor sidebar to the given element.
    * @return {?Element} The nearest ancestor sidebar or null.
    */
-  Chrome.prototype.getNearestSidebar = function(el) {
+  treesaver.ui.Chrome.prototype.getNearestSidebar = function(el) {
     var parent = el;
 
-    if (dom.hasClass(parent, 'sidebar')) {
+    if (treesaver.dom.hasClass(parent, 'sidebar')) {
       return parent;
     }
 
     while ((parent = parent.parentNode) !== null && parent.nodeType === 1) {
-      if (dom.hasClass(parent, 'sidebar')) {
+      if (treesaver.dom.hasClass(parent, 'sidebar')) {
         return parent;
       }
     }
@@ -1294,8 +1259,8 @@ goog.scope(function() {
    * @param {!Element} el
    * @return {boolean} True if content can be shown.
    */
-  Chrome.prototype.showLightBox = function(el) {
-    var figure = ArticleManager.getFigure(el);
+  treesaver.ui.Chrome.prototype.showLightBox = function(el) {
+    var figure = treesaver.ui.ArticleManager.getFigure(el);
 
     if (!figure) {
       return false;
@@ -1321,8 +1286,8 @@ goog.scope(function() {
     this.lightBox.node = /** @type {!Element} */ (this.lightBox.node);
 
     // Cover entire chrome with the lightbox
-    dimensions.setCssPx(this.lightBox.node, 'width', dimensions.getOffsetWidth(this.node));
-    dimensions.setCssPx(this.lightBox.node, 'height', dimensions.getOffsetHeight(this.node));
+    treesaver.dimensions.setCssPx(this.lightBox.node, 'width', treesaver.dimensions.getOffsetWidth(this.node));
+    treesaver.dimensions.setCssPx(this.lightBox.node, 'height', treesaver.dimensions.getOffsetHeight(this.node));
 
     if (!this.lightBox.showFigure(figure)) {
       // Showing failed
@@ -1339,7 +1304,7 @@ goog.scope(function() {
    *
    * @private
    */
-  Chrome.prototype.hideLightBox = function() {
+  treesaver.ui.Chrome.prototype.hideLightBox = function() {
     if (this.lightBoxActive) {
       this.lightBoxActive = false;
       this.node.parentNode.removeChild(this.lightBox.node);
@@ -1351,35 +1316,35 @@ goog.scope(function() {
   /**
    * @return {boolean} True if the Chrome meets current browser capabilities.
    */
-  Chrome.prototype.meetsRequirements = function() {
+  treesaver.ui.Chrome.prototype.meetsRequirements = function() {
     if (!this.requirements) {
       return true;
     }
 
-    return capabilities.check(this.requirements, true);
+    return treesaver.capabilities.check(this.requirements, true);
   };
 
   /**
    * @param {treesaver.dimensions.Size} availSize
    * @return {boolean} True if fits.
    */
-  Chrome.prototype.fits = function(availSize) {
-    return dimensions.inSizeRange(this.size, availSize);
+  treesaver.ui.Chrome.prototype.fits = function(availSize) {
+    return treesaver.dimensions.inSizeRange(this.size, availSize);
   };
 
   /**
    * @private
    */
-  Chrome.prototype.calculatePageArea = function() {
+  treesaver.ui.Chrome.prototype.calculatePageArea = function() {
     if (goog.DEBUG) {
       if (!this.viewer) {
-        debug.error('No viewer in chrome');
+        treesaver.debug.error('No viewer in chrome');
       }
     }
 
     this.pageArea = {
-      w: dimensions.getOffsetWidth(this.viewer),
-      h: dimensions.getOffsetHeight(this.viewer)
+      w: treesaver.dimensions.getOffsetWidth(this.viewer),
+      h: treesaver.dimensions.getOffsetHeight(this.viewer)
     };
   };
 
@@ -1387,9 +1352,9 @@ goog.scope(function() {
    * Sets the size of the chrome
    * @param {treesaver.dimensions.Size} availSize
    */
-  Chrome.prototype.setSize = function(availSize) {
-    dimensions.setCssPx(/** @type {!Element} */ (this.node), 'width', availSize.w);
-    dimensions.setCssPx(/** @type {!Element} */ (this.node), 'height', availSize.h);
+  treesaver.ui.Chrome.prototype.setSize = function(availSize) {
+    treesaver.dimensions.setCssPx(/** @type {!Element} */ (this.node), 'width', availSize.w);
+    treesaver.dimensions.setCssPx(/** @type {!Element} */ (this.node), 'height', availSize.h);
 
     // Clear out previous value
     this.pageArea = null;
@@ -1397,7 +1362,7 @@ goog.scope(function() {
     // Update to our new page area
     this.calculatePageArea();
 
-    if (ArticleManager.currentDocument) {
+    if (treesaver.ui.ArticleManager.currentDocument) {
       // Re-query for pages later
       this.selectPagesDelayed();
       this.updateTOCDelayed();
@@ -1409,19 +1374,19 @@ goog.scope(function() {
    *
    * @private
    */
-  Chrome.prototype.updateTOCActive = function() {
-    var currentUrl = ArticleManager.getCurrentUrl();
+  treesaver.ui.Chrome.prototype.updateTOCActive = function() {
+    var currentUrl = treesaver.ui.ArticleManager.getCurrentUrl();
 
     this.indexElements.forEach(function(el) {
-      var anchors = dom.querySelectorAll('a[href]', el).filter(function(a) {
+      var anchors = treesaver.dom.querySelectorAll('a[href]', el).filter(function(a) {
             // The anchors in the TOC may be relative URLs so we need to create absolute
             // ones when comparing to the currentUrl, which is always absolute.
-            return network.absoluteURL(a.href) === currentUrl;
+            return treesaver.network.absoluteURL(a.href) === currentUrl;
           }),
           children = [];
 
       if (anchors.length) {
-        children = array.toArray(el.children);
+        children = treesaver.array.toArray(el.children);
 
         children.forEach(function(c) {
           var containsUrl = anchors.some(function(a) {
@@ -1429,43 +1394,43 @@ goog.scope(function() {
               });
 
           if (containsUrl) {
-            dom.addClass(c, 'current');
+            treesaver.dom.addClass(c, 'current');
           }
           else {
-            dom.removeClass(c, 'current');
+            treesaver.dom.removeClass(c, 'current');
           }
         });
       }
     });
   };
 
-  Chrome.prototype.updatePosition = function() {
+  treesaver.ui.Chrome.prototype.updatePosition = function() {
     this.positionElements.forEach(function(el, i) {
       var template = this.positionTemplates[i];
 
       treesaver.template.expand(el, template, {
-        'pagenumber': ArticleManager.getCurrentPageNumber(),
-        'pagecount': ArticleManager.getCurrentPageCount(),
-        'url': ArticleManager.getCurrentUrl(),
-        'documentnumber': ArticleManager.getCurrentDocumentNumber(),
-        'documentcount': ArticleManager.getDocumentCount()
+        'pagenumber': treesaver.ui.ArticleManager.getCurrentPageNumber(),
+        'pagecount': treesaver.ui.ArticleManager.getCurrentPageCount(),
+        'url': treesaver.ui.ArticleManager.getCurrentUrl(),
+        'documentnumber': treesaver.ui.ArticleManager.getCurrentDocumentNumber(),
+        'documentcount': treesaver.ui.ArticleManager.getDocumentCount()
       });
     }, this);
   };
 
-  Chrome.prototype.updatePublication = function() {
+  treesaver.ui.Chrome.prototype.updatePublication = function() {
     this.publicationElements.forEach(function(el, i) {
       var template = this.publicationTemplates[i];
 
-      treesaver.template.expand(el, template, ArticleManager.index.meta);
+      treesaver.template.expand(el, template, treesaver.ui.ArticleManager.index.meta);
     }, this);
   };
 
-  Chrome.prototype.updateCurrentDocument = function() {
+  treesaver.ui.Chrome.prototype.updateCurrentDocument = function() {
     this.currentDocumentElements.forEach(function(el, i) {
       var template = this.currentDocumentTemplates[i];
 
-      treesaver.template.expand(el, template, ArticleManager.getCurrentDocument().meta);
+      treesaver.template.expand(el, template, treesaver.ui.ArticleManager.getCurrentDocument().meta);
     }, this);
   };
 
@@ -1473,10 +1438,10 @@ goog.scope(function() {
    * Update the width of elements bound to the page width
    * @private
    */
-  Chrome.prototype.updatePageWidth = function(width) {
+  treesaver.ui.Chrome.prototype.updatePageWidth = function(width) {
     if (width) {
       this.pageWidth.forEach(function(el) {
-        dimensions.setCssPx(el, 'width', width);
+        treesaver.dimensions.setCssPx(el, 'width', width);
       }, this);
     }
   };
@@ -1490,16 +1455,16 @@ goog.scope(function() {
    * @param {!Element} el The element to set the state for.
    * @param {!boolean} enable True to enable the element, false to disable it.
    */
-  Chrome.prototype.setElementState = function(el, enable) {
+  treesaver.ui.Chrome.prototype.setElementState = function(el, enable) {
     if (el.nodeName === 'BUTTON') {
       el.disabled = !enable;
     }
     else {
       if (enable) {
-        dom.removeClass(el, 'disabled');
+        treesaver.dom.removeClass(el, 'disabled');
       }
       else {
-        dom.addClass(el, 'disabled');
+        treesaver.dom.addClass(el, 'disabled');
       }
     }
   };
@@ -1508,9 +1473,9 @@ goog.scope(function() {
    * Update the state of the next page elements.
    * @private
    */
-  Chrome.prototype.updateNextPageState = function() {
+  treesaver.ui.Chrome.prototype.updateNextPageState = function() {
     if (this.nextPage) {
-      var canGoToNextPage = ArticleManager.canGoToNextPage();
+      var canGoToNextPage = treesaver.ui.ArticleManager.canGoToNextPage();
 
       this.nextPage.forEach(function(el) {
         this.setElementState(el, canGoToNextPage);
@@ -1522,9 +1487,9 @@ goog.scope(function() {
    * Update the state of the next article elements.
    * @private
    */
-  Chrome.prototype.updateNextArticleState = function() {
+  treesaver.ui.Chrome.prototype.updateNextArticleState = function() {
     if (this.nextArticle) {
-      var canGoToNextArticle = ArticleManager.canGoToNextArticle();
+      var canGoToNextArticle = treesaver.ui.ArticleManager.canGoToNextArticle();
 
       this.nextArticle.forEach(function(el) {
         this.setElementState(el, canGoToNextArticle);
@@ -1536,9 +1501,9 @@ goog.scope(function() {
    * Update the state of the previous page elements.
    * @private
    */
-  Chrome.prototype.updatePreviousPageState = function() {
+  treesaver.ui.Chrome.prototype.updatePreviousPageState = function() {
     if (this.prevPage) {
-      var canGoToPreviousPage = ArticleManager.canGoToPreviousPage();
+      var canGoToPreviousPage = treesaver.ui.ArticleManager.canGoToPreviousPage();
 
       this.prevPage.forEach(function(el) {
         this.setElementState(el, canGoToPreviousPage);
@@ -1550,9 +1515,9 @@ goog.scope(function() {
    * Update the state of the previous article elements.
    * @private
    */
-  Chrome.prototype.updatePreviousArticleState = function() {
+  treesaver.ui.Chrome.prototype.updatePreviousArticleState = function() {
     if (this.prevArticle) {
-      var canGoToPreviousArticle = ArticleManager.canGoToPreviousArticle();
+      var canGoToPreviousArticle = treesaver.ui.ArticleManager.canGoToPreviousArticle();
 
       this.prevArticle.forEach(function(el) {
         this.setElementState(el, canGoToPreviousArticle);
@@ -1564,16 +1529,16 @@ goog.scope(function() {
    * Run selectPages on a delay
    * @private
    */
-  Chrome.prototype.selectPagesDelayed = function() {
-    scheduler.queue(this.selectPages, [], 'selectPages', this);
+  treesaver.ui.Chrome.prototype.selectPagesDelayed = function() {
+    treesaver.scheduler.queue(this.selectPages, [], 'selectPages', this);
   };
 
   /**
    * Run updateTOC on a delay
    * @private
    */
-  Chrome.prototype.updateTOCDelayed = function() {
-    scheduler.queue(this.updateTOC, [], 'updateTOC', this);
+  treesaver.ui.Chrome.prototype.updateTOCDelayed = function() {
+    treesaver.scheduler.queue(this.updateTOC, [], 'updateTOC', this);
   };
 
   /**
@@ -1581,7 +1546,7 @@ goog.scope(function() {
    * including DOM insertion
    * @private
    */
-  Chrome.prototype.selectPages = function() {
+  treesaver.ui.Chrome.prototype.selectPages = function() {
     this.stopDelayedFunctions();
 
     // Populate the pages
@@ -1595,7 +1560,7 @@ goog.scope(function() {
     this.updatePosition();
     this.updateCurrentDocument();
     this.updatePublication();
-    this.updatePageWidth(ArticleManager.getCurrentPageWidth());
+    this.updatePageWidth(treesaver.ui.ArticleManager.getCurrentPageWidth());
 
     // Update the previous/next buttons depending on the current state
     this.updateNextPageState();
@@ -1608,12 +1573,12 @@ goog.scope(function() {
    * Manages the TOC.
    * @private
    */
-  Chrome.prototype.updateTOC = function() {
+  treesaver.ui.Chrome.prototype.updateTOC = function() {
     // Stop any running TOC updates
-    scheduler.clear('updateTOC');
+    treesaver.scheduler.clear('updateTOC');
 
     var toc = {
-      'contents': ArticleManager.index.contents.map(function(child) {
+      'contents': treesaver.ui.ArticleManager.index.contents.map(function(child) {
         return child.meta;
       })
     };
@@ -1632,11 +1597,12 @@ goog.scope(function() {
    *
    * @private
    */
-  Chrome.prototype.populatePages = function() {
+  treesaver.ui.Chrome.prototype.populatePages = function() {
+
     var old_pages = this.pages;
 
     // TODO: Master page width?
-    this.pages = ArticleManager.getPages(/** @type {!treesaver.dimensions.Size} */ (this.pageArea), 1);
+    this.pages = treesaver.ui.ArticleManager.getPages(/** @type {!treesaver.dimensions.Size} */ (this.pageArea), 1);
 
     old_pages.forEach(function(page) {
       // Only deactivate pages we're not about to use again
@@ -1673,7 +1639,7 @@ goog.scope(function() {
    * Positions the current visible pages
    * @param {number=} pageShift
    */
-  Chrome.prototype.layoutPages = function(pageShift) {
+  treesaver.ui.Chrome.prototype.layoutPages = function(pageShift) {
     // For now, hard coded to show up to three pages, in the prev/current/next
     // configuration
     //
@@ -1761,21 +1727,21 @@ goog.scope(function() {
    * Run updatePagePositions on a delay
    * @private
    */
-  Chrome.prototype._updatePagePositionsDelayed = function() {
-    scheduler.queue(this._updatePagePositions, [], 'animatePages', this);
+  treesaver.ui.Chrome.prototype._updatePagePositionsDelayed = function() {
+    treesaver.scheduler.queue(this._updatePagePositions, [], 'animatePages', this);
   };
 
   /**
    * @private
    * @param {boolean=} preventAnimation
    */
-  Chrome.prototype._updatePagePositions = function(preventAnimation) {
+  treesaver.ui.Chrome.prototype._updatePagePositions = function(preventAnimation) {
     var t;
 
     if (!preventAnimation && this.pageOffset) {
       if (MAX_ANIMATION_DURATION && this.animationStart) {
         // Pause tasks to keep animation smooth
-        scheduler.pause(['animatePages', 'resumeTasks']);
+        treesaver.scheduler.pause(['animatePages', 'resumeTasks']);
 
         // Percent of time left in animation
         t = 1 - (goog.now() - this.animationStart) / MAX_ANIMATION_DURATION;
@@ -1788,7 +1754,7 @@ goog.scope(function() {
         if (!this.pageOffset) {
           this.pageOffset = 0;
           // Re-enable other tasks, soon
-          scheduler.queue(scheduler.resume, [], 'resumeTasks');
+          treesaver.scheduler.queue(treesaver.scheduler.resume, [], 'resumeTasks');
         }
         else {
           // Queue up another call in a bit
@@ -1802,13 +1768,13 @@ goog.scope(function() {
     }
     else {
       // Stop any animations that might be queued
-      scheduler.clear('animatePages');
+      treesaver.scheduler.clear('animatePages');
     }
 
     // Update position
     this.pages.forEach(function(page, i) {
       if (page && page.node) {
-        dimensions.setOffsetX(page.node, this.pagePositions[i] + this.pageOffset);
+        treesaver.dimensions.setOffsetX(page.node, this.pagePositions[i] + this.pageOffset);
       }
     }, this);
   };
@@ -1820,7 +1786,7 @@ goog.scope(function() {
    * @param {treesaver.dimensions.Size} availSize
    * @return {?treesaver.ui.Chrome} A suitable Chrome, if one was found.
    */
-  Chrome.select = function(chromes, availSize) {
+  treesaver.ui.Chrome.select = function(chromes, availSize) {
     // Cycle through chromes
     var i, len, current, chrome = null;
 
@@ -1833,7 +1799,7 @@ goog.scope(function() {
     }
 
     if (!chrome) {
-      debug.error('No Chrome Fits!');
+      treesaver.debug.error('No Chrome Fits!');
     }
 
     return chrome;
@@ -1841,9 +1807,9 @@ goog.scope(function() {
 
   if (goog.DEBUG) {
     // Expose for testing
-    Chrome.prototype.toString = function() {
+    treesaver.ui.Chrome.prototype.toString = function() {
       return '[Chrome: ]';
     };
   }
-});
+
 

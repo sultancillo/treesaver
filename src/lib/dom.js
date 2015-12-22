@@ -71,7 +71,7 @@ require('./scheduler');
     // http://dean.edwards.name/IE7/caveats/
     treesaver.dom.addClass = function(el, className) {
       if (el.className) {
-        if (!treesaver.treesaver.dom.hasClass(el, className)) {
+        if (!treesaver.dom.hasClass(el, className)) {
           el.className += ' ' + className;
         }
       }
@@ -295,7 +295,7 @@ require('./scheduler');
     img.setAttribute('src', 'data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs=');
 
     // Pause to let collection happen
-    treesaver.scheduler.limit(treesaver.treesaver.dom.clearImgCache_, 3000, [], 'clearImgCache');
+    treesaver.scheduler.limit(treesaver.dom.clearImgCache_, 3000, [], 'clearImgCache');
   };
 
   /**

@@ -7,17 +7,17 @@ treesaver.ui = treesaver.ui || {};
 treesaver.ui.Article = treesaver.ui.Article || {};
 
 
-goog.require('treesaver.array');
-goog.require('treesaver.debug');
-goog.require('treesaver.dimensions');
-goog.require('treesaver.dom');
-goog.require('treesaver.events');
-goog.require('treesaver.layout.BreakRecord');
-goog.require('treesaver.layout.Content');
-goog.require('treesaver.layout.ContentPosition');
-goog.require('treesaver.layout.Grid');
-goog.require('treesaver.layout.Page');
-goog.require('treesaver.scheduler');
+require('../lib/array');
+require('../lib/debug');
+require('../lib/dimensions');
+require('../lib/dom');
+require('../lib/events');
+require('../layout/breakrecord');
+require('../layout/content');
+require('../layout/contentposition');
+require('../layout/grid');
+require('../layout/page');
+require('../lib/scheduler');
 
 
   /**
@@ -39,108 +39,93 @@ goog.require('treesaver.scheduler');
     }
   };
 
-
-
-  var Article = treesaver.ui.Article,
-      array = treesaver.array,
-      debug = treesaver.debug,
-      dimensions = treesaver.dimensions,
-      dom = treesaver.dom,
-      events = treesaver.events,
-      scheduler = treesaver.scheduler,
-      BreakRecord = treesaver.layout.BreakRecord,
-      Content = treesaver.layout.Content,
-      ContentPosition = treesaver.layout.ContentPosition,
-      Grid = treesaver.layout.Grid,
-      Page = treesaver.layout.Page;
-
   /**
    * @type {?string}
    */
-  Article.prototype.theme;
+  treesaver.ui.Article.prototype.theme;
 
   /**
    * @type {treesaver.layout.Content} The content of this article
    */
-  Article.prototype.content;
+  treesaver.ui.Article.prototype.content;
 
   /**
    * @type {treesaver.layout.BreakRecord}
    */
-  Article.prototype.br;
+  treesaver.ui.Article.prototype.br;
 
   /**
    * @type {number}
    */
-  Article.prototype.pageCount;
+  treesaver.ui.Article.prototype.pageCount;
 
   /**
    * @type {Array.<treesaver.layout.Page>}
    */
-  Article.prototype.pages;
+  treesaver.ui.Article.prototype.pages;
 
   /**
    * @type {boolean}
    */
-  Article.prototype.paginationClean;
+  treesaver.ui.Article.prototype.paginationClean;
 
   /**
    * @type {boolean}
    */
-  Article.prototype.paginationComplete;
+  treesaver.ui.Article.prototype.paginationComplete;
 
   /**
    * @type {boolean}
    */
-  Article.prototype.loaded;
+  treesaver.ui.Article.prototype.loaded;
 
   /**
    * @type {boolean}
    */
-  Article.prototype.loading;
+  treesaver.ui.Article.prototype.loading;
 
   /**
    * @type {boolean}
    */
-  Article.prototype.loadFailed;
+  treesaver.ui.Article.prototype.loadFailed;
 
   /**
    * @type {boolean}
    */
-  Article.prototype.error;
+  treesaver.ui.Article.prototype.error;
 
   /**
    * @type {?{ w: number, h: number }} size
    */
-  Article.prototype.maxPageSize;
+  treesaver.ui.Article.prototype.maxPageSize;
 
   /**
    * Constraint ...
    * @type {?treesaver.dimensions.SizeRange}
    */
-  Article.prototype.constraint;
+  treesaver.ui.Article.prototype.constraint;
 
   /**
    * @type {!Array.<treesaver.layout.Grid>}
    */
-  Article.prototype.eligible_grids;
+  treesaver.ui.Article.prototype.eligible_grids;
 
   /**
    * @type {Array.<treesaver.layout.Grid>}
    */
-  Article.prototype.grids;
+  treesaver.ui.Article.prototype.grids;
 
   /**
    * Reference to the parent document.
    * @type {!treesaver.ui.Document}
    */
-  Article.prototype.doc;
+  treesaver.ui.Article.prototype.doc;
 
   /**
    * Names of events fired by this class
    * @type {Object.<string, string>}
    */
-  Article.events = {
+  treesaver.ui.Article.events = {
     PAGINATIONERROR: 'treesaver.paginationerror',
     PAGINATIONPROGRESS: 'treesaver.paginationprogress'
   };
@@ -148,9 +133,9 @@ goog.require('treesaver.scheduler');
   /**
    * @param {?Element} article_node  The article node containing the content for this article.
    */
-  Article.prototype.processHTML = function(article_node) {
+  treesaver.ui.Article.prototype.processHTML = function(article_node) {
     if (article_node.nodeName !== 'ARTICLE') {
-      debug.error('Could not find article content: ' + article_node.innerHTML);
+      treesaver.debug.error('Could not find article content: ' + article_node.innerHTML);
 
       this.error = true;
 
@@ -166,27 +151,27 @@ goog.require('treesaver.scheduler');
 
     // Set up a temporary container for layout
     fake_grid.style.display = 'none';
-    dom.addClass(fake_grid, 'offscreen grid');
-    dom.addClass(fake_column, 'column');
+    treesaver.dom.addClass(fake_grid, 'offscreen grid');
+    treesaver.dom.addClass(fake_column, 'column');
 
     // Remove any ID so CSS styles don't affect the elements within
     article_node.removeAttribute('id');
 
     // Clear the container so node can be the only thing in it
-    dom.clearChildren(fake_grid);
+    treesaver.dom.clearChildren(fake_grid);
 
     // Set up theme flag, if it exists
     // TODO: Remove compatibility data-grids parameter
     this.theme = article_node.getAttribute('data-theme') ||
       article_node.getAttribute('data-grids') || null;
     if (this.theme) {
-      dom.addClass(fake_grid, this.theme);
-      dom.addClass(fake_column, this.theme);
+      treesaver.dom.addClass(fake_grid, this.theme);
+      treesaver.dom.addClass(fake_column, this.theme);
 
       // New theme means grids need to be filtered again
       this.setGrids(this.grids);
     }
-    this.extra_classes = dom.classes(article_node);
+    this.extra_classes = treesaver.dom.classes(article_node);
 
     // Move the content from the article to the column
     while (article_node.firstChild) {
@@ -201,12 +186,12 @@ goog.require('treesaver.scheduler');
     document.body.appendChild(fake_grid);
 
     // Construct
-    this.content = new Content(fake_column, this.doc);
+    this.content = new treesaver.layout.Content(fake_column, this.doc);
 
     // Clean up the DOM
     document.body.removeChild(fake_grid);
     fake_grid.removeChild(fake_column);
-    dom.clearChildren(fake_column);
+    treesaver.dom.clearChildren(fake_column);
 
     // Reset pagination state
     this.resetPagination();
@@ -220,7 +205,7 @@ goog.require('treesaver.scheduler');
    *
    * @param {Array.<treesaver.layout.Grid>} all_grids
    */
-  Article.prototype.setGrids = function(all_grids) {
+  treesaver.ui.Article.prototype.setGrids = function(all_grids) {
     // Filter out any grids that don't match our article classes
     if (this.theme) {
       this.grids = all_grids.filter(function(grid) {
@@ -238,7 +223,7 @@ goog.require('treesaver.scheduler');
    * which do not fit. Return the stretched subset of grids in an array
    * @param {{ w: number, h: number }} size
    */
-  Article.prototype.stretchGrids = function(size) {
+  treesaver.ui.Article.prototype.stretchGrids = function(size) {
     this.eligible_grids = this.grids.filter(function(grid) {
       return grid.capabilityFilter() && grid.sizeFilter(size);
     }).map(function(grid) {
@@ -248,11 +233,11 @@ goog.require('treesaver.scheduler');
 
     // Are there any grids?
     if (!this.eligible_grids.length) {
-      debug.error('No eligible grids at ' + size.w + 'x' + size.h);
+      treesaver.debug.error('No eligible grids at ' + size.w + 'x' + size.h);
     }
 
     // Sort by highest text height (helps with shortcutting in scoring)
-    this.eligible_grids.sort(Grid.sort);
+    this.eligible_grids.sort(treesaver.layout.Grid.sort);
   };
 
   /**
@@ -260,14 +245,14 @@ goog.require('treesaver.scheduler');
    * @param {{ w: number, h: number }} size
    * @return {boolean} True if a re-layout will be required at this size.
    */
-  Article.prototype.setMaxPageSize = function(size) {
+  treesaver.ui.Article.prototype.setMaxPageSize = function(size) {
     if (!this.maxPageSize ||
         this.maxPageSize.w !== size.w || this.maxPageSize.h !== size.h) {
       this.maxPageSize = size;
 
       // Check if all the pages of our content will fit at this size
       this.paginationClean =
-        dimensions.inSizeRange(/** @type {!treesaver.dimensions.SizeRange} */ (this.constraint), size);
+        treesaver.dimensions.inSizeRange(/** @type {!treesaver.dimensions.SizeRange} */ (this.constraint), size);
     }
 
     return !this.paginationClean;
@@ -276,9 +261,9 @@ goog.require('treesaver.scheduler');
   /**
    * Reset all pagination data and stored pages.
    */
-  Article.prototype.resetPagination = function() {
+  treesaver.ui.Article.prototype.resetPagination = function() {
     // Stop all pagination related tasks
-    scheduler.clear('paginate');
+    treesaver.scheduler.clear('paginate');
 
     // Clear out the old pages
     this.pages = [];
@@ -290,7 +275,7 @@ goog.require('treesaver.scheduler');
     }
 
     // Our old break record is now useless
-    this.br = new BreakRecord();
+    this.br = new treesaver.layout.BreakRecord();
 
     // As is the constraint
     this.constraint = null;
@@ -304,36 +289,36 @@ goog.require('treesaver.scheduler');
    * Paginate the article asynchronously
    * @param {boolean} bg Paginate remainder of article in background.
    * @param {number} index Paginate synchronously until this index.
-   * @param {?treesaver.layout.ContentPosition|number} pos Paginate synchronously until this position.
+   * @param {?treesaver.ui.ContentPosition|number} pos Paginate synchronously until this position.
    * @private
    */
-  Article.prototype.paginate = function(bg, index, pos) {
+  treesaver.ui.Article.prototype.paginate = function(bg, index, pos) {
     if (goog.DEBUG) {
       if (!this.content) {
-        debug.error('Tried to paginate missing content');
+        treesaver.debug.error('Tried to paginate missing content');
         return;
       }
 
       if (!this.maxPageSize) {
-        debug.error('Tried to paginate without a page size');
+        treesaver.debug.error('Tried to paginate without a page size');
         return;
       }
 
       if (this.paginationComplete) {
-        debug.info('Needless call to paginate');
+        treesaver.debug.info('Needless call to paginate');
         return;
       }
     }
 
     // Stop any previous pagination
     // (TODO: What if this conflicts with other articles?)
-    scheduler.clear('paginate');
+    treesaver.scheduler.clear('paginate');
 
     var page;
     index = index || 0;
 
     while (!this.br.finished) {
-      page = new Page(
+      page = new treesaver.layout.Page(
         /** @type {!treesaver.layout.Content } */ (this.content),
         this.eligible_grids,
         /** @type {!treesaver.layout.BreakRecord} */ (this.br),
@@ -343,10 +328,10 @@ goog.require('treesaver.scheduler');
       // Pagination can fail to produce a useful page
       if (page.ignore) {
         if (this.br.finished) {
-          debug.info('Page ignored during pagination and article terminated');
+          treesaver.debug.info('Page ignored during pagination and article terminated');
         }
         else {
-          debug.info('Page ignored during pagination');
+          treesaver.debug.info('Page ignored during pagination');
         }
 
         if (this.br.finished) {
@@ -365,9 +350,9 @@ goog.require('treesaver.scheduler');
         this.error = true;
 
         // Fire pagination error for logging
-        events.fireEvent(
+        treesaver.events.fireEvent(
           document,
-          Article.events.PAGINATIONERROR,
+          treesaver.ui.Article.events.PAGINATIONERROR,
           { article: this }
         );
 
@@ -388,10 +373,10 @@ goog.require('treesaver.scheduler');
 
       // Update page constraint
       this.constraint =
-        dimensions.mergeSizeRange(/** @type {!treesaver.dimensions.SizeRange} */ (this.constraint), page.size, true);
+        treesaver.dimensions.mergeSizeRange(/** @type {!treesaver.dimensions.SizeRange} */ (this.constraint), page.size, true);
 
       if (index && this.pageCount <= index ||
-          pos && ((pos === ContentPosition.END) || !pos.lessOrEqual(page.end))) {
+          pos && ((pos === treesaver.layout.ContentPosition.END) || !pos.lessOrEqual(page.end))) {
         // Not done yet, gotta keep on going
         continue;
       }
@@ -400,14 +385,14 @@ goog.require('treesaver.scheduler');
         if (bg) {
           // Fire progress event, but only when async
           // TODO: Is this the right thing here?
-          events.fireEvent(
+          treesaver.events.fireEvent(
             document,
-            Article.events.PAGINATIONPROGRESS,
+            treesaver.ui.Article.events.PAGINATIONPROGRESS,
             { article: this }
           );
 
           // Delay rest of pagination to make sure UI thread doesn't hang
-          this.paginateAsync(array.toArray(arguments));
+          this.paginateAsync(treesaver.array.toArray(arguments));
         }
 
         // Break out of loop early
@@ -417,9 +402,9 @@ goog.require('treesaver.scheduler');
 
     // All done, fire completed event
     this.paginationComplete = true;
-    events.fireEvent(
+    treesaver.events.fireEvent(
       document,
-      Article.events.PAGINATIONPROGRESS,
+      treesaver.ui.Article.events.PAGINATIONPROGRESS,
       { article: this, completed: true }
     );
   };
@@ -428,8 +413,8 @@ goog.require('treesaver.scheduler');
    * Start asynchronous pagination
    * @param {Array} args Arguments array to pass to the paginate function.
    */
-  Article.prototype.paginateAsync = function(args) {
-    scheduler.delay(Article.prototype.paginate,
+  treesaver.ui.Article.prototype.paginateAsync = function(args) {
+    treesaver.scheduler.delay(treesaver.ui.Article.prototype.paginate,
         PAGINATE_DEBOUNCE_TIME, args, 'paginate', this);
   };
 
@@ -438,7 +423,7 @@ goog.require('treesaver.scheduler');
    * elements
    * @return {number}
    */
-  Article.prototype.getPageWidth = function() {
+  treesaver.ui.Article.prototype.getPageWidth = function() {
     if (this.constraint) {
       return this.constraint.w;
     }
@@ -460,12 +445,12 @@ goog.require('treesaver.scheduler');
    * @param {number} count  Number of pages requested.
    * @return {Array.<treesaver.layout.Page>}
    */
-  Article.prototype.getPages = function(start, count) {
+  treesaver.ui.Article.prototype.getPages = function(start, count) {
     if (goog.DEBUG) {
       // Do we have our content yet?
       if (!this.loaded) {
         if (!this.loading) {
-          debug.error('Tried to getPages on non-loaded article');
+          treesaver.debug.error('Tried to getPages on non-loaded article');
         }
 
         // Return dead pages, fire event when they are ready
@@ -527,12 +512,12 @@ goog.require('treesaver.scheduler');
    * Find the index of the page that contains the given position
    * will do asynchronous pagination in order to find out
    *
-   * @param {?treesaver.layout.ContentPosition} position
+   * @param {?treesaver.ui.ContentPosition} position
    * @return {number} Index of the page with that position, -1 if it is
    *                  currently unknown because the content hasn't paginated
    *                  that far yet.
    */
-  Article.prototype.getPageIndex = function(position) {
+  treesaver.ui.Article.prototype.getPageIndex = function(position) {
     if (!this.content) {
       // Haven't loaded yet
       return -1;
@@ -553,7 +538,7 @@ goog.require('treesaver.scheduler');
 
     // We might need to paginate more
     if (!this.paginationComplete) {
-      if (position === ContentPosition.END || !this.pageCount ||
+      if (position === treesaver.layout.ContentPosition.END || !this.pageCount ||
           !position.lessOrEqual(this.pages[this.pageCount - 1].end)) {
         // Need to paginate up to that position
         // TODO: Postpone this
@@ -563,7 +548,7 @@ goog.require('treesaver.scheduler');
     }
 
     // Special case for the last page request
-    if (position === ContentPosition.END) {
+    if (position === treesaver.layout.ContentPosition.END) {
       // If we've paginated, give the last page, otherwise we don't know
       return this.paginationComplete ? this.pageCount - 1 : -1;
     }
@@ -583,7 +568,7 @@ goog.require('treesaver.scheduler');
   };
 
   if (goog.DEBUG) {
-    Article.prototype.toString = function() {
+    treesaver.ui.Article.prototype.toString = function() {
       return '[treesaver.ui.Article]';
     };
   }

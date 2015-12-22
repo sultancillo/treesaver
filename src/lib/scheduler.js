@@ -12,7 +12,6 @@ require('./debug');
 
 
 
-
   /**
    * Milliseconds between checks for task execution
    *
@@ -107,7 +106,6 @@ require('./debug');
    */
   treesaver.scheduler.tick_ = function() {
     var now = goog.now();
-
     treesaver.scheduler.tasks_.forEach(function(task, i) {
       // If the tick function is no longer on interval, prevent all task
       // execution
@@ -142,7 +140,7 @@ require('./debug');
         // they only get removed when their times count is -1
         if (!task.immediate || task.times < 0) {
           // Remove from registries
-          treesaver.array.remove(treesaver.treesaver.scheduler.tasks_, i);
+          treesaver.array.remove(treesaver.scheduler.tasks_, i);
           delete treesaver.scheduler.namedTasks_[task.name];
 
           // Exit early in order to make sure we don't execute an extra time
@@ -346,7 +344,7 @@ require('./debug');
 
     treesaver.scheduler.tasks_.forEach(function(task, i) {
       if (task.name === name) {
-        treesaver.array.remove(treesaver.treesaver.scheduler.tasks_, i);
+        treesaver.array.remove(treesaver.scheduler.tasks_, i);
         // Mark task as inactive, in case there are any references left
         task.removed = true;
       }
@@ -359,7 +357,7 @@ require('./debug');
    */
   treesaver.scheduler.start_ = function() {
     if (treesaver.scheduler.tickID_ === -1) {
-      treesaver.scheduler.tickID_ = treesaver.treesaver.scheduler.requestAnimationFrame_(
+      treesaver.scheduler.tickID_ = treesaver.scheduler.requestAnimationFrame_(
         treesaver.scheduler.tick_,
         document.body
       );
@@ -372,7 +370,7 @@ require('./debug');
   treesaver.scheduler.stopAll = function() {
     // Stop task
     if (treesaver.scheduler.tickID_) {
-      treesaver.scheduler.cancelAnimationFrame_(treesaver.treesaver.scheduler.tickID_);
+      treesaver.scheduler.cancelAnimationFrame_(treesaver.scheduler.tickID_);
     }
 
     // Clear out any timeout

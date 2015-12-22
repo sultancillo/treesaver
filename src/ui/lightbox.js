@@ -4,19 +4,14 @@
 
 treesaver = treesaver || {};
 treesaver.ui = treesaver.ui || {};
+treesaver.ui.LightBox = treesaver.ui.LightBox || {};
 
-goog.provide('treesaver.ui.LightBox');
+require('../lib/capabilities');
+require('../lib/debug');
+require('../lib/dimensions');
+require('../lib/dom');
+require('../ui/scrollable');
 
-goog.require('treesaver.capabilities');
-goog.require('treesaver.debug');
-goog.require('treesaver.dimensions');
-goog.require('treesaver.dom');
-goog.require('treesaver.ui.Scrollable');
-
-goog.scope(function() {
-  var debug = treesaver.debug,
-      dimensions = treesaver.dimensions,
-      dom = treesaver.dom;
 
   /**
    * LightBox
@@ -25,30 +20,30 @@ goog.scope(function() {
    * @constructor
    */
   treesaver.ui.LightBox = function(node) {
-    var containerNode = dom.querySelectorAll('.container', node)[0];
+    var containerNode = treesaver.dom.querySelectorAll('.container', node)[0];
 
     // DEBUG-only validation
     if (goog.DEBUG) {
       if (!containerNode) {
-        debug.error('No container within lightbox!');
+        treesaver.debug.error('No container within lightbox!');
       }
     }
 
     // TODO: Only store mutable capabilities
-    this.requirements = dom.hasAttr(node, 'data-requires') ?
+    this.requirements = treesaver.dom.hasAttr(node, 'data-requires') ?
       node.getAttribute('data-requires').split(' ') : null;
 
     this.html = node.parentNode.innerHTML;
 
-    this.size = new dimensions.Metrics(node);
+    this.size = new treesaver.dimensions.Metrics(node);
 
     // Clean up metrics object
     delete this.size.w;
     delete this.size.h;
   };
-});
 
-goog.scope(function() {
+
+
   var LightBox = treesaver.ui.LightBox,
       capabilities = treesaver.capabilities,
       debug = treesaver.debug,
@@ -61,43 +56,43 @@ goog.scope(function() {
    *
    * @type {?Array.<string>}
    */
-  LightBox.prototype.requirements;
+  treesaver.ui.LightBox.prototype.requirements;
 
   /**
    * @type {string}
    */
-  LightBox.prototype.html;
+  treesaver.ui.LightBox.prototype.html;
 
   /**
    * The measurements of the chrome
    * @type {!treesaver.dimensions.Metrics}
    */
-  LightBox.prototype.size;
+  treesaver.ui.LightBox.prototype.size;
 
   /**
    * @type {boolean}
    */
-  LightBox.prototype.active;
+  treesaver.ui.LightBox.prototype.active;
 
   /**
    * @type {?Element}
    */
-  LightBox.prototype.node;
+  treesaver.ui.LightBox.prototype.node;
 
   /**
    * @type {?Element}
    */
-  LightBox.prototype.container;
+  treesaver.ui.LightBox.prototype.container;
 
   /**
    * @return {!Element} The activated node.
    */
-  LightBox.prototype.activate = function() {
+  treesaver.ui.LightBox.prototype.activate = function() {
     if (!this.active) {
       this.active = true;
 
-      this.node = dom.createElementFromHTML(this.html);
-      this.container = dom.querySelectorAll('.container', this.node)[0];
+      this.node = treesaver.dom.createElementFromHTML(this.html);
+      this.container = treesaver.dom.querySelectorAll('.container', this.node)[0];
     }
 
     return /** @type {!Element} */ (this.node);
@@ -106,7 +101,7 @@ goog.scope(function() {
   /**
    * Deactivate the lightbox
    */
-  LightBox.prototype.deactivate = function() {
+  treesaver.ui.LightBox.prototype.deactivate = function() {
     if (!this.active) {
       return;
     }
@@ -122,10 +117,10 @@ goog.scope(function() {
    *
    * @return {!treesaver.dimensions.Size}
    */
-  LightBox.prototype.getMaxSize = function() {
+  treesaver.ui.LightBox.prototype.getMaxSize = function() {
     if (goog.DEBUG) {
       if (!this.node || !this.container) {
-        debug.error('No active container for lightbox');
+        treesaver.debug.error('No active container for lightbox');
       }
     }
 
@@ -133,7 +128,7 @@ goog.scope(function() {
     this.container = /** @type {!Element} */ (this.container);
 
     // TODO: Query only needed properties
-    var metrics = new dimensions.Metrics(this.container);
+    var metrics = new treesaver.dimensions.Metrics(this.container);
 
     return {
       w: metrics.w,
@@ -145,11 +140,11 @@ goog.scope(function() {
   /**
    * @param {!treesaver.layout.Figure} figure
    */
-  LightBox.prototype.showFigure = function(figure) {
+  treesaver.ui.LightBox.prototype.showFigure = function(figure) {
     var containerSize = this.getMaxSize(),
         largest = figure.getLargestSize(containerSize, true),
-        screenW = dimensions.getOffsetWidth(this.container.offsetParent),
-        screenH = dimensions.getOffsetHeight(this.container.offsetParent),
+        screenW = treesaver.dimensions.getOffsetWidth(this.container.offsetParent),
+        screenH = treesaver.dimensions.getOffsetHeight(this.container.offsetParent),
         scrollNode,
         contentW, contentH, metrics;
 
@@ -165,7 +160,7 @@ goog.scope(function() {
 
       // What's the size of the content?
       // TODO: Refactor to query only needed properties
-      metrics = new dimensions.Metrics(this.container);
+      metrics = new treesaver.dimensions.Metrics(this.container);
       contentW = metrics.w;
       contentH = metrics.h;
 
@@ -173,15 +168,15 @@ goog.scope(function() {
       if (figure.scrollable) {
         contentW = Math.min(containerSize.w, contentW);
         contentH = Math.min(containerSize.h, contentH);
-        dimensions.setCssPx(this.container, 'width', contentW);
-        dimensions.setCssPx(this.container, 'height', contentH);
-        dom.addClass(this.container, 'scroll');
-        Scrollable.initDom(this.container);
+        treesaver.dimensions.setCssPx(this.container, 'width', contentW);
+        treesaver.dimensions.setCssPx(this.container, 'height', contentH);
+        treesaver.dom.addClass(this.container, 'scroll');
+        treesaver.ui.Scrollable.initDom(this.container);
       }
 
       // Center the container on the screen (use offsetWidth to include border/padding)
-      dimensions.setCssPx(this.container, 'left', (screenW - contentW - metrics.bpWidth) / 2);
-      dimensions.setCssPx(this.container, 'top', (screenH - contentH - metrics.bpHeight) / 2);
+      treesaver.dimensions.setCssPx(this.container, 'left', (screenW - contentW - metrics.bpWidth) / 2);
+      treesaver.dimensions.setCssPx(this.container, 'top', (screenH - contentH - metrics.bpHeight) / 2);
       return true;
     }
     else {
@@ -193,19 +188,19 @@ goog.scope(function() {
    * @param {treesaver.dimensions.Size} availSize
    * @return {boolean} True if fits.
    */
-  LightBox.prototype.fits = function(availSize) {
-    return dimensions.inSizeRange(this.size, availSize);
+  treesaver.ui.LightBox.prototype.fits = function(availSize) {
+    return treesaver.dimensions.inSizeRange(this.size, availSize);
   };
 
   /**
    * @return {boolean} True if the LightBox meets current browser capabilities.
    */
-  LightBox.prototype.meetsRequirements = function() {
+  treesaver.ui.LightBox.prototype.meetsRequirements = function() {
     if (!this.requirements) {
       return true;
     }
 
-    return capabilities.check(this.requirements, true);
+    return treesaver.capabilities.check(this.requirements, true);
   };
 
   /**
@@ -215,7 +210,7 @@ goog.scope(function() {
    * @param {treesaver.dimensions.Size} availSize
    * @return {?treesaver.ui.LightBox} A suitable LightBox, if one was found.
    */
-  LightBox.select = function(lightboxes, availSize) {
+  treesaver.ui.LightBox.select = function(lightboxes, availSize) {
     // Cycle through lightboxes
     var i, len, current, lightbox = null;
 
@@ -228,9 +223,9 @@ goog.scope(function() {
     }
 
     if (!lightbox) {
-      debug.error('No LightBox Fits!');
+      treesaver.debug.error('No LightBox Fits!');
     }
 
     return lightbox;
   };
-});
+

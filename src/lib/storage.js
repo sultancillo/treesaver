@@ -18,7 +18,7 @@ require('./debug');
    * @param {!*} value
    * @param {boolean=} persist
    */
-  treesaver.treesaver.storage.set = function set(key, value, persist) {
+  treesaver.storage.set = function set(key, value, persist) {
     var store = persist ? localStore : sessionStore;
 
     // iPad throws QUOTA_EXCEEDED_ERR frequently here, even though we're not

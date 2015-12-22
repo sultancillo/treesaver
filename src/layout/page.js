@@ -9,8 +9,8 @@ require('../lib/debug');
 require('../lib/dimensions');
 require('../lib/dom');
 require('../lib/template');
-require('../layout/Grid');
-require('../ui/Scrollable');
+require('./grid');
+require('../ui/scrollable');
 
 
   /**
@@ -45,7 +45,8 @@ require('../ui/Scrollable');
     }
 
     // Store state
-    this.size = best.treesaver.layout.Grid.stretchedSize.clone();
+
+    this.size = best.grid.stretchedSize.clone();
     this.begin = br.getPosition();
 
     // Create our host for measuring and producing HTML
@@ -53,7 +54,7 @@ require('../ui/Scrollable');
     // TODO: Only add to body if needed?
     // TODO: Perhaps not, since IE has innerHTML issues when disconnected
     document.body.appendChild(host);
-    host.innerHTML = best.treesaver.layout.Grid.html;
+    host.innerHTML = best.grid.html;
     host.firstChild.className += ' ' + extra_classes.join(' ');
     this.node = /** @type {!Element} */ (host.firstChild);
 
@@ -76,7 +77,7 @@ require('../ui/Scrollable');
       if (mapping) {
         figureIndex = mapping.figureIndex;
         figure = /** @type {!treesaver.layout.Figure} */ (content.figures[figureIndex]);
-        success = treesaver.layout.treesaver.layout.Page.fillContainer(containerNode, figure, mapping,
+        success = treesaver.layout.Page.fillContainer(containerNode, figure, mapping,
           content.lineHeight);
 
         // Account for the figure we used
@@ -95,9 +96,9 @@ require('../ui/Scrollable');
           }
 
           // Size to the container
-          if (i === 0 && best.treesaver.layout.Grid.scoringFlags['sizetocontainer']) {
+          if (i === 0 && best.grid.scoringFlags['sizetocontainer']) {
             this.size.h = treesaver.dimensions.getOffsetHeight(containerNode) +
-              best.treesaver.layout.Grid.containers[0].delta;
+              best.grid.containers[0].delta;
             this.size.outerH = this.size.h + this.size.bpHeight;
             treesaver.dimensions.setCssPx(/** @type {!Element} */ (this.node), 'height', this.size.h);
           }
@@ -131,9 +132,9 @@ require('../ui/Scrollable');
 
     // Columns
     treesaver.dom.querySelectorAll('.column', this.node).forEach(function(colNode, i) {
-      var col = best.treesaver.layout.Grid.cols[i];
-      treesaver.layout.treesaver.layout.Page.fillColumn(content, br, colNode,
-        best.treesaver.layout.Grid.maxColHeight, col.minH);
+      var col = best.grid.cols[i];
+      treesaver.layout.Page.fillColumn(content, br, colNode,
+        best.grid.maxColHeight, col.minH);
     });
 
     // Check if there was forward progress made
@@ -141,7 +142,7 @@ require('../ui/Scrollable');
       treesaver.debug.error('No progress made in pagination: ' + arguments + best);
       this.error = true;
     }
-    else if (!containerFilled && best.treesaver.layout.Grid.scoringFlags['sizetocontainer']) {
+    else if (!containerFilled && best.grid.scoringFlags['sizetocontainer']) {
       treesaver.debug.warn('sizetocontainer not filled, page ignored');
       // Couldn't fill the container, ignore this page
       this.ignore = true;
@@ -152,7 +153,7 @@ require('../ui/Scrollable');
       treesaver.dimensions.setCssPx(this.node, 'marginLeft', -this.size.outerW / 2);
 
       // Are we finished?
-      br.finished = best.treesaver.layout.Grid.scoringFlags['onlypage'] || br.atEnd(content);
+      br.finished = best.grid.scoringFlags['onlypage'] || br.atEnd(content);
 
       // Add last page flag if complete
       if (br.finished) {
@@ -185,7 +186,7 @@ require('../ui/Scrollable');
   treesaver.layout.Page.prototype.ignore;
 
   /**
-   * @type {!treesaver.treesaver.dimensions.Metrics}
+   * @type {!treesaver.dimensions.Metrics}
    */
   treesaver.layout.Page.prototype.size;
 
@@ -217,7 +218,7 @@ require('../ui/Scrollable');
   /**
    * @param {!Element} container
    * @param {!treesaver.layout.Figure} figure
-   * @param {!treesaver.layout.treesaver.layout.Grid.ContainerMap} map
+   * @param {!treesaver.layout.Grid.ContainerMap} map
    * @param {?number} lineHeight
    * @return {boolean} True if the figure fit within the container.
    */

@@ -226,7 +226,7 @@ require('./storage');
 
         // Now, fire onpopstate with the state object
         // NOTE: popstate fires on window, not document
-        treesaver.events.fireEvent(window, treesaver.history.treesaver.events.POPSTATE,
+        treesaver.events.fireEvent(window, treesaver.history.events.POPSTATE,
           { 'state': data ? data.state : null });
       };
 

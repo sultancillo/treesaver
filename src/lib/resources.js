@@ -6,18 +6,12 @@ treesaver = treesaver || {};
 treesaver.resources = treesaver.resources || {};
 
 
-goog.require('treesaver.array');
-goog.require('treesaver.constants');
-goog.require('treesaver.debug');
-goog.require('treesaver.dom');
-goog.require('treesaver.network');
+require('./array');
+require('./constants');
+require('./debug');
+require('./dom');
+require('./network');
 
-
-  var resources = treesaver.resources,
-      array = treesaver.array,
-      debug = treesaver.debug,
-      dom = treesaver.dom,
-      network = treesaver.network;
   /**
    * Loads resource file for the current document, as specified through
    * <link rel="resources" /> in the <head>

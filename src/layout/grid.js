@@ -7,19 +7,13 @@ treesaver.layout = treesaver.layout || {};
 treesaver.layout.Grid = treesaver.layout.Grid || {};
 
 
-require('./lib/capabilities');
-require('./lib/debug');
-require('./lib/dom');
-require('./lib/dimensions');
-require('./Column');
-require('./Container');
+require('../lib/capabilities');
+require('../lib/debug');
+require('../lib/dom');
+require('../lib/dimensions');
+require('./column');
+require('./container');
 
-
-  var debug = treesaver.debug,
-      dom = treesaver.dom,
-      dimensions = treesaver.dimensions,
-      Column = treesaver.layout.Column,
-      Container = treesaver.layout.Container;
 
   /**
    * Grid class
@@ -146,12 +140,12 @@ require('./Container');
   Grid.prototype.pageNumberNegationFlags;
 
   /**
-   * @type {!treesaver.treesaver.dimensions.Metrics}
+   * @type {!treesaver.dimensions.Metrics}
    */
   Grid.prototype.stretchedSize;
 
   /**
-   * @type {!treesaver.treesaver.dimensions.Metrics}
+   * @type {!treesaver.dimensions.Metrics}
    */
   Grid.prototype.size;
 
@@ -489,7 +483,7 @@ require('./Container');
   /**
    * Eliminate a grid if it does not fit within the specified size
    *
-   * @param {!treesaver.treesaver.dimensions.Size} size
+   * @param {!treesaver.dimensions.Size} size
    * @return {boolean} False if the grid does not qualify
    */
   Grid.prototype.sizeFilter = function(size) {

@@ -16,7 +16,7 @@ require('./debug');
    * @param {!string} str
    * @return {*}
    */
-  json.parse = function(str) {
+  treesaver.json.parse = function(str) {
     return nativeJSON.parse(str);
   };
 
@@ -26,7 +26,7 @@ require('./debug');
    * @param {*} val
    * @return {!string}
    */
-  json.stringify = function(val) {
+  treesaver.json.stringify = function(val) {
     return nativeJSON.stringify(val);
   };
 

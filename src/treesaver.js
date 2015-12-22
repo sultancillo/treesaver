@@ -10,7 +10,7 @@
  * Licensed under MIT and GPLv2.
  */
 
-treesaver = treesaver || {};
+treesaver = {};
 
 
 require('./lib/capabilities');
@@ -21,14 +21,15 @@ require('./lib/events');
 require('./lib/fonts');
 require('./lib/history');
 require('./lib/resources');
+require('./lib/network');
 require('./lib/scheduler');
 require('./lib/styles');
-require('./ui/Article');
-require('./ui/ArticleManager');
-require('./ui/Chrome');
-require('./ui/StateManager');
+require('./ui/article');
+require('./ui/articlemanager');
+require('./ui/chrome');
+require('./ui/statemanager');
 
-
+treesaver.LOAD_TIMEOUT = 5000 // 5 seconds
 
   /**
    * Treesaver events fired
@@ -111,7 +112,7 @@ require('./ui/StateManager');
     // Clean up libraries
     treesaver.resources.unload();
     treesaver.network.unload();
-    treesaver.treesaver.fonts.unload();
+    treesaver.fonts.unload();
 
     // Setup classes
     treesaver.capabilities.resetClasses();
@@ -231,7 +232,7 @@ require('./ui/StateManager');
     // Kick off boot process, but back up if any single item fails
     if (treesaver.ui.StateManager.load() &&
         // Grids
-        treesaver.ui.ArticleManager.sload(treesaver.originalHtml)) {
+        treesaver.ui.ArticleManager.load(treesaver.originalHtml)) {
     }
     else {
       treesaver.debug.error('Load failed');

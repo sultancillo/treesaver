@@ -21,7 +21,7 @@ require('./dom');
   treesaver.styles.stylesheet_.setAttribute('type', 'text/css');
 
   if (treesaver.dom.querySelectorAll('head').length) {
-    treesaver.dom.querySelectorAll('head')[0].appendChild(treesaver.treesaver.styles.stylesheet_);
+    treesaver.dom.querySelectorAll('head')[0].appendChild(treesaver.styles.stylesheet_);
     treesaver.styles.stylesheet_ = document.styleSheets[document.styleSheets.length - 1];
 
     // Offscreen

@@ -1,7 +1,8 @@
 
 treesaver = treesaver || {};
 treesaver.ui = treesaver.ui || {};
-goog.provide('treesaver.ui.TreeNode');
+treesaver.ui.TreeNode = treesaver.ui.TreeNode || {};
+
 
 /**
  * TreeNode to represent a node in the (hierarchical) index. Every document inherits
@@ -13,15 +14,15 @@ treesaver.ui.TreeNode = function() {
   this.parent = null;
 };
 
-goog.scope(function() {
-  var TreeNode = treesaver.ui.TreeNode;
+
+  
 
   /**
    * Appends a child to this node.
    * @param {!treesaver.ui.TreeNode} child
    * @return {!treesaver.ui.TreeNode} The added child.
    */
-  TreeNode.prototype.appendChild = function(child) {
+  treesaver.ui.TreeNode.prototype.appendChild = function(child) {
     child.parent = this;
     this.contents.push(child);
     return child;
@@ -33,7 +34,7 @@ goog.scope(function() {
    * @param {!treesaver.ui.TreeNode} oldChild
    * @return {treesaver.ui.TreeNode} The old child, or null.
    */
-  TreeNode.prototype.replaceChild = function(newChild, oldChild) {
+  treesaver.ui.TreeNode.prototype.replaceChild = function(newChild, oldChild) {
     var index = this.contents.indexOf(oldChild);
     if (index !== -1) {
       newChild.parent = oldChild.parent;
@@ -49,7 +50,7 @@ goog.scope(function() {
    * @param {!treesaver.ui.TreeNode} reference
    * @return {!treesaver.ui.TreeNode} The new child.
    */
-  TreeNode.prototype.insertBefore = function(newChild, reference) {
+  treesaver.ui.TreeNode.prototype.insertBefore = function(newChild, reference) {
     var index = this.contents.indexOf(reference);
     newChild.parent = this;
     if (index === 0) {
@@ -66,7 +67,7 @@ goog.scope(function() {
    * @param {!treesaver.ui.TreeNode} reference
    * @return {!treesaver.ui.TreeNode} The new child.
    */
-  TreeNode.prototype.insertAfter = function(newChild, reference) {
+  treesaver.ui.TreeNode.prototype.insertAfter = function(newChild, reference) {
     var index = this.contents.indexOf(reference);
     newChild.parent = this;
     if (index === this.contents.length) {
@@ -82,7 +83,7 @@ goog.scope(function() {
    * @param {!treesaver.ui.TreeNode} child
    * @return {treesaver.ui.TreeNode} The removed node or null if the node was not found.
    */
-  TreeNode.prototype.removeChild = function(child) {
+  treesaver.ui.TreeNode.prototype.removeChild = function(child) {
     var index = this.contents.indexOf(child),
         node = null;
     if (index !== -1) {
@@ -91,4 +92,4 @@ goog.scope(function() {
     }
     return node;
   };
-});
+

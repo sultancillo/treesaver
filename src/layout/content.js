@@ -7,10 +7,10 @@ treesaver.layout = treesaver.layout || {};
 treesaver.layout.Content = treesaver.layout.Content || {};
 
 
-require('./lib/css');
-require('./lib/debug');
-require('./lib/dimensions');
-require('./lib/dom');
+require('../lib/css');
+require('../lib/debug');
+require('../lib/dimensions');
+require('../lib/dom');
 require('./block');
 
 
@@ -31,9 +31,9 @@ require('./block');
 
     // TODO: More intelligent back-up value
     this.lineHeight =
-      Math.ceil(dimensions.toPixels(el, treesaver.css.getStyleObject(el).lineHeight) || 1);
+      Math.ceil(treesaver.dimensions.toPixels(el, treesaver.css.getStyleObject(el).lineHeight) || 1);
 
-    this.colWidth = dimensions.getOffsetWidth(el);
+    this.colWidth = treesaver.dimensions.getOffsetWidth(el);
 
     // In order to properly measure the dimensions of all the content,
     // we need to hide all figures to prevent them from being laid out

@@ -65,7 +65,7 @@ treesaver.network = treesaver.network || {};
 
       // Hook up event handlers
       treesaver.network.watchedEvents_.forEach(function(evt) {
-        treesaver.events.addListener(document, evt, network);
+        treesaver.events.addListener(document, evt, treesaver.network);
       });
 
       if (treesaver.capabilities.SUPPORTS_APPLICATIONCACHE &&
@@ -134,7 +134,7 @@ treesaver.network = treesaver.network || {};
 
     // Fire Treesaver event
     treesaver.events.fireEvent(window,
-      onLine ? treesaver.network.treesaver.events.ONLINE : treesaver.network.treesaver.events.OFFLINE);
+      onLine ? treesaver.network.events.ONLINE : treesaver.network.events.OFFLINE);
   };
 
   /**
@@ -157,7 +157,7 @@ treesaver.network = treesaver.network || {};
    * Handle events
    * @param {Event} e
    */
-  network['handleEvent'] = function(e) {
+  treesaver.network['handleEvent'] = function(e) {
     treesaver.debug.info('Network event recieved: ' + e);
 
     switch (e.type) {
